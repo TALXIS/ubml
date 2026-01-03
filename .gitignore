@@ -3,6 +3,11 @@ node_modules/
 dist/
 *.tsbuildinfo
 
+# Compiled output in src (should only be in dist/)
+src/**/*.js
+src/**/*.d.ts
+src/**/*.d.ts.map
+
 # IDE and editor files
 .idea/
 .vscode/

@@ -54,8 +54,8 @@
   ],
   "scripts": {
     "build": "npm run generate && tsup",
-    "generate": "node --loader ts-node/esm bin/generate-all.ts",
-    "validate:example": "node --loader ts-node/esm bin/ubml.ts validate ./example",
+    "generate": "node --import tsx bin/generate-all.ts",
+    "validate:example": "node --import tsx bin/ubml.ts validate ./example",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:workspace": "vitest run tests/workspace",
@@ -69,8 +69,8 @@
     "@types/node": "^20.0.0",
     "eslint": "^8.0.0",
     "json-schema-to-typescript": "^15.0.4",
-    "ts-node": "^10.9.0",
     "tsup": "^8.0.0",
+    "tsx": "^4.21.0",
     "typedoc": "^0.25.0",
     "typescript": "^5.0.0",
     "vitest": "^1.0.0"

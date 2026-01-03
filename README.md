@@ -3,48 +3,125 @@
 [![npm version](https://img.shields.io/npm/v/ubml.svg)](https://www.npmjs.com/package/ubml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 
-**UBML** is a YAML-based notation for capturing business processes, organizational structures, and strategic initiatives. It provides a structured, human-readable format that can be validated, versioned with Git, and processed programmatically.
+**A notation for understanding how organizations create and deliver value.**
 
-## Why UBML?
+UBML is a YAML-based format for capturing business processes, organizational structures, and strategic initiatives. It bridges the gap between informal workshop discovery and formal business modeling—designed from the ground up for AI assistance and modern development workflows.
 
-Traditional business process documentation lives in slides, diagrams, and wikis—difficult to validate, hard to version, and impossible to integrate with development workflows. UBML addresses this by treating business models as code:
-
-- **Version control** — Track changes to business processes with Git
-- **Validation** — Catch structural errors before they become misunderstandings
-- **Tooling** — Editor support with error highlighting, CLI for CI/CD pipelines
-- **Interoperability** — Parse and render UBML in any application
-
-### What You Can Model
-
-| Domain | Elements |
-|--------|----------|
-| Processes | Workflows (L1–L4), steps, gateways, phases |
-| Organization | Roles, teams, systems, resource pools, skills |
-| Information | Entities, documents, locations, relationships |
-| Strategy | Value streams, capabilities, products, portfolios |
-| Analysis | KPIs, ROI models, simulation scenarios |
-| Problem Framing | Hypothesis trees with SCQH framework |
+> 📖 **[Read the full vision →](./docs/VISION.md)**
 
 ---
 
-## Quick Start: VS Code & CLI
+## The Problem
 
-For consultants and analysts authoring UBML files locally.
+Software development is getting dramatically faster. AI-assisted coding tools are turning what took weeks into hours. But this creates a new bottleneck: **understanding what to build**.
 
-### 1. Install the package
+The gap is widening. Implementation accelerates while specification stays stuck in slides, scattered notes, and diagrams that can't be validated or versioned. Organizations produce more software, faster, that doesn't match how the business actually works.
+
+Traditional modeling tools don't help:
+- **UML/BPMN** demand precise semantics before you've understood the business
+- **Diagramming tools** present blank canvases with no guidance
+- **Workshop notes** can't be validated, connected, or processed
+
+UBML solves this by treating business understanding as code—structured, validated, version-controlled, and designed for AI assistance.
+
+---
+
+## Who Is This For?
+
+UBML is for everyone who needs to understand how a business works:
+
+| Role | Use Case |
+|------|----------|
+| **Software engineers** | Understand the real-world context and motivation behind what you're building |
+| **Management consultants** | Capture workshop findings in structured, validated models |
+| **Business analysts** | Map how organizations actually operate |
+| **Strategy teams** | Build ROI-backed business cases for change |
+| **Operations leaders** | Identify bottlenecks and improvement opportunities |
+| **Tool developers** | Embed UBML editing in web applications |
+
+Whether you're figuring out *what to build* or *why it matters*, UBML provides a shared language between business and technology.
+
+---
+
+## What You Can Model
+
+| Domain | Elements |
+|--------|----------|
+| **Processes** | Workflows (L1–L4), steps, decisions, phases |
+| **Organization** | Roles, teams, systems, resource pools, skills |
+| **Information** | Entities, documents, locations, relationships |
+| **Strategy** | Value streams, capabilities, products, portfolios |
+| **Analysis** | KPIs, ROI models, simulation scenarios |
+| **Improvements** | Hypothesis trees to identify how to make more money |
+
+---
+
+## Key Features
+
+- **Version control** — Track changes to business processes with Git
+- **Validation** — Catch structural errors before they become misunderstandings  
+- **Editor support** — Red squiggles in VS Code as you type
+- **CLI for CI/CD** — Validate models in your pipeline
+- **Browser-safe** — Parse and validate in web applications
+- **AI-ready** — Semantic structure designed for AI assistance
+- **Open standard** — MIT licensed, no vendor lock-in
+
+---
+
+## Quick Example
+
+```yaml
+# customer-onboarding.process.ubml.yaml
+ubml: "1.0"
+
+processes:
+  PR001:
+    id: "PR001"
+    name: "Customer Onboarding"
+    description: "End-to-end onboarding from application to activation"
+    level: 3
+
+    steps:
+      ST001:
+        name: "Receive Application"
+        kind: action
+        description: "Receive and log new application"
+
+      ST002:
+        name: "Verify Identity"
+        kind: action
+        description: "Verify customer identity documents"
+        inputs:
+          - ref: DC001
+        outputs:
+          - ref: DC002
+
+      ST003:
+        name: "Approved?"
+        kind: decision
+        description: "Decision point for application approval"
+```
+
+See the [example/](./example) directory for a complete workspace.
+
+---
+
+## Getting Started
+
+### Install
 
 ```bash
 npm install -g ubml
 ```
 
-### 2. Initialize a workspace
+### Initialize a workspace
 
 ```bash
 ubml init my-project
 cd my-project
 ```
 
-This creates a workspace with starter files:
+This creates:
 
 ```
 my-project/
@@ -53,7 +130,7 @@ my-project/
 └── organization.actors.ubml.yaml
 ```
 
-### 3. Configure VS Code
+### Configure VS Code
 
 Install the [YAML extension](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml), then add to `.vscode/settings.json`:
 
@@ -72,102 +149,60 @@ Install the [YAML extension](https://marketplace.visualstudio.com/items?itemName
 }
 ```
 
-You'll get inline validation (red squiggles) for structural errors as you type.
-
-### 4. Validate from the command line
+### Validate
 
 ```bash
-# Validate a single file
+# Single file
 ubml validate process.ubml.yaml
 
-# Validate an entire workspace
+# Entire workspace
 ubml validate ./my-project
 
-# Output as JSON (for CI/CD)
+# JSON output for CI/CD
 ubml validate . --format json
 ```
 
 ---
 
-## Quick Start: Browser Integration
+## For Developers
 
-For developers embedding UBML editing in web applications (Monaco, CodeMirror, etc.).
+### Library Usage
 
-### Installation
+```typescript
+// Browser & Node — zero Node.js deps
+import { parse, createValidator, serialize, schemas } from 'ubml';
 
-```bash
-npm install ubml
+// Node.js only — file system operations  
+import { parseFile, validateWorkspace, serializeToFile } from 'ubml/node';
+
+// ESLint plugin
+import ubml from 'ubml/eslint';
 ```
 
-### Parse and validate documents
+### Parse and Validate
 
 ```typescript
 import { parse, createValidator } from 'ubml';
 
-// Parse UBML content (browser-safe, no file system needed)
-const parseResult = parse(yamlContent, 'process.ubml.yaml');
+const result = parse(yamlContent, 'process.ubml.yaml');
 
-if (!parseResult.ok) {
-  // Handle parse errors with line/column info
-  for (const error of parseResult.errors) {
-    editor.addDiagnostic({
-      line: error.line,
-      column: error.column,
-      message: error.message,
-      severity: 'error',
-    });
-  }
-}
-
-// Create a validator (reuse for performance)
-const validator = await createValidator();
-const result = validator.validateDocument(parseResult.document);
-
-if (!result.valid) {
+if (!result.ok) {
   for (const error of result.errors) {
-    editor.addDiagnostic({
-      message: error.message,
-      path: error.path,
-      severity: 'error',
-    });
+    console.error(`${error.line}:${error.column} - ${error.message}`);
   }
 }
 
-// Or use the convenience function
-import { parseAndValidate } from 'ubml';
-const { document, validation, errors, ok } = await parseAndValidate(yamlContent, 'process.ubml.yaml');
+const validator = await createValidator();
+const validation = validator.validateDocument(result.document);
+
+if (!validation.valid) {
+  for (const error of validation.errors) {
+    console.error(`${error.path}: ${error.message}`);
+  }
+}
 ```
 
-### Serialize changes back to YAML
-
-```typescript
-import { serialize } from 'ubml';
-
-const updatedYaml = serialize(modifiedDocument, { indent: 2 });
-// Write to your virtual file system
-```
-
-### Schema access API
-
-All schemas are bundled at build time—no file system access required:
-
-```typescript
-import { schemas } from 'ubml';
-
-// Get a document schema
-const processSchema = schemas.document('process');
-const actorsSchema = schemas.document('actors');
-
-// Get all schemas keyed by $id (for Ajv)
-const allSchemas = schemas.all();
-
-// List available types
-schemas.documentTypes(); // ['workspace', 'process', 'actors', ...]
-```
-
-### TypeScript types
-
-Work with UBML documents in a type-safe way:
+### TypeScript Types
 
 ```typescript
 import type { Process, Step, Actor, ProcessDocument } from 'ubml';
@@ -183,54 +218,25 @@ const process: Process = {
     }
   }
 };
-
-// Full document type
-const doc: ProcessDocument = {
-  ubml: '1.0',
-  processes: { PR001: process }
-};
 ```
 
-### Node.js file operations
+### ESLint Integration
 
-For file system operations, import from `ubml/node`:
-
-```typescript
-import { parseFile, validateFile, validateWorkspace, serializeToFile } from 'ubml/node';
-
-// Parse a file from disk
-const parseResult = await parseFile('./process.ubml.yaml');
-
-// Validate a single file
-const fileResult = await validateFile('./process.ubml.yaml');
-
-// Validate an entire workspace
-const workspaceResult = await validateWorkspace('./my-project');
-
-// Write to disk
-await serializeToFile(document, './output.ubml.yaml');
-```
-
----
-
-## Import Patterns
-
-```typescript
-// 🌐 Browser & Node — zero Node.js deps, works everywhere
-import { parse, createValidator, serialize, schemas } from 'ubml';
-
-// 📁 Node.js only — file system operations
-import { parseFile, validateWorkspace, serializeToFile } from 'ubml/node';
-
-// 🔌 ESLint plugin
+```javascript
+// eslint.config.js
 import ubml from 'ubml/eslint';
+
+export default [
+  {
+    files: ['**/*.ubml.yaml'],
+    ...ubml.configs.recommended,
+  },
+];
 ```
 
 ---
 
 ## File Naming Convention
-
-UBML uses filename patterns to associate schemas:
 
 | Pattern | Purpose |
 |---------|---------|
@@ -245,201 +251,24 @@ UBML uses filename patterns to associate schemas:
 
 ---
 
-## Element ID Patterns
+## Documentation
 
-All elements use typed ID prefixes for consistency and tooling support:
-
-| Prefix | Element | Prefix | Element |
-|--------|---------|--------|---------|
-| `PR###` | Process | `EN###` | Entity |
-| `ST###` | Step | `DC###` | Document |
-| `AC###` | Actor | `LO###` | Location |
-| `SK###` | Skill | `HT###` | Hypothesis Tree |
-| `KP###` | KPI | `VS###` | Value Stream |
+- **[Vision](./docs/VISION.md)** — Why UBML exists and where it's going
+- **[Best Practices](./docs/best-practices.md)** — Guidelines for effective modeling
+- **[Schema Reference](./docs/schema-reference.md)** — Complete element documentation
+- **[Examples](./example)** — Sample workspace with all document types
 
 ---
 
-## API Reference
+## Open Standard
 
-### Parser (browser-safe)
-
-```typescript
-import { parse } from 'ubml';
-
-// Parse from string (works in browser)
-const result = parse(content, 'process.ubml.yaml');
-
-// Result shape
-interface ParseResult<T = unknown> {
-  document: UBMLDocument<T> | undefined;
-  errors: ParseError[];
-  warnings: ParseWarning[];
-  ok: boolean;
-}
-```
-
-### Validator (browser-safe)
-
-```typescript
-import { createValidator, parseAndValidate } from 'ubml';
-
-// Create validator (reuse for performance)
-const validator = await createValidator();
-
-// Validate parsed content
-const result = validator.validate(content, 'process');
-const result = validator.validateDocument(parsedDoc);
-
-// Convenience: parse + validate in one call
-const { document, validation, ok } = await parseAndValidate(content, 'file.ubml.yaml');
-
-// Result shape
-interface ValidationResult {
-  valid: boolean;
-  errors: ValidationError[];
-  warnings: ValidationWarning[];
-}
-```
-
-### Serializer (browser-safe)
-
-```typescript
-import { serialize } from 'ubml';
-
-// To string (works in browser)
-const yaml = serialize(content, { indent: 2, lineWidth: 120 });
-```
-
-### Node.js Operations
-
-```typescript
-import { parseFile, validateFile, validateWorkspace, serializeToFile } from 'ubml/node';
-
-// File operations
-const result = await parseFile('./process.ubml.yaml');
-const result = await validateFile('./process.ubml.yaml');
-const result = await validateWorkspace('./my-project');
-await serializeToFile(content, './output.ubml.yaml');
-```
-
-### Schemas
-
-```typescript
-import { schemas } from 'ubml';
-
-// Get document schema by type
-const schema = schemas.document('process');
-
-// Get all schemas as Map<$id, schema>
-const all = schemas.all();
-
-// Available methods
-schemas.document(type)      // Document schema by type
-schemas.fragment(name)      // Fragment schema by name
-schemas.all()               // All schemas by $id
-schemas.documentTypes()     // List document types
-```
-
-### Types
-
-```typescript
-import type {
-  // Documents
-  ProcessDocument,
-  ActorsDocument,
-  EntitiesDocument,
-  WorkspaceDocument,
-  
-  // Domain objects
-  Process,
-  Step,
-  Actor,
-  Entity,
-  Link,
-  Phase,
-} from 'ubml';
-```
-
-### ESLint Integration
-
-```javascript
-// eslint.config.js (flat config)
-import ubml from 'ubml/eslint';
-
-export default [
-  {
-    files: ['**/*.ubml.yaml'],
-    ...ubml.configs.recommended,
-  },
-];
-```
-
----
-
-## Schema Architecture
-
-```
-schemas/
-├── ubml.schema.yaml          # Root schema
-├── common/
-│   └── defs.schema.yaml      # Shared type definitions
-├── documents/                # Per-file-type schemas
-│   ├── workspace.document.yaml
-│   ├── process.document.yaml
-│   └── ...
-└── fragments/                # Reusable type definitions
-    ├── actor.fragment.yaml
-    ├── process.fragment.yaml
-    └── ...
-```
-
-Schemas use JSON Schema Draft 2020-12 and can be used with any compliant validator.
-
----
-
-## Example
-
-```yaml
-# customer-onboarding.process.ubml.yaml
-ubml: "1.0"
-
-processes:
-  PR001:
-    name: "Customer Onboarding"
-    description: "End-to-end onboarding from application to activation"
-    level: L3
-    owner: AC001
-
-    steps:
-      ST001:
-        name: "Receive Application"
-        type: task
-        responsible: AC002
-        duration: "15min"
-
-      ST002:
-        name: "Verify Identity"
-        type: task
-        responsible: AC003
-        duration: "2h"
-        inputs:
-          - DC001
-        outputs:
-          - DC002
-
-      ST003:
-        name: "Approved?"
-        type: gateway
-        gatewayType: exclusive
-```
-
-See the [example/](./example) directory for a complete workspace.
+UBML is released under the MIT License. Your models belong to you—plain text files you can version, export, and process with any tool. No vendor lock-in, no proprietary formats.
 
 ---
 
 ## Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for development setup and guidelines.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for development setup.
 
 ```bash
 npm install
@@ -452,3 +281,7 @@ npm run validate:example
 ## License
 
 MIT — see [LICENSE](./LICENSE)
+
+---
+
+*UBML is developed by [NETWORG](https://networg.com), a consulting and technology firm focused on business process improvement.*

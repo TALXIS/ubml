@@ -41,7 +41,7 @@ Process workflow definitions.
 |----------|------|----------|-------------|
 | `name` | string | ✅ | Process name |
 | `description` | string | | Detailed description |
-| `level` | enum | | `L1`, `L2`, `L3`, `L4` |
+| `level` | integer | | Process level (1-4) |
 | `owner` | ActorRef | | Process owner |
 | `steps` | object | | Map of step definitions (ST###) |
 | `links` | object | | Map of link definitions |
@@ -81,15 +81,15 @@ SCQH problem framing.
 
 ## Element Reference
 
-### Step Types
+### Step Kinds
 
-| Type | Description |
+| Kind | Description |
 |------|-------------|
-| `startEvent` | Process entry point |
-| `endEvent` | Process exit point |
-| `task` | Work activity |
-| `gateway` | Decision or merge point |
-| `block` | Structured control flow |
+| `action` | Work activity or task |
+| `decision` | Decision or gateway point |
+| `wait` | Waiting for external event |
+| `notification` | Send notification |
+| `subprocess` | Call to sub-process |
 
 ### Gateway Types
 
@@ -109,9 +109,9 @@ SCQH problem framing.
 | `loop` | Iteration |
 | `opt` | Optional execution |
 
-### Actor Types
+### Actor Kinds
 
-| Type | Description |
+| Kind | Description |
 |------|-------------|
 | `role` | Internal role or position |
 | `team` | Group of people |
