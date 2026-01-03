@@ -1,0 +1,14 @@
+ubml: "1.0"
+name: "ACME Corp Customer Onboarding"
+description: "End-to-end customer onboarding process optimization for ACME Corp"
+status: draft
+
+organization:
+  name: "ACME Corporation"
+  department: "Customer Operations"
+
+documents:
+  - organization.actors.ubml.yaml
+  - customer-onboarding.process.ubml.yaml
+  - data-model.entities.ubml.yaml
+  - onboarding-kpis.metrics.ubml.yaml

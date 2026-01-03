@@ -1,8 +1,8 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@ubml/schema",
+  "name": "ubml",
   "version": "1.0.0",
-  "description": "UBML - Unified Business Modeling Language schema definitions",
+  "description": "UBML - Unified Business Modeling Language: parsing, validation, and serialization library",
   "keywords": [
     "ubml",
     "business-modeling",
@@ -10,7 +10,10 @@
     "yaml-schema",
     "json-schema",
     "bpmn",
-    "dsl"
+    "dsl",
+    "validation",
+    "parser",
+    "serializer"
   ],
   "homepage": "https://github.com/TALXIS/ubml",
   "repository": {
@@ -25,12 +28,15 @@
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "ubml": "./dist/cli.js"
+  },
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    },
+    ".": "./dist/index.js",
+    "./parser": "./dist/parser/index.js",
+    "./validator": "./dist/validator/index.js",
+    "./serializer": "./dist/serializer/index.js",
+    "./eslint": "./dist/eslint/index.js",
     "./schemas/*": "./schemas/*"
   },
   "files": [
@@ -40,31 +46,39 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts",
-    "validate": "node scripts/validate-schemas.js",
-    "validate:example": "node scripts/validate-workspace.js",
+    "build": "tsup",
+    "validate": "node --loader ts-node/esm bin/validate-schemas.ts",
+    "validate:example": "node --loader ts-node/esm bin/ubml.ts validate ./example",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:workspace": "vitest run tests/workspace",
     "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit",
     "docs": "typedoc src/index.ts --out docs/api",
-    "prepublishOnly": "npm run build && npm run validate"
+    "prepublishOnly": "npm run build && npm run validate && npm run test"
   },
   "devDependencies": {
+    "@types/eslint": "^8.56.0",
     "@types/node": "^20.0.0",
-    "ajv": "^8.12.0",
-    "ajv-formats": "^3.0.1",
     "eslint": "^8.0.0",
+    "ts-node": "^10.9.0",
     "tsup": "^8.0.0",
     "typedoc": "^0.25.0",
     "typescript": "^5.0.0",
-    "vitest": "^1.0.0",
+    "vitest": "^1.0.0"
+  },
+  "dependencies": {
+    "ajv": "^8.12.0",
+    "ajv-formats": "^3.0.1",
+    "commander": "^12.0.0",
+    "glob": "^10.3.0",
     "yaml": "^2.3.0"
   },
   "peerDependencies": {
-    "ajv": "^8.0.0"
+    "eslint": "^8.0.0 || ^9.0.0"
   },
   "peerDependenciesMeta": {
-    "ajv": {
+    "eslint": {
       "optional": true
     }
   },

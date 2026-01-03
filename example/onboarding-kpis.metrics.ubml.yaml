@@ -1,0 +1,26 @@
+ubml: "1.0"
+
+kpis:
+  KP001:
+    name: "Average Onboarding Time"
+    description: "Average time from application receipt to account activation"
+    unit: "hours"
+    target: 24
+    frequency: daily
+    owner: AC002
+    
+  KP002:
+    name: "Application Approval Rate"
+    description: "Percentage of applications approved on first submission"
+    unit: "percent"
+    target: 85
+    frequency: weekly
+    owner: AC002
+    
+  KP003:
+    name: "Customer Satisfaction Score"
+    description: "NPS score for onboarding experience"
+    unit: "score"
+    target: 8.5
+    frequency: monthly
+    owner: AC001

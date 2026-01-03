@@ -1,0 +1,59 @@
+ubml: "1.0"
+
+processes:
+  PR001:
+    name: "Customer Onboarding"
+    description: "End-to-end process for onboarding new customers"
+    level: L3
+    owner: AC002
+    
+    steps:
+      ST001:
+        name: "Receive Customer Application"
+        type: task
+        description: "Receive and log new customer application"
+        responsible: AC001
+        duration: "15min"
+        inputs:
+          - EN001
+        outputs:
+          - EN002
+          
+      ST002:
+        name: "Verify Customer Identity"
+        type: task
+        description: "Verify customer identity documents"
+        responsible: AC002
+        duration: "30min"
+        inputs:
+          - EN002
+          - EN003
+          
+      ST003:
+        name: "Perform Background Check"
+        type: task
+        description: "Run background and credit checks"
+        responsible: AC003
+        duration: "2h"
+        
+      ST004:
+        name: "Review Application"
+        type: decision
+        description: "Decision point for application approval"
+        responsible: AC002
+        
+      ST005:
+        name: "Create Customer Account"
+        type: task
+        description: "Create customer account in CRM"
+        responsible: AC001
+        duration: "10min"
+        tools:
+          - AC003
+          
+      ST006:
+        name: "Send Welcome Package"
+        type: task
+        description: "Send welcome email and documentation"
+        responsible: AC001
+        duration: "5min"
