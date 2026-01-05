@@ -12,4 +12,12 @@ export default defineConfig({
       exclude: ['src/**/*.d.ts'],
     },
   },
+  resolve: {
+    extensions: ['.ts', '.js', '.mts', '.mjs'],
+    alias: {
+      // Allow .js imports to resolve to .ts files
+      './generated/metadata.js': './src/generated/metadata.ts',
+      './generated/bundled.js': './src/generated/bundled.ts',
+    },
+  },
 });

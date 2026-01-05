@@ -53,3 +53,4 @@ src/generated/
 # Local samples (not part of the package)
 samples/
 example_cetin/
+temp

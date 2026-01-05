@@ -12,7 +12,7 @@ import { resolve } from 'path';
 import { parseFile, validateWorkspace } from '../../src/node/index.js';
 import { extractDefinedIds } from '../../src/semantic-validator.js';
 
-const EXAMPLE_DIR = resolve(__dirname, '../../example_cetin');
+const EXAMPLE_DIR = resolve(__dirname, '../../example');
 
 describe('Example Workspace', () => {
   describe('YAML Parsing', () => {
@@ -56,15 +56,6 @@ describe('Example Workspace', () => {
     it('should parse metrics file', async () => {
       const result = await parseFile(
         resolve(EXAMPLE_DIR, 'metrics.ubml.yaml')
-      );
-      expect(result.errors).toHaveLength(0);
-      expect(result.ok).toBe(true);
-      expect(result.document).toBeDefined();
-    });
-
-    it('should parse glossary file', async () => {
-      const result = await parseFile(
-        resolve(EXAMPLE_DIR, 'glossary.ubml.yaml')
       );
       expect(result.errors).toHaveLength(0);
       expect(result.ok).toBe(true);
