@@ -110,8 +110,14 @@ See the [example/](./example) directory for a complete workspace.
 
 ### Install
 
+**CLI (for validation):**
 ```bash
-npm install -g @ubml/core
+npm install -g @ubml/cli
+```
+
+**Library (for integration):**
+```bash
+npm install @ubml/core
 ```
 
 ### Initialize a workspace
@@ -273,6 +279,17 @@ export default [
 
 ---
 
+## Packages
+
+This monorepo contains two packages:
+
+| Package | Description | npm |
+|---------|-------------|-----|
+| [@ubml/core](./packages/core) | Core library for parsing, validation, and serialization | [![npm](https://img.shields.io/npm/v/@ubml/core.svg)](https://www.npmjs.com/package/@ubml/core) |
+| [@ubml/cli](./packages/cli) | Command-line interface | [![npm](https://img.shields.io/npm/v/@ubml/cli.svg)](https://www.npmjs.com/package/@ubml/cli) |
+
+---
+
 ## Documentation
 
 - **[Vision](./docs/VISION.md)** — Why UBML exists and where it's going
@@ -293,9 +310,17 @@ UBML is released under the MIT License. Your models belong to you—plain text f
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for development setup.
 
 ```bash
+# Install dependencies (uses npm workspaces)
 npm install
-npm test
-npm run validate:example
+
+# Build all packages
+npm run build
+
+# Run tests
+npm run test
+
+# Type check
+npm run typecheck
 ```
 
 ---

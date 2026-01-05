@@ -1,6 +1,11 @@
 # @ubml/core
 
-Core library for UBML (Unified Business Modeling Language) - parsing, validation, and serialization.
+[![npm version](https://img.shields.io/npm/v/@ubml/core.svg)](https://www.npmjs.com/package/@ubml/core)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../../LICENSE)
+
+Core library for UBML (Unified Business Modeling Language) — parsing, validation, and serialization.
+
+> 📖 **Part of the [UBML monorepo](https://github.com/TALXIS/ubml)**
 
 ## Installation
 
@@ -12,6 +17,8 @@ npm install @ubml/core
 
 ### Browser-Safe API
 
+Works everywhere: browser, Node.js, Deno, Bun.
+
 ```typescript
 import { parse, validate, serialize } from '@ubml/core';
 
@@ -19,7 +26,7 @@ import { parse, validate, serialize } from '@ubml/core';
 const result = parse(yamlContent, 'process.ubml.yaml');
 
 if (result.ok) {
-  // Validate
+  // Validate (schema + cross-references)
   const validation = await validate([result.document]);
   
   if (validation.valid) {
@@ -61,9 +68,27 @@ export default [
 ];
 ```
 
+### TypeScript Types
+
+```typescript
+import type { Process, Step, Actor, ProcessDocument } from '@ubml/core';
+
+const process: Process = {
+  id: 'PR001',
+  name: 'Customer Onboarding',
+  level: 3,
+  steps: {
+    ST001: {
+      name: 'Receive Application',
+      kind: 'action',
+    }
+  }
+};
+```
+
 ## CLI Tool
 
-For command-line usage, install the separate CLI package:
+For command-line usage, install the [@ubml/cli](https://www.npmjs.com/package/@ubml/cli) package:
 
 ```bash
 npm install -g @ubml/cli
@@ -73,9 +98,9 @@ ubml validate ./workspace
 ## Documentation
 
 - [GitHub Repository](https://github.com/TALXIS/ubml)
-- [Schema Reference](../../docs/schema-reference.md)
-- [Best Practices](../../docs/best-practices.md)
+- [Schema Reference](https://github.com/TALXIS/ubml/blob/master/docs/schema-reference.md)
+- [Best Practices](https://github.com/TALXIS/ubml/blob/master/docs/best-practices.md)
 
 ## License
 
-MIT
+MIT — see [LICENSE](../../LICENSE)

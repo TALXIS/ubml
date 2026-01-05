@@ -1,19 +1,9 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "lib": ["ES2022"],
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "declaration": true,
-    "declarationMap": true,
     "outDir": "./dist",
-    "rootDir": ".",
-    "resolveJsonModule": true
+    "rootDir": "."
   },
-  "include": ["src/**/*", "bin/**/*", "tests/**/*"],
-  "exclude": ["node_modules", "dist", "example"]
+  "include": ["src/**/*", "tests/**/*"],
+  "exclude": ["node_modules", "dist"]
 }
