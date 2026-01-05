@@ -9,7 +9,7 @@
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
 $id: "https://ubml.io/schemas/1.0/documents/mining.document.yaml"
-title: "UBML Mining Document"
+title: "Mining"
 description: |
   Mining documents configure process mining data sources and mappings.
   
@@ -32,12 +32,19 @@ description: |
     - sap-order-mining.mining.ubml.yaml
     - crm-ticket-mining.mining.ubml.yaml
     - erp-integration.mining.ubml.yaml
-  
-  GETTING STARTED:
-  1. Define the data source (CSV, database, API)
-  2. Map columns to event log fields
-  3. Map activities to UBML steps
-  4. Map resources to UBML actors
+
+# CLI metadata - structured data for tooling
+x-ubml-cli:
+  category: advanced
+  categoryDisplayName: "Advanced"
+  workflowOrder: 12
+  shortDescription: "Configure process mining data sources and mappings."
+  gettingStarted:
+    - "Define the data source (CSV, database, API)"
+    - "Map columns to event log fields"
+    - "Map activities to UBML steps"
+    - "Map resources to UBML actors"
+  exampleFilename: "event-log.mining.ubml.yaml"
 
 type: object
 additionalProperties: false

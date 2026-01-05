@@ -1,0 +1,81 @@
+# @ubml/core
+
+Core library for UBML (Unified Business Modeling Language) - parsing, validation, and serialization.
+
+## Installation
+
+```bash
+npm install @ubml/core
+```
+
+## Usage
+
+### Browser-Safe API
+
+```typescript
+import { parse, validate, serialize } from '@ubml/core';
+
+// Parse UBML document
+const result = parse(yamlContent, 'process.ubml.yaml');
+
+if (result.ok) {
+  // Validate
+  const validation = await validate([result.document]);
+  
+  if (validation.valid) {
+    console.log('Valid UBML document!');
+  } else {
+    console.error(validation.errors);
+  }
+}
+```
+
+### Node.js File Operations
+
+```typescript
+import { parseFile, validateWorkspace, serializeToFile } from '@ubml/core/node';
+
+// Validate entire workspace
+const result = await validateWorkspace('./my-workspace');
+
+if (!result.valid) {
+  for (const file of result.files) {
+    for (const error of file.errors) {
+      console.error(`${file.path}:${error.line} - ${error.message}`);
+    }
+  }
+}
+```
+
+### ESLint Integration
+
+```javascript
+// eslint.config.js
+import ubml from '@ubml/core/eslint';
+
+export default [
+  {
+    files: ['**/*.ubml.yaml'],
+    ...ubml.configs.recommended,
+  },
+];
+```
+
+## CLI Tool
+
+For command-line usage, install the separate CLI package:
+
+```bash
+npm install -g @ubml/cli
+ubml validate ./workspace
+```
+
+## Documentation
+
+- [GitHub Repository](https://github.com/TALXIS/ubml)
+- [Schema Reference](../../docs/schema-reference.md)
+- [Best Practices](../../docs/best-practices.md)
+
+## License
+
+MIT

@@ -1,6 +1,6 @@
 # UBML — Unified Business Modeling Language
 
-[![npm version](https://img.shields.io/npm/v/ubml.svg)](https://www.npmjs.com/package/ubml)
+[![npm version](https://img.shields.io/npm/v/@ubml/core.svg)](https://www.npmjs.com/package/@ubml/core)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 
 **A notation for understanding how organizations create and deliver value.**
@@ -71,7 +71,7 @@ Whether you're figuring out *what to build* or *why it matters*, UBML provides a
 ## Quick Example
 
 ```yaml
-# customer-onboarding.process.ubml.yaml
+# process.ubml.yaml
 ubml: "1.0"
 
 processes:
@@ -111,7 +111,7 @@ See the [example/](./example) directory for a complete workspace.
 ### Install
 
 ```bash
-npm install -g ubml
+npm install -g @ubml/core
 ```
 
 ### Initialize a workspace
@@ -126,8 +126,8 @@ This creates:
 ```
 my-project/
 ├── my-project.workspace.ubml.yaml
-├── main.process.ubml.yaml
-└── organization.actors.ubml.yaml
+├── process.ubml.yaml
+└── actors.ubml.yaml
 ```
 
 ### Configure VS Code
@@ -137,16 +137,19 @@ Install the [YAML extension](https://marketplace.visualstudio.com/items?itemName
 ```json
 {
   "yaml.schemas": {
-    "node_modules/ubml/schemas/documents/workspace.document.yaml": "*.workspace.ubml.yaml",
-    "node_modules/ubml/schemas/documents/process.document.yaml": "*.process.ubml.yaml",
-    "node_modules/ubml/schemas/documents/actors.document.yaml": "*.actors.ubml.yaml",
-    "node_modules/ubml/schemas/documents/entities.document.yaml": "*.entities.ubml.yaml",
-    "node_modules/ubml/schemas/documents/metrics.document.yaml": "*.metrics.ubml.yaml",
-    "node_modules/ubml/schemas/documents/hypotheses.document.yaml": "*.hypotheses.ubml.yaml",
-    "node_modules/ubml/schemas/documents/strategy.document.yaml": "*.strategy.ubml.yaml",
-    "node_modules/ubml/schemas/documents/scenarios.document.yaml": "*.scenarios.ubml.yaml"
+    "node_modules/@ubml/core/schemas/documents/workspace.document.yaml": "*.workspace.ubml.yaml",
+    "node_modules/@ubml/core/schemas/documents/process.document.yaml": ["*.process.ubml.yaml", "process.ubml.yaml"],
+    "node_modules/@ubml/core/schemas/documents/actors.document.yaml": ["*.actors.ubml.yaml", "actors.ubml.yaml"],
+    "node_modules/@ubml/core/schemas/documents/entities.document.yaml": ["*.entities.ubml.yaml", "entities.ubml.yaml"],
+    "node_modules/@ubml/core/schemas/documents/metrics.document.yaml": ["*.metrics.ubml.yaml", "metrics.ubml.yaml"],
+    "node_modules/@ubml/core/schemas/documents/hypotheses.document.yaml": ["*.hypotheses.ubml.yaml", "hypotheses.ubml.yaml"],
+    "node_modules/@ubml/core/schemas/documents/strategy.document.yaml": ["*.strategy.ubml.yaml", "strategy.ubml.yaml"],
+    "node_modules/@ubml/core/schemas/documents/scenarios.document.yaml": ["*.scenarios.ubml.yaml", "scenarios.ubml.yaml"]
   }
 }
+```
+
+> **Tip:** Running `ubml init` automatically creates these settings for you.
 ```
 
 ### Validate
@@ -170,19 +173,19 @@ ubml validate . --format json
 
 ```typescript
 // Parse, validate, serialize (works everywhere - browser, Node, Deno, Bun)
-import { parse, validate, serialize, schemas } from 'ubml';
+import { parse, validate, serialize, schemas } from '@ubml/core';
 
 // Node.js file operations
-import { parseFile, validateWorkspace, serializeToFile } from 'ubml/node';
+import { parseFile, validateWorkspace, serializeToFile } from '@ubml/core/node';
 
 // ESLint plugin
-import ubml from 'ubml/eslint';
+import ubml from '@ubml/core/eslint';
 ```
 
 ### Parse and Validate
 
 ```typescript
-import { parse, validate } from 'ubml';
+import { parse, validate } from '@ubml/core';
 
 // Parse documents
 const actors = parse(actorsYaml, 'actors.actors.ubml.yaml');
@@ -206,7 +209,7 @@ for (const warning of result.warnings) {
 ### Validate Workspace (Node.js)
 
 ```typescript
-import { validateWorkspace } from 'ubml/node';
+import { validateWorkspace } from '@ubml/core/node';
 
 // Validate all UBML files in a directory (schema + references)
 const result = await validateWorkspace('./my-workspace');
@@ -224,7 +227,7 @@ if (!result.valid) {
 ### TypeScript Types
 
 ```typescript
-import type { Process, Step, Actor, ProcessDocument } from 'ubml';
+import type { Process, Step, Actor, ProcessDocument } from '@ubml/core';
 
 const process: Process = {
   id: 'PR001',
@@ -243,7 +246,7 @@ const process: Process = {
 
 ```javascript
 // eslint.config.js
-import ubml from 'ubml/eslint';
+import ubml from '@ubml/core/eslint';
 
 export default [
   {

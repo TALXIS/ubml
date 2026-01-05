@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@ubml/cli",
+  "version": "1.0.0",
+  "description": "UBML CLI - Command-line interface for validating and working with UBML documents",
+  "keywords": [
+    "ubml",
+    "cli",
+    "validation",
+    "business-modeling"
+  ],
+  "homepage": "https://github.com/TALXIS/ubml",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TALXIS/ubml.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/TALXIS/ubml/issues"
+  },
+  "license": "MIT",
+  "author": "NETWORG (https://networg.com)",
+  "type": "module",
+  "bin": {
+    "ubml": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "test": "echo 'CLI tests run via core package'",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@ubml/core": "file:../core",
+    "chalk": "^5.3.0",
+    "commander": "^12.0.0",
+    "glob": "^10.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

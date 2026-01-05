@@ -9,7 +9,7 @@
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
 $id: "https://ubml.io/schemas/1.0/documents/strategy.document.yaml"
-title: "UBML Strategy Document"
+title: "Strategy"
 description: |
   Strategy documents define strategic elements that provide context
   for process models.
@@ -34,12 +34,19 @@ description: |
     - enterprise-capabilities.strategy.ubml.yaml
     - product-portfolio.strategy.ubml.yaml
     - value-streams.strategy.ubml.yaml
-  
-  GETTING STARTED:
-  1. Define value streams for customer journeys
-  2. Map capabilities required
-  3. Connect to products and services
-  4. Link processes to capabilities
+
+# CLI metadata - structured data for tooling
+x-ubml-cli:
+  category: strategy
+  categoryDisplayName: "Strategy"
+  workflowOrder: 8
+  shortDescription: "Define value streams, capabilities, products, and services."
+  gettingStarted:
+    - "Define value streams for customer journeys"
+    - "Map capabilities required"
+    - "Connect to products and services"
+    - "Link processes to capabilities"
+  exampleFilename: "enterprise.strategy.ubml.yaml"
 
 type: object
 additionalProperties: false

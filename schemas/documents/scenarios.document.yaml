@@ -9,7 +9,7 @@
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
 $id: "https://ubml.io/schemas/1.0/documents/scenarios.document.yaml"
-title: "UBML Scenarios Document"
+title: "Scenarios"
 description: |
   Scenario documents define simulation scenarios for "what-if" analysis.
   
@@ -33,12 +33,19 @@ description: |
     - baseline-2024.scenarios.ubml.yaml
     - growth-scenarios.scenarios.ubml.yaml
     - peak-season.scenarios.ubml.yaml
-  
-  GETTING STARTED:
-  1. Define a baseline scenario with current volumes
-  2. Add work arrival patterns
-  3. Define work mix distribution
-  4. Create alternative scenarios for comparison
+
+# CLI metadata - structured data for tooling
+x-ubml-cli:
+  category: analysis
+  categoryDisplayName: "Analysis & Planning"
+  workflowOrder: 7
+  shortDescription: "Define simulation scenarios for what-if analysis."
+  gettingStarted:
+    - "Define a baseline scenario with current volumes"
+    - "Add work arrival patterns"
+    - "Define work mix distribution"
+    - "Create alternative scenarios for comparison"
+  exampleFilename: "baseline.scenarios.ubml.yaml"
 
 type: object
 additionalProperties: false

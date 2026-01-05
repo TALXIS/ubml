@@ -9,7 +9,7 @@
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
 $id: "https://ubml.io/schemas/1.0/documents/hypotheses.document.yaml"
-title: "UBML Hypotheses Document"
+title: "Hypotheses"
 description: |
   Hypothesis documents define hypothesis trees for structured problem framing.
   
@@ -33,12 +33,19 @@ description: |
     - process-improvement.hypotheses.ubml.yaml
     - market-entry.hypotheses.ubml.yaml
     - cost-reduction.hypotheses.ubml.yaml
-  
-  GETTING STARTED:
-  1. Define the SCQH context
-  2. Create the root hypothesis
-  3. Decompose into sub-hypotheses
-  4. Track validation status as you gather evidence
+
+# CLI metadata - structured data for tooling
+x-ubml-cli:
+  category: analysis
+  categoryDisplayName: "Analysis & Planning"
+  workflowOrder: 6
+  shortDescription: "Define hypothesis trees for structured problem framing."
+  gettingStarted:
+    - "Define the SCQH context"
+    - "Create the root hypothesis"
+    - "Decompose into sub-hypotheses"
+    - "Track validation status as you gather evidence"
+  exampleFilename: "solution.hypotheses.ubml.yaml"
 
 type: object
 additionalProperties: false

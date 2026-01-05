@@ -9,7 +9,7 @@
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
 $id: "https://ubml.io/schemas/1.0/documents/glossary.document.yaml"
-title: "UBML Glossary Document"
+title: "Glossary"
 description: |
   Glossary documents define business terminology and definitions.
   
@@ -32,12 +32,19 @@ description: |
     - business-terms.glossary.ubml.yaml
     - technical-glossary.glossary.ubml.yaml
     - domain-vocabulary.glossary.ubml.yaml
-  
-  GETTING STARTED:
-  1. Identify key terms in your domain
-  2. Write clear, concise definitions
-  3. Add aliases for common variations
-  4. Categorize for easier navigation
+
+# CLI metadata - structured data for tooling
+x-ubml-cli:
+  category: advanced
+  categoryDisplayName: "Advanced"
+  workflowOrder: 9
+  shortDescription: "Define business terminology and definitions."
+  gettingStarted:
+    - "Identify key terms in your domain"
+    - "Write clear, concise definitions"
+    - "Add aliases for common variations"
+    - "Categorize for easier navigation"
+  exampleFilename: "business-terms.glossary.ubml.yaml"
 
 type: object
 additionalProperties: false

@@ -1,0 +1,12 @@
+ubml: "1.0"
+name: "ACME Corp Customer Onboarding"
+description: "End-to-end customer onboarding process optimization for ACME Corp"
+status: draft
+
+organization:
+  name: "ACME Corporation"
+  department: "Customer Operations"
+
+files:
+  include:
+    - "*.ubml.yaml"

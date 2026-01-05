@@ -9,7 +9,7 @@
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
 $id: "https://ubml.io/schemas/1.0/documents/workspace.document.yaml"
-title: "UBML Workspace Document"
+title: "Workspace"
 description: |
   The workspace document is the root configuration file for a UBML project.
   
@@ -27,12 +27,19 @@ description: |
   
   FILE NAMING: *.workspace.ubml.yaml
   Example: acme-order-management.workspace.ubml.yaml
-  
-  GETTING STARTED:
-  1. Create a workspace file with name and description
-  2. Add process files for your business processes
-  3. Add actor files to define roles and teams
-  4. Add entity files for your information model
+
+# CLI metadata - structured data for tooling
+x-ubml-cli:
+  category: core
+  categoryDisplayName: "Core Modeling"
+  workflowOrder: 1
+  shortDescription: "Root configuration file for a UBML project."
+  gettingStarted:
+    - "Create a workspace file with name and description"
+    - "Add process files for your business processes"
+    - "Add actor files to define roles and teams"
+    - "Add entity files for your information model"
+  exampleFilename: "acme-project.workspace.ubml.yaml"
 
 type: object
 additionalProperties: false

@@ -4,14 +4,34 @@ Guidelines and recommendations for creating effective UBML models.
 
 ## File Organization
 
+### File Naming Patterns
+
+UBML supports two naming patterns for document files:
+
+| Pattern | Example | When to use |
+|---------|---------|-------------|
+| Simple | `actors.ubml.yaml` | Single file of that type, minimal projects |
+| Prefixed | `sales-team.actors.ubml.yaml` | Multiple files of same type, complex projects |
+
 ### Workspace Structure
 
-Organize files by domain, not by UBML type:
+**Simple workspace** (getting started):
 
 ```
-✅ Good - By domain
 my-project/
 ├── my-project.workspace.ubml.yaml
+├── process.ubml.yaml
+├── actors.ubml.yaml
+└── entities.ubml.yaml
+```
+
+**Complex workspace** (organize by domain):
+
+```
+my-project/
+├── my-project.workspace.ubml.yaml
+├── glossary.ubml.yaml           # Singleton - shared terminology
+├── strategy.ubml.yaml           # Singleton - strategic context
 ├── customer-service/
 │   ├── onboarding.process.ubml.yaml
 │   ├── support.process.ubml.yaml
@@ -20,26 +40,27 @@ my-project/
 │   ├── order-to-cash.process.ubml.yaml
 │   └── order-entities.entities.ubml.yaml
 └── shared/
-    ├── organization.actors.ubml.yaml
+    ├── actors.ubml.yaml
     └── master-data.entities.ubml.yaml
+```
 
-❌ Avoid - By file type
-my-project/
+**Avoid** organizing by file type (this makes domain understanding harder):
+
+```
+❌ my-project/
 ├── processes/
-│   ├── onboarding.process.ubml.yaml
-│   ├── support.process.ubml.yaml
-│   └── order-to-cash.process.ubml.yaml
+│   └── *.process.ubml.yaml
 ├── actors/
-│   └── all-actors.actors.ubml.yaml
+│   └── *.actors.ubml.yaml
 └── entities/
-    └── all-entities.entities.ubml.yaml
+    └── *.entities.ubml.yaml
 ```
 
 ### Naming Conventions
 
 | Element | Convention | Example |
 |---------|------------|---------|
-| File names | kebab-case | `customer-onboarding.process.ubml.yaml` |
+| File names | kebab-case | `process.ubml.yaml` or `customer-onboarding.process.ubml.yaml` |
 | Process names | Title Case | `"Customer Onboarding"` |
 | Step names | Verb + Object | `"Verify Documents"` |
 | Actor names | Role/Team Title | `"Customer Service Representative"` |

@@ -9,7 +9,7 @@
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
 $id: "https://ubml.io/schemas/1.0/documents/links.document.yaml"
-title: "UBML Links Document"
+title: "Links"
 description: |
   Link documents define relationships between steps across processes.
   
@@ -30,12 +30,19 @@ description: |
     - cross-process-links.links.ubml.yaml
     - order-to-fulfillment.links.ubml.yaml
     - integration-links.links.ubml.yaml
-  
-  GETTING STARTED:
-  1. Identify cross-process connections
-  2. Define links with source and target steps
-  3. Add conditions or scheduling as needed
-  4. Document data bindings if applicable
+
+# CLI metadata - structured data for tooling
+x-ubml-cli:
+  category: advanced
+  categoryDisplayName: "Advanced"
+  workflowOrder: 11
+  shortDescription: "Define relationships between steps across processes."
+  gettingStarted:
+    - "Identify cross-process connections"
+    - "Define links with source and target steps"
+    - "Add conditions or scheduling as needed"
+    - "Document data bindings if applicable"
+  exampleFilename: "cross-process.links.ubml.yaml"
 
 type: object
 additionalProperties: false

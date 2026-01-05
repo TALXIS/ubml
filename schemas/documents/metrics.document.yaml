@@ -9,7 +9,7 @@
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
 $id: "https://ubml.io/schemas/1.0/documents/metrics.document.yaml"
-title: "UBML Metrics Document"
+title: "Metrics"
 description: |
   Metrics documents define Key Performance Indicators (KPIs) and 
   Return on Investment (ROI) analyses.
@@ -31,12 +31,19 @@ description: |
     - process-kpis.metrics.ubml.yaml
     - automation-roi.metrics.ubml.yaml
     - performance-targets.metrics.ubml.yaml
-  
-  GETTING STARTED:
-  1. Define KPIs for your key processes
-  2. Set baseline and target values
-  3. Define thresholds for performance levels
-  4. Add ROI analysis for improvement initiatives
+
+# CLI metadata - structured data for tooling
+x-ubml-cli:
+  category: analysis
+  categoryDisplayName: "Analysis & Planning"
+  workflowOrder: 5
+  shortDescription: "Define KPIs and ROI analyses for performance measurement."
+  gettingStarted:
+    - "Define KPIs for your key processes"
+    - "Set baseline and target values"
+    - "Define thresholds for performance levels"
+    - "Add ROI analysis for improvement initiatives"
+  exampleFilename: "process-kpis.metrics.ubml.yaml"
 
 type: object
 additionalProperties: false

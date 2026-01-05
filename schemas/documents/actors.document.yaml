@@ -9,7 +9,7 @@
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
 $id: "https://ubml.io/schemas/1.0/documents/actors.document.yaml"
-title: "UBML Actors Document"
+title: "Actors"
 description: |
   Actor documents define the people, roles, teams, and systems that 
   participate in business processes.
@@ -32,12 +32,24 @@ description: |
     - sales-team.actors.ubml.yaml
     - operations-department.actors.ubml.yaml
     - external-parties.actors.ubml.yaml
-  
-  GETTING STARTED:
-  1. Define actors with their types (role, team, system, external)
-  2. Add skills they possess
-  3. Define availability and capacity
-  4. Optionally add personas and pain points
+
+# CLI metadata - structured data for tooling
+x-ubml-cli:
+  category: core
+  categoryDisplayName: "Core Modeling"
+  workflowOrder: 2
+  shortDescription: "Define people, roles, teams, and systems that participate in processes."
+  gettingStarted:
+    - "Define actors with their types (role, team, system, external)"
+    - "Add skills they possess"
+    - "Define availability and capacity"
+    - "Optionally add personas and pain points"
+  exampleFilename: "actors.ubml.yaml"
+  exampleFilenameAlternative: "organization.actors.ubml.yaml"
+  templateDefaults:
+    actors:
+      type: "role"
+      kind: "human"
 
 type: object
 additionalProperties: false
