@@ -8,7 +8,6 @@ import { formatValidationError } from './validation-errors';
 
 export interface StylishOptions {
   quiet?: boolean;
-  colors?: boolean;
   explain?: boolean;
 }
 

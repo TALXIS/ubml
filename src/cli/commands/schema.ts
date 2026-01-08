@@ -14,13 +14,11 @@ import {
   getDocumentTypeInfo,
   getAllElementTypes,
   getElementTypeInfo,
-  getMinimalTemplate,
   getAnnotatedTemplate,
   getSuggestedWorkflow,
   type DocumentTypeInfo,
 } from '../schema-introspection';
 import { DOCUMENT_TYPES, type DocumentType } from '../../generated/metadata';
-import { serialize } from '../../index';
 
 // =============================================================================
 // Formatting Helpers
