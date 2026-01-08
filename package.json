@@ -63,8 +63,8 @@
   ],
   "scripts": {
     "build": "npm run generate && tsup",
-    "generate": "npx tsx bin/generate-all.ts",
-    "validate:example": "npx tsx bin/ubml.ts validate ./example",
+    "generate": "tsx bin/generate-all.ts",
+    "validate:example": "tsx bin/ubml.ts validate ./example",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:workspace": "vitest run tests/workspace",
