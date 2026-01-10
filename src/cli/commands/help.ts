@@ -30,7 +30,7 @@ import {
   type IdPrefix,
   DOCUMENT_TYPES,
   type DocumentType,
-} from '../../generated/metadata';
+} from '../../metadata.js';
 import { INDENT, header, subheader, dim, code, highlight } from '../formatters/text';
 
 // =============================================================================

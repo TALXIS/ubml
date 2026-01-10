@@ -20,7 +20,7 @@ import {
   formatId,
   parseIdNumber,
   type IdPrefix,
-} from '../../generated/metadata';
+} from '../../metadata.js';
 import { scanWorkspaceIds, getNextAvailableId, readIdStats, syncIdStats } from '../../node/id-scanner';
 import { INDENT, header, subheader, dim, highlight, code } from '../formatters/text';
 

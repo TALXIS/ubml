@@ -15,7 +15,7 @@ import {
   getElementTypeFromId,
   ID_PREFIXES,
   DOCUMENT_TYPES,
-} from '../../src/generated/metadata.js';
+} from '../../src/metadata.js';
 
 describe('Generated Metadata', () => {
   describe('REFERENCE_FIELDS', () => {

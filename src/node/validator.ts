@@ -20,7 +20,7 @@ import {
 import { 
   getUBMLFilePatterns,
   type DocumentType,
-} from '../generated/metadata.js';
+} from '../metadata.js';
 import { 
   validateWorkspaceStructure,
   type WorkspaceWarning,

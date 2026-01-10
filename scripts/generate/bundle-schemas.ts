@@ -52,7 +52,7 @@ export function generateBundledTs(schemas: BundledSchemas): string {
 These schemas are embedded at build time for browser compatibility.
 They can be used without any file system access.`)}
 
-import type { DocumentType } from './metadata.js';
+import type { DocumentType } from './data.js';
 
 /** Root UBML schema */
 export const rootSchema = ${JSON.stringify(schemas.root, null, 2)} as const;

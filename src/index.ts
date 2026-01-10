@@ -148,7 +148,7 @@ export {
   // Reference field validation
   REFERENCE_FIELDS,
   isReferenceField,
-} from './generated/metadata.js';
+} from './metadata.js';
 
 // ============================================================================
 // CONSTANTS

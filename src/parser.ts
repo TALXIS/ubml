@@ -8,7 +8,7 @@
  */
 
 import { parseDocument as parseYamlDocument, Document, isMap, isSeq, Pair, Scalar, YAMLMap, YAMLSeq } from 'yaml';
-import { detectDocumentType, detectDocumentTypeFromContent, type DocumentType } from './generated/metadata.js';
+import { detectDocumentType, detectDocumentTypeFromContent, type DocumentType } from './metadata.js';
 
 // Re-export for convenience
 export { detectDocumentType, detectDocumentTypeFromContent };

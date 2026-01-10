@@ -11,10 +11,15 @@ import {
   PATTERN_HINTS,
   NESTED_PROPERTY_HINTS,
   ENUM_HINTS,
-  type PatternHint,
-  type NestedPropertyHint,
-  type EnumHint,
-} from '../generated/metadata.js';
+  type PatternHintData,
+  type NestedPropertyHintData,
+  type EnumHintData,
+} from '../metadata.js';
+
+// Re-export with simpler names for consumers
+export type PatternHint = PatternHintData;
+export type NestedPropertyHint = NestedPropertyHintData;
+export type EnumHint = EnumHintData;
 
 // =============================================================================
 // Pattern Hints

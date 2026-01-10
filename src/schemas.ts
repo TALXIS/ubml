@@ -18,7 +18,7 @@
  * ```
  */
 
-import { type DocumentType, SCHEMA_VERSION, DOCUMENT_TYPES, FRAGMENT_NAMES } from './generated/metadata.js';
+import { type DocumentType, SCHEMA_VERSION, DOCUMENT_TYPES, FRAGMENT_NAMES } from './metadata.js';
 import {
   rootSchema,
   defsSchema,

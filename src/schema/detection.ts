@@ -6,7 +6,7 @@
  * @module ubml/schema/detection
  */
 
-import { DOCUMENT_TYPES, SCHEMA_PATHS, type DocumentType } from '../generated/metadata.js';
+import { DOCUMENT_TYPES, SCHEMA_PATHS, type DocumentType } from '../metadata.js';
 
 // =============================================================================
 // Filename-based Detection

@@ -18,7 +18,7 @@ import {
   getIdPrefix,
   isValidId,
   type IdPrefix,
-} from '../generated/metadata.js';
+} from '../metadata.js';
 
 /**
  * ID statistics stored in workspace document.

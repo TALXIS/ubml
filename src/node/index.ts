@@ -82,4 +82,4 @@ export type {
 
 export type { 
   DocumentType,
-} from '../generated/metadata.js';
+} from '../metadata.js';

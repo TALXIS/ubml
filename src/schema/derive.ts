@@ -8,8 +8,8 @@
  */
 
 import { defsSchema, rootSchema } from '../generated/bundled.js';
-import type { IdPrefix } from '../generated/metadata.js';
-import { getCategorySortOrder } from '../generated/metadata.js';
+import type { IdPrefix } from '../metadata.js';
+import { getCategorySortOrder } from '../metadata.js';
 
 // =============================================================================
 // Types
@@ -141,7 +141,7 @@ export function getIdPrefixMetadata(prefix: IdPrefix): IdPrefixMetadata | undefi
 // Common Properties
 // =============================================================================
 
-import { COMMON_PROPERTIES } from '../generated/metadata.js';
+import { COMMON_PROPERTIES } from '../metadata.js';
 
 /**
  * Property names that are common across all document types.

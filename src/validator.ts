@@ -24,7 +24,7 @@
  */
 
 import { documentSchemas, getAllSchemasById } from './generated/bundled.js';
-import { detectDocumentType, type DocumentType } from './generated/metadata.js';
+import { detectDocumentType, type DocumentType } from './metadata.js';
 import { parse, type ParseResult, type UBMLDocument } from './parser.js';
 
 /**

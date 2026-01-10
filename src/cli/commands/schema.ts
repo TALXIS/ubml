@@ -19,7 +19,7 @@ import {
   getIdPrefixCategoryMap,
   type DocumentTypeInfo,
 } from '../../schema/index.js';
-import { DOCUMENT_TYPES, type DocumentType } from '../../generated/metadata';
+import { DOCUMENT_TYPES, type DocumentType } from '../../metadata.js';
 import { INDENT, header, subheader, dim, success, highlight, code } from '../formatters/text';
 
 /**

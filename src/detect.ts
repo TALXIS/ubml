@@ -16,9 +16,9 @@ export {
   getSchemaPathForFileSuffix,
 } from './schema/detection.js';
 
-// Re-export types and constants from generated metadata
+// Re-export types and constants from metadata
 export {
   type DocumentType,
   DOCUMENT_TYPES,
   isDocumentType,
-} from './generated/metadata.js';
+} from './metadata.js';

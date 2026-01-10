@@ -12,7 +12,7 @@ import {
   ID_PREFIXES,
   type DocumentType,
   type IdPrefix,
-} from '../generated/metadata.js';
+} from '../metadata.js';
 import { documentSchemas, fragmentSchemas, defsSchema } from '../generated/bundled.js';
 import type {
   SchemaCliMetadata,

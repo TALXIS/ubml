@@ -13,8 +13,8 @@ import {
   shouldBeNested,
   getEnumValueMistakeHint,
   SCHEMA_VERSION,
-  type PatternHint,
-} from '../../generated/metadata.js';
+  type PatternHintData,
+} from '../../metadata.js';
 
 /**
  * Enhanced error result with formatted message and suggestions.

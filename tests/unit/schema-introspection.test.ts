@@ -18,7 +18,7 @@ import {
   type ElementTypeInfo,
   type WorkflowStep,
 } from '../../src/schema/index.js';
-import { DOCUMENT_TYPES, type DocumentType } from '../../src/generated/metadata.js';
+import { DOCUMENT_TYPES, type DocumentType } from '../../src/metadata.js';
 
 describe('Schema Introspection', () => {
   // ==========================================================================

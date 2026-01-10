@@ -45,9 +45,9 @@
       "types": "./dist/eslint/index.d.ts",
       "import": "./dist/eslint/index.js"
     },
-    "./generated/metadata": {
-      "types": "./dist/generated/metadata.d.ts",
-      "import": "./dist/generated/metadata.js"
+    "./generated/data": {
+      "types": "./dist/generated/data.d.ts",
+      "import": "./dist/generated/data.js"
     },
     "./generated/bundled": {
       "types": "./dist/generated/bundled.d.ts",

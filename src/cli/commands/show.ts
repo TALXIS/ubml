@@ -20,7 +20,7 @@ import {
   getIdPrefix,
   isValidId,
   detectDocumentType,
-} from '../../generated/metadata';
+} from '../../metadata.js';
 import { INDENT, header, subheader, dim, highlight, success } from '../formatters/text';
 
 // =============================================================================

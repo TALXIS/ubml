@@ -6,17 +6,22 @@
  * It reads YAML schemas and generates:
  *
  * 1. src/generated/bundled.ts - Bundled schemas for browser use
- * 2. src/generated/metadata.ts - Document types, ID patterns, etc.
+ * 2. src/generated/data.ts - Pure data constants (no functions)
  * 3. src/generated/types.ts - TypeScript interfaces
- * 4. src/generated/templates.ts - Document templates
+ * 4. src/generated/template-data.ts - Template metadata (no functions)
  * 5. src/constants.ts - Version constants
+ *
+ * Hand-written runtime utilities (NOT generated):
+ * - src/metadata.ts - Functions that use data.ts
+ * - src/templates.ts - Functions that use template-data.ts
  *
  * Run: npm run generate
  *
  * Philosophy:
  * - One file change (schema), everything else derived
- * - No manual metadata duplication
- * - All schema-related constants extracted at build time
+ * - Generated files contain DATA ONLY (no functions)
+ * - Runtime logic is hand-written, type-checked, testable
+ * - Clear separation between data and behavior
  *
  * @module generate/index
  */
@@ -45,9 +50,9 @@ import {
 } from './extract-metadata.js';
 
 import { bundleSchemas, generateBundledTs } from './bundle-schemas.js';
-import { generateMetadataTs } from './generate-metadata.js';
+import { generateDataTs } from './generate-data.js';
 import { generateTypesTs } from './generate-types.js';
-import { generateTemplatesTs, transformTemplateData } from './generate-templates.js';
+import { generateTemplateDataTs, transformTemplateData } from './generate-template-data.js';
 import { generateConstantsTs } from './generate-constants.js';
 
 // =============================================================================
@@ -120,16 +125,16 @@ async function main() {
   console.log(`   Found ${categoryConfig.length} category definitions`);
 
   // Phase 10: Generate files
-  console.log('\n📝 Generating TypeScript files...');
+  console.log('\n📝 Generating TypeScript files (DATA ONLY - no functions)...');
 
-  // Generate bundled.ts
+  // Generate bundled.ts (schemas as data)
   const bundledSchemas = bundleSchemas(documentTypes, fragments);
   const bundledContent = generateBundledTs(bundledSchemas);
   writeFileSync(join(OUTPUT_DIR, 'bundled.ts'), bundledContent, 'utf8');
-  console.log('   ✓ src/generated/bundled.ts');
+  console.log('   ✓ src/generated/bundled.ts (schema data)');
 
-  // Generate metadata.ts
-  const metadataContent = generateMetadataTs(
+  // Generate data.ts (pure data - replaces old metadata.ts)
+  const dataContent = generateDataTs(
     documentTypes,
     fragments,
     refInfos,
@@ -141,26 +146,29 @@ async function main() {
     commonPropertiesConfig,
     categoryConfig
   );
-  writeFileSync(join(OUTPUT_DIR, 'metadata.ts'), metadataContent, 'utf8');
-  console.log('   ✓ src/generated/metadata.ts');
+  writeFileSync(join(OUTPUT_DIR, 'data.ts'), dataContent, 'utf8');
+  console.log('   ✓ src/generated/data.ts (pure data constants)');
 
   // Generate types.ts (async - uses json-schema-to-typescript)
   console.log('   ⏳ Generating types from schemas...');
   const typesContent = await generateTypesTs(refInfos);
   writeFileSync(join(OUTPUT_DIR, 'types.ts'), typesContent, 'utf8');
-  console.log('   ✓ src/generated/types.ts');
+  console.log('   ✓ src/generated/types.ts (TypeScript interfaces)');
 
-  // Generate templates.ts
-  const templatesContent = generateTemplatesTs(templateData);
-  writeFileSync(join(OUTPUT_DIR, 'templates.ts'), templatesContent, 'utf8');
-  console.log('   ✓ src/generated/templates.ts');
+  // Generate template-data.ts (pure data - replaces old templates.ts)
+  const templateDataContent = generateTemplateDataTs(templateData);
+  writeFileSync(join(OUTPUT_DIR, 'template-data.ts'), templateDataContent, 'utf8');
+  console.log('   ✓ src/generated/template-data.ts (template data)');
 
   // Generate constants.ts (in src/, not src/generated/)
   const constantsContent = generateConstantsTs();
   writeFileSync(join(ROOT_DIR, 'src', 'constants.ts'), constantsContent, 'utf8');
   console.log('   ✓ src/constants.ts');
 
-  console.log('\n✅ Generation complete!\n');
+  console.log('\n✅ Generation complete!');
+  console.log('\n📌 Note: Runtime utilities are in hand-written files:');
+  console.log('   - src/metadata.ts (uses generated/data.ts)');
+  console.log('   - src/templates.ts (uses generated/template-data.ts)\n');
 }
 
 main().catch((error) => {

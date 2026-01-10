@@ -25,13 +25,13 @@ import {
   ID_CONFIG,
   SCHEMA_VERSION,
   formatId,
-} from '../../generated/metadata';
+} from '../../metadata.js';
 import {
   TEMPLATE_DATA,
   createMinimalDocument,
   getDocumentHeader,
   getSectionComment,
-} from '../../generated/templates';
+} from '../../templates.js';
 import { INDENT, success, highlight, code, dim } from '../formatters/text';
 
 /**

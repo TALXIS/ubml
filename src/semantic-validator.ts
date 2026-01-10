@@ -5,7 +5,7 @@
  * For file system operations, use the Node.js version in `node/semantic-validator.ts`.
  */
 
-import { isValidId, REFERENCE_FIELDS, DOCUMENT_TYPES, type DocumentType, getIdPrefix } from './generated/metadata.js';
+import { isValidId, REFERENCE_FIELDS, DOCUMENT_TYPES, type DocumentType, getIdPrefix } from './metadata.js';
 import type { UBMLDocument } from './parser.js';
 
 // =============================================================================

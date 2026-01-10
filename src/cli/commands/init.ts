@@ -18,7 +18,7 @@ import {
   SCHEMA_PATHS,
   ID_CONFIG,
   formatId,
-} from '../../generated/metadata';
+} from '../../metadata.js';
 import { INDENT, success, highlight, code, dim } from '../formatters/text';
 
 /**
