@@ -75,70 +75,77 @@ properties:
   
   terms:
     description: |
-      Glossary term definitions.
+      Glossary term definitions, keyed by TM### ID.
+      
+      Each term has a unique ID (TM#####) used for cross-referencing.
       
       Example:
         terms:
-          - term: "Order Fulfillment"
+          TM00001:
+            term: "Order Fulfillment"
             definition: "The complete process from receiving an order to delivering the product"
             aliases: ["Order Processing", "Order Completion"]
             category: "Process"
-          - term: "SLA"
+          TM00002:
+            term: "SLA"
             definition: "Service Level Agreement - contractual commitment for service delivery"
             aliases: ["Service Level Agreement"]
             category: "Governance"
-    type: array
-    items:
-      type: object
-      additionalProperties: false
-      required: [term, definition]
-      properties:
-        term:
-          description: "The term being defined."
-          type: string
-        
-        definition:
-          description: "Clear, concise definition of the term."
-          type: string
-        
-        aliases:
-          description: "Alternative names or abbreviations."
-          type: array
-          items:
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^TM\\d{5,}$":
+        type: object
+        additionalProperties: false
+        required: [term, definition]
+        properties:
+          term:
+            description: "The term being defined."
             type: string
-        
-        category:
-          description: |
-            Category for grouping terms.
-            
-            Examples: "Process", "Technical", "Business", "Legal"
-          type: string
-        
-        context:
-          description: "Where or how this term is used."
-          type: string
-        
-        examples:
-          description: "Usage examples."
-          type: array
-          items:
+          
+          definition:
+            description: "Clear, concise definition of the term."
             type: string
-        
-        relatedTerms:
-          description: "Related glossary terms."
-          type: array
-          items:
+          
+          aliases:
+            description: "Alternative names or abbreviations."
+            type: array
+            items:
+              type: string
+          
+          category:
+            description: |
+              Category for grouping terms.
+              
+              Examples: "Process", "Technical", "Business", "Legal"
             type: string
-        
-        source:
-          description: "Source or authority for the definition."
-          type: string
-        
-        tags:
-          description: "Tags for filtering."
-          type: array
-          items:
+          
+          context:
+            description: "Where or how this term is used."
             type: string
+          
+          examples:
+            description: "Usage examples."
+            type: array
+            items:
+              type: string
+          
+          relatedTerms:
+            description: |
+              Related glossary terms (references to other TM### IDs).
+            type: array
+            items:
+              $ref: "../common/defs.schema.yaml#/$defs/TermRef"
+          
+          source:
+            description: "Source or authority for the definition."
+            type: string
+          
+          tags:
+            description: "Tags for filtering."
+            type: array
+            items:
+              type: string
   
   categories:
     description: |

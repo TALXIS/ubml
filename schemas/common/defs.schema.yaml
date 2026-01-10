@@ -289,6 +289,28 @@ $defs:
       category: analysis
       categoryDisplayName: "Analysis"
 
+  TermRef:
+    description: |
+      Reference to a glossary term (TM### pattern).
+      
+      Terms are business vocabulary entries in the glossary.
+      They define domain-specific terminology consistently across the workspace.
+      
+      Examples: TM00001, TM00010, TM00100
+    type: string
+    pattern: "^TM\\d{5,}$"
+    examples:
+      - "TM00001"
+      - "TM00010"
+      - "TM00100"
+    x-ubml:
+      prefix: "TM"
+      humanName: "Term ID"
+      shortDescription: "Glossary terms"
+      errorHint: "TM + 5+ digits (e.g., TM00001, TM00010)"
+      category: advanced
+      categoryDisplayName: "Advanced"
+
   CapabilityRef:
     description: |
       Reference to a capability (CP### pattern).

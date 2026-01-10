@@ -538,3 +538,57 @@ export function findHelpTopic(name: string): HelpTopic | undefined {
 
   return undefined;
 }
+
+// =============================================================================
+// Concept Information (Block, Phase, etc.)
+// =============================================================================
+
+/**
+ * Get information about a concept type from fragment schemas.
+ * Used for help topics that explain control flow concepts like Block, Phase.
+ * 
+ * @param conceptName - Name of the concept (e.g., 'Block', 'Phase')
+ */
+export function getConceptInfo(conceptName: string): {
+  name: string;
+  description: string;
+  properties: PropertyInfo[];
+} | undefined {
+  const capitalizedName = conceptName.charAt(0).toUpperCase() + conceptName.slice(1);
+
+  // Search all fragment schemas for the concept definition
+  for (const [fragName, schema] of Object.entries(fragmentSchemas)) {
+    const defs = (schema as Record<string, unknown>).$defs as Record<string, Record<string, unknown>> | undefined;
+    if (!defs) continue;
+
+    // Look for matching definition
+    for (const [defName, defSchema] of Object.entries(defs)) {
+      if (defName === capitalizedName || defName.toLowerCase() === conceptName.toLowerCase()) {
+        const properties = (defSchema.properties ?? {}) as Record<string, Record<string, unknown>>;
+        const required = (defSchema.required ?? []) as string[];
+
+        const props: PropertyInfo[] = [];
+        for (const [propName, propSchema] of Object.entries(properties)) {
+          props.push({
+            name: propName,
+            type: getTypeString(propSchema),
+            description: (propSchema.description as string) ?? '',
+            required: required.includes(propName),
+            enumValues: propSchema.enum as string[] | undefined,
+            examples: propSchema.examples as unknown[] | undefined,
+            pattern: propSchema.pattern as string | undefined,
+            default: propSchema.default,
+          });
+        }
+
+        return {
+          name: conceptName,
+          description: (defSchema.description as string) ?? '',
+          properties: props,
+        };
+      }
+    }
+  }
+
+  return undefined;
+}

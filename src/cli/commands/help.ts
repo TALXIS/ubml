@@ -19,6 +19,7 @@ import {
   getHelpTopicsByCategory,
   findHelpTopic,
   getIdPrefixCategoryMap,
+  getConceptInfo,
   type HelpTopic,
   type HelpTopicCategory,
 } from '../../schema/index.js';
@@ -74,6 +75,11 @@ const TOPICS: Record<string, () => void> = {
   metrics: () => showDocumentHelp('metrics'),
   strategy: () => showDocumentHelp('strategy'),
   glossary: () => showDocumentHelp('glossary'),
+  links: () => showDocumentHelp('links'),
+  
+  // Control flow concepts - use schema introspection
+  blocks: () => showConceptHelp('Block'),
+  phases: () => showConceptHelp('Phase'),
   
   // Reference
   ids: showIdPatterns,
@@ -244,6 +250,57 @@ function showDocumentHelp(docType: string): void {
   console.log(INDENT + code(`ubml add ${docType}`));
   console.log();
 }
+
+/**
+ * Show help for a concept type (Block, Phase, etc.) by reading from schema.
+ */
+function showConceptHelp(conceptName: string): void {
+  const info = getConceptInfo(conceptName);
+  if (!info) {
+    console.error(chalk.red(`Unknown concept type: ${conceptName}`));
+    return;
+  }
+  
+  console.log();
+  console.log(header(`${conceptName} Reference`));
+  console.log(dim('─'.repeat(60)));
+  console.log();
+  
+  // Display the full description from the schema
+  console.log(info.description);
+  console.log();
+  
+  // Show key properties
+  if (info.properties.length > 0) {
+    console.log(subheader('Properties'));
+    console.log();
+    
+    for (const prop of info.properties) {
+      const req = prop.required ? chalk.red('*') : ' ';
+      const typeInfo = prop.enumValues 
+        ? prop.enumValues.slice(0, 5).join(' | ') + (prop.enumValues.length > 5 ? ' ...' : '')
+        : prop.type;
+      
+      console.log(`${req} ${highlight(prop.name)}: ${typeInfo}`);
+      
+      // Show description if not too long
+      const firstLine = prop.description.split('\n')[0];
+      if (firstLine && firstLine.length < 80) {
+        console.log(INDENT + dim(firstLine));
+      }
+      
+      if (prop.default !== undefined) {
+        console.log(INDENT + dim('Default:') + ` ${prop.default}`);
+      }
+    }
+    console.log();
+  }
+  
+  console.log(dim('─'.repeat(60)));
+  console.log(dim(`${chalk.red('*')} = required`));
+  console.log();
+}
+
 
 function showIdPatterns(): void {
   console.log();

@@ -20,6 +20,7 @@ export interface ValidateOptions {
   quiet: boolean;
   suppressUnused: boolean;
   explain: boolean;
+  health: boolean;
 }
 
 /**
@@ -47,6 +48,42 @@ function formatStructureWarnings(result: WorkspaceValidationResult): string {
 }
 
 /**
+ * Format health report summary.
+ */
+function formatHealthReport(result: WorkspaceValidationResult): string {
+  const lines: string[] = [];
+  
+  // Calculate health score
+  const errorCount = result.errorCount;
+  const warningCount = result.warningCount;
+  let score = 100;
+  score -= errorCount * 10;
+  score -= warningCount * 2;
+  score = Math.max(0, Math.min(100, score));
+  
+  const scoreColor = score >= 90 ? chalk.green : score >= 70 ? chalk.yellow : chalk.red;
+  
+  lines.push('');
+  lines.push(chalk.bold('Health Report'));
+  lines.push(chalk.dim('─'.repeat(60)));
+  lines.push(`  Files: ${chalk.cyan(result.fileCount.toString())}`);
+  lines.push(`  Errors: ${errorCount > 0 ? chalk.red(errorCount.toString()) : chalk.green('0')}`);
+  lines.push(`  Warnings: ${warningCount > 0 ? chalk.yellow(warningCount.toString()) : chalk.green('0')}`);
+  lines.push(`  Health Score: ${scoreColor(score + '/100')}`);
+  lines.push('');
+  
+  if (score === 100) {
+    lines.push(chalk.green('✓ Perfect! Your workspace is healthy.'));
+  } else if (score >= 70) {
+    lines.push(chalk.yellow('⚠ Good, but could be improved. Address warnings when possible.'));
+  } else {
+    lines.push(chalk.red('✗ Issues detected. Please review errors and warnings.'));
+  }
+  
+  return lines.join('\n');
+}
+
+/**
  * Create the validate command.
  */
 export function validateCommand(): Command {
@@ -59,6 +96,7 @@ export function validateCommand(): Command {
     .option('-s, --strict', 'Treat warnings as errors', false)
     .option('-q, --quiet', 'Only output errors', false)
     .option('--explain', 'Show detailed explanations for errors', false)
+    .option('--health', 'Show health report summary', false)
     .option('--suppress-unused', 'Suppress unused-id warnings (useful for catalog documents)', false)
     .action(async (path: string, options: ValidateOptions) => {
       const absolutePath = resolve(path);
@@ -75,6 +113,13 @@ export function validateCommand(): Command {
       const rawResult = isDirectory
         ? await validateWorkspace(absolutePath, { suppressUnusedWarnings: options.suppressUnused })
         : await validateFile(absolutePath);
+
+      // Warn about single-file validation limitations
+      if (!isDirectory && !options.quiet) {
+        console.log(chalk.yellow('⚠️  Single-file validation:') + ' Cross-document references not checked.');
+        console.log(chalk.dim('   Run ') + chalk.cyan('ubml validate .') + chalk.dim(' to validate workspace-level references.'));
+        console.log();
+      }
 
       // Convert to unified format for formatters
       const result: FormatterResult = isDirectory
@@ -121,12 +166,18 @@ export function validateCommand(): Command {
 
       console.log(output);
 
-      // Show structure warnings for workspace validation (stylish format only)
+      // Show health report for workspace validation (if requested)
       if (isDirectory && options.format === 'stylish' && !options.quiet) {
         const workspaceResult = rawResult as WorkspaceValidationResult;
-        const structureOutput = formatStructureWarnings(workspaceResult);
-        if (structureOutput) {
-          console.log(structureOutput);
+        
+        if (options.health) {
+          const healthOutput = formatHealthReport(workspaceResult);
+          console.log(healthOutput);
+        } else {
+          const structureOutput = formatStructureWarnings(workspaceResult);
+          if (structureOutput) {
+            console.log(structureOutput);
+          }
         }
       }
 

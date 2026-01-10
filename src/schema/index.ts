@@ -39,6 +39,7 @@ export {
   getHelpTopics,
   getHelpTopicsByCategory,
   findHelpTopic,
+  getConceptInfo,
   type HelpTopic,
   type HelpTopicCategory,
 } from './introspection.js';

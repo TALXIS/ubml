@@ -175,47 +175,16 @@ function createDocumentTemplate(type: TemplateType, name?: string): unknown {
 // =============================================================================
 
 interface InitOptions {
-  here: boolean;
   minimal: boolean;
   force: boolean;
 }
 
 /**
- * Initialize a workspace in a new directory.
- */
-function initNewDirectory(name: string, parentDir: string, options: InitOptions): void {
-  const workspaceDir = resolve(parentDir, name);
-  const safeName = toKebabCase(name);
-
-  // Check if directory exists
-  if (existsSync(workspaceDir) && !options.force) {
-    if (!isDirectoryEmpty(workspaceDir)) {
-      console.error(chalk.red(`Error: Directory already exists and is not empty: ${workspaceDir}`));
-      console.error();
-      console.error('Options:');
-      console.error(INDENT + 'Use ' + code('--force') + ' to initialize anyway');
-      console.error(INDENT + 'Use ' + code('ubml init --here') + ' to initialize in current directory');
-      process.exit(1);
-    }
-  }
-
-  // Create directory
-  mkdirSync(workspaceDir, { recursive: true });
-
-  // Create files
-  createWorkspaceFiles(workspaceDir, safeName, name, options.minimal);
-
-  // Print success message
-  printSuccessMessage(workspaceDir, name, false);
-}
-
-/**
  * Initialize a workspace in the current directory.
  */
-function initCurrentDirectory(options: InitOptions): void {
+function initCurrentDirectory(name: string, options: InitOptions): void {
   const workspaceDir = resolve('.');
-  const dirName = basename(workspaceDir);
-  const safeName = toKebabCase(dirName);
+  const safeName = toKebabCase(name);
 
   // Check for existing UBML files
   if (hasUbmlFiles(workspaceDir) && !options.force) {
@@ -226,10 +195,10 @@ function initCurrentDirectory(options: InitOptions): void {
   }
 
   // Create files
-  createWorkspaceFiles(workspaceDir, safeName, dirName, options.minimal);
+  createWorkspaceFiles(workspaceDir, safeName, name, options.minimal);
 
   // Print success message
-  printSuccessMessage(workspaceDir, dirName, true);
+  printSuccessMessage(workspaceDir, name, true);
 }
 
 /**
@@ -367,18 +336,14 @@ export function initCommand(): Command {
   const command = new Command('init');
 
   command
-    .description('Initialize a new UBML workspace')
-    .argument('[name]', 'Workspace name (creates new directory)')
-    .option('--here', 'Initialize in current directory instead of creating new one')
+    .description('Initialize a new UBML workspace in the current directory')
+    .argument('<name>', 'Workspace name (used for file naming)')
     .option('-m, --minimal', 'Create only workspace file, no samples', false)
     .option('-f, --force', 'Force initialization even if files exist', false)
     .addHelpText('after', `
 Examples:
-  ${chalk.dim('# Create a new workspace directory')}
+  ${chalk.dim('# Initialize workspace in current directory')}
   ubml init my-project
-
-  ${chalk.dim('# Initialize in the current (empty) directory')}
-  ubml init --here
 
   ${chalk.dim('# Create minimal workspace (no sample files)')}
   ubml init my-project --minimal
@@ -393,19 +358,8 @@ What gets created:
   ${highlight('.vscode/settings.json')}       VS Code YAML schema settings
   ${highlight('.vscode/extensions.json')}     Recommended extensions
 `)
-    .action((name: string | undefined, options: InitOptions) => {
-      if (options.here) {
-        initCurrentDirectory(options);
-      } else if (name) {
-        initNewDirectory(name, '.', options);
-      } else {
-        console.error(chalk.red('Error: Please provide a workspace name or use --here'));
-        console.error();
-        console.error('Usage:');
-        console.error(INDENT + code('ubml init <name>') + dim('    # Create new directory'));
-        console.error(INDENT + code('ubml init --here') + dim('    # Initialize current directory'));
-        process.exit(1);
-      }
+    .action((name: string, options: InitOptions) => {
+      initCurrentDirectory(name, options);
     });
 
   return command;

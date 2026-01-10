@@ -17,9 +17,11 @@ import {
   getSuggestedWorkflow,
   createDocumentYaml,
   getIdPrefixCategoryMap,
+  getCommonProperties,
   type DocumentTypeInfo,
 } from '../../schema/index.js';
 import { DOCUMENT_TYPES, type DocumentType } from '../../metadata.js';
+import { documentSchemas } from '../../generated/bundled.js';
 import { INDENT, header, subheader, dim, success, highlight, code } from '../formatters/text';
 
 /**
@@ -36,6 +38,36 @@ function getPatternHint(pattern: string): string | undefined {
   };
   
   return hints[pattern];
+}
+
+/**
+ * Get JSON Schema type as a readable string.
+ */
+function getTypeString(schema: Record<string, unknown>): string {
+  if (schema.$ref) {
+    const ref = schema.$ref as string;
+    const match = ref.match(/#\/\$defs\/(\w+)/);
+    return match ? match[1] : 'object';
+  }
+  if (schema.type === 'array') {
+    const items = schema.items as Record<string, unknown> | undefined;
+    if (items?.$ref) {
+      const ref = items.$ref as string;
+      const match = ref.match(/#\/\$defs\/(\w+)/);
+      return match ? `${match[1]}[]` : 'array';
+    }
+    return `${items?.type ?? 'any'}[]`;
+  }
+  if (schema.enum) {
+    return 'enum';
+  }
+  if (schema.type === 'object') {
+    if (schema.patternProperties) {
+      return 'object (keyed)';
+    }
+    return 'object';
+  }
+  return (schema.type as string) ?? 'any';
 }
 
 // =============================================================================
@@ -187,6 +219,8 @@ function displayElementProperties(docInfo: DocumentTypeInfo): void {
   console.log(subheader('Element Properties:'));
   console.log();
 
+  let hasProperties = false;
+
   for (const section of docInfo.sections) {
     if (!section.idPrefix) continue;
 
@@ -198,6 +232,7 @@ function displayElementProperties(docInfo: DocumentTypeInfo): void {
     const info = getElementTypeInfo(element.type);
     if (!info || info.properties.length === 0) continue;
 
+    hasProperties = true;
     console.log(INDENT + chalk.bold(section.name) + dim(` (${section.idPrefix}###)`));
     console.log();
 
@@ -226,6 +261,36 @@ function displayElementProperties(docInfo: DocumentTypeInfo): void {
       }
     }
     console.log();
+  }
+
+  // If no element properties found, show document-level properties
+  if (!hasProperties) {
+    console.log(INDENT + dim('Document properties (not element-based):'));
+    console.log();
+    
+    // Get all properties from the document schema
+    const schema = documentSchemas[docInfo.type] as Record<string, unknown> | undefined;
+    if (schema) {
+      const properties = (schema.properties ?? {}) as Record<string, Record<string, unknown>>;
+      const required = (schema.required ?? []) as string[];
+      
+      // Use schema-derived common properties (no hardcoding!)
+      const skipProps = getCommonProperties();
+      
+      for (const [propName, propSchema] of Object.entries(properties)) {
+        if (skipProps.has(propName)) continue;
+        
+        const req = required.includes(propName) ? success('*') : ' ';
+        const typeStr = dim(`<${getTypeString(propSchema)}>`);
+        console.log(INDENT + INDENT + req + highlight(propName.padEnd(20)) + typeStr);
+        
+        const description = (propSchema.description as string)?.split('\n')[0];
+        if (description) {
+          console.log(INDENT + INDENT + '  ' + dim(description));
+        }
+      }
+      console.log();
+    }
   }
 
   console.log(dim('* = required'));
