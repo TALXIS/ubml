@@ -50,6 +50,9 @@ pnpm-debug.log*
 # Auto-generated files (run 'npm run generate' to recreate)
 src/generated/
 
+# Allow bin folder for CLI scripts (override global gitignore)
+!bin/
+
 # Local samples (not part of the package)
 samples/
 example_cetin/

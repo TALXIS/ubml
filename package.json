@@ -63,7 +63,7 @@
   ],
   "scripts": {
     "build": "npm run generate && tsup",
-    "generate": "tsx bin/generate-all.ts",
+    "generate": "tsx scripts/generate-all.ts",
     "validate:example": "tsx bin/ubml.ts validate ./example",
     "test": "vitest run",
     "test:watch": "vitest",
