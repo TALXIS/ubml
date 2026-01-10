@@ -32,28 +32,7 @@ import {
   getDocumentHeader,
   getSectionComment,
 } from '../../generated/templates';
-
-// =============================================================================
-// Helpers
-// =============================================================================
-
-const INDENT = '  ';
-
-function success(text: string): string {
-  return chalk.green(text);
-}
-
-function highlight(text: string): string {
-  return chalk.yellow(text);
-}
-
-function code(text: string): string {
-  return chalk.cyan(text);
-}
-
-function dim(text: string): string {
-  return chalk.dim(text);
-}
+import { INDENT, success, highlight, code, dim } from '../formatters/text';
 
 /**
  * Convert a name to kebab-case for filenames.

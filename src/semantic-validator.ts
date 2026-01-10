@@ -5,8 +5,78 @@
  * For file system operations, use the Node.js version in `node/semantic-validator.ts`.
  */
 
-import { isValidId, REFERENCE_FIELDS, DOCUMENT_TYPES, type DocumentType } from './generated/metadata.js';
+import { isValidId, REFERENCE_FIELDS, DOCUMENT_TYPES, type DocumentType, getIdPrefix } from './generated/metadata.js';
 import type { UBMLDocument } from './parser.js';
+
+// =============================================================================
+// Fuzzy Matching Utilities
+// =============================================================================
+
+/**
+ * Calculate Levenshtein distance between two strings.
+ */
+function levenshteinDistance(a: string, b: string): number {
+  if (a.length === 0) return b.length;
+  if (b.length === 0) return a.length;
+
+  const matrix: number[][] = [];
+
+  for (let i = 0; i <= b.length; i++) {
+    matrix[i] = [i];
+  }
+
+  for (let j = 0; j <= a.length; j++) {
+    matrix[0][j] = j;
+  }
+
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j] + 1
+        );
+      }
+    }
+  }
+
+  return matrix[b.length][a.length];
+}
+
+/**
+ * Find similar IDs in a set of defined IDs.
+ * Returns up to 3 suggestions with similarity scores.
+ */
+function findSimilarIds(
+  targetId: string,
+  definedIds: Map<string, { filepath: string; path: string }>
+): { id: string; name?: string; distance: number }[] {
+  const prefix = getIdPrefix(targetId);
+  const suggestions: { id: string; distance: number }[] = [];
+
+  for (const id of definedIds.keys()) {
+    // Prefer same-prefix matches
+    const idPrefix = getIdPrefix(id);
+    const samePrefix = prefix && idPrefix === prefix;
+    
+    // Calculate distance
+    const distance = levenshteinDistance(targetId, id);
+    
+    // Only suggest if reasonably similar (distance <= 4 for same prefix, <= 2 for different)
+    const threshold = samePrefix ? 4 : 2;
+    if (distance <= threshold) {
+      suggestions.push({ id, distance: samePrefix ? distance : distance + 2 });
+    }
+  }
+
+  // Sort by distance and return top 3
+  return suggestions
+    .sort((a, b) => a.distance - b.distance)
+    .slice(0, 3);
+}
 
 /**
  * Validation error for reference issues.
@@ -20,6 +90,8 @@ export interface ReferenceError {
   path?: string;
   /** Error code */
   code?: string;
+  /** Suggested IDs that might be intended */
+  suggestions?: string[];
 }
 
 /**
@@ -231,11 +303,22 @@ export function validateDocuments(
   for (const [id, filepaths] of referencedIds) {
     if (!definedIds.has(id)) {
       const uniqueFiles = [...new Set(filepaths)];
+      
+      // Find similar IDs for suggestions
+      const similar = findSimilarIds(id, definedIds);
+      const suggestions = similar.map(s => s.id);
+      
       for (const filepath of uniqueFiles) {
+        let message = `Reference to undefined ID "${id}"`;
+        if (suggestions.length > 0) {
+          message += ` - did you mean: ${suggestions.join(', ')}?`;
+        }
+        
         errors.push({
-          message: `Reference to undefined ID "${id}"`,
+          message,
           filepath,
           code: 'ubml/undefined-reference',
+          suggestions: suggestions.length > 0 ? suggestions : undefined,
         });
       }
     }

@@ -62,7 +62,7 @@ $defs:
           Examples:
             "1d" - 1 day delay
             "-2h" - 2 hour overlap
-            "30m" - 30 minute delay
+            "30min" - 30 minute delay
         $ref: "../common/defs.schema.yaml#/$defs/Duration"
       
       priority:

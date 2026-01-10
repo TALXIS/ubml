@@ -19,36 +19,7 @@ import {
   type DocumentTypeInfo,
 } from '../schema-introspection';
 import { DOCUMENT_TYPES, type DocumentType } from '../../generated/metadata';
-
-// =============================================================================
-// Formatting Helpers
-// =============================================================================
-
-const INDENT = '  ';
-
-function header(text: string): string {
-  return chalk.bold.cyan(text);
-}
-
-function subheader(text: string): string {
-  return chalk.bold.white(text);
-}
-
-function dim(text: string): string {
-  return chalk.dim(text);
-}
-
-function success(text: string): string {
-  return chalk.green(text);
-}
-
-function highlight(text: string): string {
-  return chalk.yellow(text);
-}
-
-function code(text: string): string {
-  return chalk.cyan(text);
-}
+import { INDENT, header, subheader, dim, success, highlight, code } from '../formatters/text';
 
 /**
  * Get human-readable hint for common regex patterns.

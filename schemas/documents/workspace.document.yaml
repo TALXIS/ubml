@@ -228,3 +228,22 @@ properties:
   custom:
     description: "User-defined custom fields."
     $ref: "../common/defs.schema.yaml#/$defs/CustomFields"
+  
+  idStats:
+    description: |
+      ID sequence tracking for the workspace.
+      Similar to database sequences, this tracks the highest used ID for each
+      prefix to enable fast next-ID generation without scanning all files.
+      
+      Updated automatically by CLI tools when creating new elements.
+      
+      Example:
+        idStats:
+          AC: 45      # Actors: next available is AC00046
+          PR: 12      # Processes: next available is PR00013
+          ST: 234     # Steps: next available is ST00235
+          EN: 67      # Entities: next available is EN00068
+    type: object
+    additionalProperties:
+      type: integer
+      minimum: 0

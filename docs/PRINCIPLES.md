@@ -62,29 +62,7 @@ These values resolve conflicts when principles compete:
 
 ## Evolution Philosophy
 
-### No Legacy Debt
-
-UBML prioritizes a **pristine, correct DSL** over backward compatibility. The language must not carry design mistakes forward to avoid breaking changes.
-
-**Rationale:** UBML is still maturing. Accumulating legacy cruft now will permanently compromise the notation's clarity. Users can tolerate migrations; they cannot tolerate a confusing, inconsistent language.
-
-### Versioned Breaking Changes
-
-When a breaking change is necessary:
-
-1. **Increment the version** — the version field in documents must change
-2. **CLI detects mismatch** — tooling must refuse to process mismatched versions
-3. **Interactive migration** — CLI provides an upgrade wizard that prompts for any information that cannot be automatically inferred
-4. **No silent degradation** — old files must not parse with new tooling without explicit migration
-
-### Migration Tooling Requirements
-
-The CLI must provide:
-
-- Automated migration command with interactive prompts for ambiguous changes
-- Dry-run mode to preview changes without applying
-- Batch mode for CI that fails if human input would be required
-- Clear diff output showing what changed and why
+See **P11: Language Clarity Over Compatibility** for the formal principle governing UBML evolution.
 
 ---
 
@@ -115,6 +93,12 @@ This applies at all nesting levels — flat collections, nested hierarchies, and
 The schema must not include properties whose values can be derived from other model elements (counts, totals, membership lists computable from graph structure).
 
 **Rationale:** Computed values go stale. Tooling computes; users model.
+
+#### P1.4: No Built-In Version Control
+
+The schema must not include version history, change tracking, or diff capabilities. Use git for version control.
+
+**Rationale:** Git provides proven version control, branching, and diffing. UBML files are plain text designed for git. Don't reinvent what git does well. Process variants use file-based organization (current/proposed folders), not schema properties.
 
 ---
 
@@ -166,6 +150,8 @@ The schema should provide a flattening mechanism (parent references) for hierarc
 
 ---
 
+## Semantic Design Principles
+
 ### P4: Explicitness
 
 **Behavior must be declared, not inferred.**
@@ -176,17 +162,23 @@ Properties that affect interpretation, execution, or visualization must be expli
 
 **Rationale:** Predictable behavior. Renaming doesn't change semantics. Tooling doesn't guess.
 
-#### P4.2: No Magic Defaults Based on Context
+#### P4.2: No Context-Dependent Defaults
 
 Default values must not change based on where an element appears. An omitted property means the same thing everywhere.
 
-**Rationale:** Consistency. No hidden rules to learn.
+**Rationale:** Consistency. No hidden rules to learn. Context should never change meaning.
 
 #### P4.3: Validation Modes Explicit
 
 Documents should be able to declare their expected validation strictness. This allows progressive formalization from rough drafts to validated models.
 
 **Rationale:** Supports workshop capture (loose) through to production models (strict).
+
+#### P4.4: No Hidden Defaults
+
+Schema properties with meaningful choices (enums, type discriminators) must not have defaults. Users must explicitly specify values.
+
+**Rationale:** Defaults hide options. Requiring explicit choice nudges users to consult help and understand alternatives. An analyst who types `kind: action` has learned that other kinds exist; one who relies on a default has not.
 
 ---
 
@@ -202,7 +194,7 @@ Each concept gets its own fragment file. Fragments must not cross-import except 
 
 #### P5.2: Required Properties Minimal
 
-Only properties essential for element identification should be required. Everything else optional with sensible defaults.
+Only properties essential for element identification should be required. Everything else optional.
 
 **Rationale:** Low barrier to start. Enables progressive detail. Workshop-friendly.
 
@@ -268,6 +260,8 @@ For each target standard, document which UBML concepts map and which are lost. U
 
 ---
 
+## Validation and Projection Principles
+
 ### P8: Semantic Validation Rules
 
 **What the validator must check beyond structural schema.**
@@ -304,6 +298,20 @@ For any given concept, the schema must define exactly one structure. No shorthan
 
 **Rationale:** One way to express a thing means one pattern to learn, one pattern to parse, one pattern to validate. Alternatives create cognitive load and tooling complexity.
 
+**Example - Duration Format:**
+
+The duration format is exactly `{number}{unit}` where units are:
+- `min` - minutes (not `m`, not `minute`)
+- `h` - hours (not `hr`, not `hour`)
+- `d` - days (not `day`)
+- `wk` - weeks (not `w`, not `week`)
+- `mo` - months (not `month`)
+
+Valid: `30min`, `2h`, `1.5d`, `1wk`, `3mo`  
+Invalid: `30m`, `1h30m`, `PT30M`, `2 hours`
+
+Use decimals for compound durations: `1.5h` (not `1h30m`).
+
 #### P9.2: No Shorthand Properties
 
 Do not provide abbreviated property names or condensed formats alongside full formats.
@@ -316,6 +324,86 @@ References to other elements use the element ID only, without file path qualific
 
 **Rationale:** Simple and readable. Global ID uniqueness makes this unambiguous.
 
+#### P9.4: One Command Per Action (CLI)
+
+The CLI must have exactly one command for each action. No aliases, no alternative spellings, no hidden synonyms.
+
+**Rationale:** One canonical form applies to tooling, not just schema. Users should learn one vocabulary. Documentation stays simple. Tab-completion is unambiguous.
+
+---
+
+### P10: Projection-First Design
+
+**Schema elements must map cleanly to formal standards (BPMN, ArchiMate, UML).**
+
+UBML is designed for export to OMG standards. Schema design must preserve clean mappings.
+
+#### P10.1: Element Types as Semantic Primitives
+
+Core element types (step kinds, actor types) are semantic primitives that map directly to formal standard constructs. Each primitive should have a clear 1:1 mapping to BPMN and ArchiMate elements.
+
+**Rationale:** Clean projection requires stable primitives. Adding primitives requires defining their projection to all target standards.
+
+#### P10.2: Behavioral Richness via Properties
+
+Model behavioral variations (approval, review, notification) using properties on primitives, not by creating new primitive types.
+
+**Rationale:** Properties add richness without fragmenting the primitive set. Export logic stays simple: each primitive has one mapping.
+
+#### P10.3: Avoid Standard-Specific Semantics
+
+Do not embed semantics from one standard that conflict with another. Keep definitions generic where standards diverge.
+
+**Rationale:** APQC, TOGAF, and ArchiMate define hierarchies differently. UBML provides mechanisms; users provide context-specific semantics.
+
+#### P10.4: Separation of Modeling and Operational Concerns
+
+Keep process modeling (roles, workflows) separate from operational data (staffing, instances). RACI references roles, not persons.
+
+**Rationale:** BPMN lanes map to roles. ArchiMate separates Actor from Role. Mixing creates ambiguous projections.
+
+#### P10.5: New Primitives Require Projection Mapping
+
+Before adding any new enum value to a primitive type, document its projection to all supported standards (BPMN, ArchiMate, UML).
+
+**Rationale:** Undocumented primitives create export ambiguity. No projection, no primitive.
+
+---
+
+## Evolution Principles
+
+### P11: Language Clarity Over Compatibility
+
+**UBML prioritizes a pristine, correct DSL over backward compatibility.**
+
+#### P11.1: No Legacy Debt
+
+The language must not carry design mistakes forward to avoid breaking changes. When a flaw is discovered, fix it.
+
+**Rationale:** UBML is maturing. Accumulating legacy cruft now will permanently compromise the notation's clarity. Users can tolerate migrations; they cannot tolerate a confusing, inconsistent language.
+
+#### P11.2: Versioned Breaking Changes
+
+When a breaking change is necessary:
+
+1. **Increment the version** — the version field in documents must change
+2. **CLI detects mismatch** — tooling must refuse to process mismatched versions
+3. **Interactive migration** — CLI provides an upgrade wizard that prompts for any information that cannot be automatically inferred
+4. **No silent degradation** — old files must not parse with new tooling without explicit migration
+
+**Rationale:** Explicit versions prevent silent corruption. Migration tooling reduces friction. Users control when they upgrade.
+
+#### P11.3: Migration Tooling Required
+
+Breaking changes require CLI migration support:
+
+- Automated migration command with interactive prompts for ambiguous changes
+- Dry-run mode to preview changes without applying
+- Batch mode for CI that fails if human input would be required
+- Clear diff output showing what changed and why
+
+**Rationale:** Breaking changes are acceptable only if migration is automated. Never force manual file editing across a workspace.
+
 ---
 
 ## Principles Summary
@@ -326,6 +414,7 @@ References to other elements use the element ID only, without file path qualific
 | P1.1 | No Dual Hierarchy | Choose parent OR children, not both |
 | P1.2 | No Redundant ID Declaration | ID in key only, not as property |
 | P1.3 | No Computed Aggregations | Don't store derivable values |
+| P1.4 | No Built-In Version Control | Use git for history/diffing |
 | **P2** | Consistent Patterns | Same concept, same syntax |
 | P2.1 | Uniform ID Patterns | Enforced prefixes and formats |
 | P2.2 | Uniform Reference Syntax | Shared reference type definitions |
@@ -336,8 +425,9 @@ References to other elements use the element ID only, without file path qualific
 | P3.3 | Maximum Nesting Depth | Flatten deep hierarchies |
 | **P4** | Explicitness | Declare behavior, don't infer |
 | P4.1 | Semantic Properties Required | Meaning is explicit |
-| P4.2 | No Magic Defaults | Same default everywhere |
+| P4.2 | No Context-Dependent Defaults | Same default everywhere |
 | P4.3 | Validation Modes Explicit | Document declares strictness |
+| P4.4 | No Hidden Defaults | Choices require explicit values |
 | **P5** | Schema Design Rules | How to write schemas |
 | P5.1 | Fragment Modularity | One concept per file |
 | P5.2 | Required Properties Minimal | Only identification required |
@@ -361,5 +451,16 @@ References to other elements use the element ID only, without file path qualific
 | P9.1 | No Alternative Representations | No multiple syntaxes |
 | P9.2 | No Shorthand Properties | No abbreviated forms |
 | P9.3 | Bare ID References | Simple ID, no qualification |
+| P9.4 | One Command Per Action (CLI) | No aliases, no synonyms |
+| **P10** | Projection-First Design | Clean mapping to formal standards |
+| P10.1 | Element Types as Semantic Primitives | Kinds/types map 1:1 to BPMN/ArchiMate |
+| P10.2 | Behavioral Richness via Properties | Properties, not new primitive types |
+| P10.3 | Avoid Standard-Specific Semantics | No hardcoded APQC/TOGAF definitions |
+| P10.4 | Separation of Modeling and Operational | Roles for process, persons for staffing |
+| P10.5 | New Primitives Require Projection Mapping | Document all standard mappings first |
+| **P11** | Language Clarity Over Compatibility | Pristine DSL, not backward compatibility |
+| P11.1 | No Legacy Debt | Fix design mistakes, don't carry them forward |
+| P11.2 | Versioned Breaking Changes | Explicit versions, CLI detects mismatch |
+| P11.3 | Migration Tooling Required | Automated migration for breaking changes |
 
 

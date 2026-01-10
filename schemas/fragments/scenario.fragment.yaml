@@ -323,7 +323,7 @@ $defs:
           - type: duration
             step: ST005
             metric: processingTime
-            value: "4h30m"
+            value: "4.5h"
             observedAt: "2024-01-15"
             source: "Time tracking system"
           - type: count

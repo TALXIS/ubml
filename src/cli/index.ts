@@ -25,7 +25,9 @@ import { initCommand } from './commands/init';
 import { schemaCommand } from './commands/schema';
 import { addCommand } from './commands/add';
 import { docsCommand } from './commands/docs';
-import { syntaxCommand, examplesCommand, idsCommand, enumsCommand, nextidCommand } from './commands/ref';
+import { showCommand } from './commands/show';
+import { helpCommand } from './commands/help';
+import { syntaxCommand, examplesCommand, idsCommand, enumsCommand, nextidCommand, syncidsCommand } from './commands/ref';
 
 /**
  * Create and configure the CLI program.
@@ -58,7 +60,9 @@ ${chalk.dim('Documentation: https://ubml.io/docs')}
   program.addCommand(schemaCommand());    // 2. Learn the schema
   program.addCommand(addCommand());       // 3. Add content
   program.addCommand(validateCommand());  // 4. Validate
-  program.addCommand(docsCommand());      // Reference docs
+  program.addCommand(showCommand());      // 5. Visualize workspace
+  program.addCommand(helpCommand());      // Unified help
+  program.addCommand(docsCommand());      // Reference docs (kept for compatibility)
   
   // Quick reference commands
   program.addCommand(syntaxCommand());    // Quick syntax lookup
@@ -66,6 +70,7 @@ ${chalk.dim('Documentation: https://ubml.io/docs')}
   program.addCommand(idsCommand());       // ID patterns
   program.addCommand(enumsCommand());     // Enum values
   program.addCommand(nextidCommand());    // Next available ID
+  program.addCommand(syncidsCommand());   // Sync ID stats from files
 
   return program;
 }

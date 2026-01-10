@@ -34,6 +34,20 @@ export { parseFile } from './parser.js';
 // Serializer operations
 export { serializeToFile } from './serializer.js';
 
+// ID scanning operations
+export {
+  scanWorkspaceIds,
+  getNextAvailableId,
+  getNextAvailableIds,
+  checkIdConflict,
+  findWorkspaceFile,
+  readIdStats,
+  writeIdStats,
+  syncIdStats,
+  type WorkspaceIdScan,
+  type IdStats,
+} from './id-scanner.js';
+
 // Validator operations
 export { 
   validateFile, 

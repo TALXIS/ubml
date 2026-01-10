@@ -472,7 +472,7 @@ export async function validate(
   documents: UBMLDocument[],
   options: ValidateOptions = {}
 ): Promise<ValidationResult> {
-  const { extractDefinedIds, extractReferencedIds } = await import('./semantic-validator.js');
+  const { validateDocuments } = await import('./semantic-validator.js');
   const errors: ValidationError[] = [];
   const warnings: ValidationWarning[] = [];
   
@@ -485,73 +485,31 @@ export async function validate(
     warnings.push(...schemaResult.warnings);
   }
   
-  // Phase 2: Validate cross-document references
-  const definedIds = new Map<string, { filepath: string; path: string }>();
-  const referencedIds = new Map<string, string[]>();
+  // Phase 2: Validate cross-document references using semantic validator
+  const refResult = validateDocuments(documents, {
+    suppressUnusedWarnings: options.suppressUnusedWarnings,
+  });
   
-  // Extract all defined IDs
-  for (const doc of documents) {
-    const filepath = doc.meta.filename || 'unknown';
-    const ids = extractDefinedIds(doc.content, filepath);
-    
-    for (const [id, info] of ids) {
-      if (definedIds.has(id)) {
-        const existing = definedIds.get(id)!;
-        errors.push({
-          code: 'ubml/duplicate-id',
-          message: `ID "${id}" is defined in multiple files: ${existing.filepath} and ${info.filepath}`,
-          filepath: info.filepath,
-          path: info.path,
-        });
-      } else {
-        definedIds.set(id, info);
-      }
-    }
-    
-    // Extract all referenced IDs
-    const refs = extractReferencedIds(doc.content, filepath);
-    for (const [id, locations] of refs) {
-      const existing = referencedIds.get(id) ?? [];
-      existing.push(...locations.map(l => l.filepath));
-      referencedIds.set(id, existing);
-    }
+  // Add reference errors with suggestions
+  for (const refError of refResult.errors) {
+    errors.push({
+      code: refError.code,
+      message: refError.message,
+      filepath: refError.filepath,
+      path: refError.path,
+    });
   }
   
-  // Check for undefined references
-  for (const [id, filepaths] of referencedIds) {
-    if (!definedIds.has(id)) {
-      const uniqueFiles = [...new Set(filepaths)];
-      for (const filepath of uniqueFiles) {
-        errors.push({
-          code: 'ubml/undefined-reference',
-          message: `Reference to undefined ID "${id}"`,
-          filepath,
-        });
-      }
-    }
-  }
-  
-  // Check for unused IDs (warning only)
-  if (!options.suppressUnusedWarnings) {
-    for (const [id, info] of definedIds) {
-      if (!referencedIds.has(id)) {
-        // Get the document to resolve source location
-        const doc = documents.find(d => d.meta.filename === info.filepath);
-        const jsonPointerPath = '/' + info.path.replace(/\./g, '/');
-        const location = doc?.getSourceLocation(jsonPointerPath);
-        
-        warnings.push({
-          code: 'ubml/unused-id',
-          message: `ID "${id}" is defined but never referenced`,
-          filepath: info.filepath,
-          path: info.path,
-          ...(location && {
-            line: location.line,
-            column: location.column,
-          }),
-        });
-      }
-    }
+  // Add reference warnings with source locations
+  for (const refWarning of refResult.warnings) {
+    warnings.push({
+      code: refWarning.code,
+      message: refWarning.message,
+      filepath: refWarning.filepath,
+      path: refWarning.path,
+      line: refWarning.line,
+      column: refWarning.column,
+    });
   }
   
   return {

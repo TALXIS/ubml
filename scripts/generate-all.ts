@@ -1630,7 +1630,7 @@ function generateTemplates(templateData: DocumentTemplateInfo[]): string {
  * - Descriptions for inline documentation
  */
 
-import type { DocumentType } from './metadata.js';
+import { SCHEMA_VERSION, type DocumentType } from './metadata.js';
 
 // ============================================================================
 // TEMPLATE METADATA TYPES

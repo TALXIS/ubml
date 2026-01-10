@@ -17,34 +17,11 @@ import {
   ID_PREFIXES, 
   ID_CONFIG, 
   formatId,
+  parseIdNumber,
   type IdPrefix,
 } from '../../generated/metadata';
-
-// =============================================================================
-// Formatting Helpers
-// =============================================================================
-
-const INDENT = '  ';
-
-function header(text: string): string {
-  return chalk.bold.cyan(text);
-}
-
-function subheader(text: string): string {
-  return chalk.bold.white(text);
-}
-
-function dim(text: string): string {
-  return chalk.dim(text);
-}
-
-function highlight(text: string): string {
-  return chalk.yellow(text);
-}
-
-function code(text: string): string {
-  return chalk.cyan(text);
-}
+import { scanWorkspaceIds, getNextAvailableId, readIdStats, syncIdStats } from '../../node/id-scanner';
+import { INDENT, header, subheader, dim, highlight, code } from '../formatters/text';
 
 // =============================================================================
 // Syntax Command
@@ -228,7 +205,7 @@ function showAllEnums(): void {
 // NextId Command
 // =============================================================================
 
-function showNextId(prefix: string, options: { start?: string }): void {
+function showNextId(prefix: string, options: { dir?: string; scan?: boolean }): void {
   // Validate prefix
   const upperPrefix = prefix.toUpperCase();
   const validPrefixes = Object.keys(ID_PREFIXES);
@@ -242,31 +219,71 @@ function showNextId(prefix: string, options: { start?: string }): void {
   
   const idPrefix = upperPrefix as IdPrefix;
   const elementType = ID_PREFIXES[idPrefix];
-  
-  // Determine starting number
-  let startNum = ID_CONFIG.addOffset; // Default to add offset (for new content)
-  if (options.start === 'init') {
-    startNum = ID_CONFIG.initOffset;
-  } else if (options.start) {
-    const parsed = parseInt(options.start, 10);
-    if (!isNaN(parsed) && parsed > 0) {
-      startNum = parsed;
-    }
-  }
-  
-  // Generate the ID
-  const nextId = formatId(idPrefix, startNum);
+  const dir = options.dir || process.cwd();
+  const shouldScan = options.scan !== false; // Default to true
   
   console.log();
   console.log(header('Next Available ID'));
   console.log(dim('────────────────────────────────────────────────────────────'));
   console.log();
-  console.log(`  Prefix:  ${highlight(idPrefix)} (${elementType})`);
-  console.log(`  Start:   ${startNum}`);
-  console.log(`  Next ID: ${code(nextId)}`);
-  console.log();
-  console.log(dim(`Tip: Subsequent IDs: ${formatId(idPrefix, startNum + 1)}, ${formatId(idPrefix, startNum + 2)}, ...`));
-  console.log(dim(`     With gaps of 10: ${formatId(idPrefix, startNum)}, ${formatId(idPrefix, startNum + 10)}, ${formatId(idPrefix, startNum + 20)}`));
+  
+  if (shouldScan) {
+    // Scan workspace for existing IDs
+    const scan = scanWorkspaceIds(dir);
+    const existingIds = scan.idsByPrefix.get(idPrefix) ?? new Set();
+    
+    if (scan.filesScanned === 0) {
+      console.log(dim(`  (No UBML files found in workspace)`));
+      console.log();
+    } else {
+      console.log(`  Workspace: ${dim(dir)}`);
+      console.log(`  Files scanned: ${scan.filesScanned}`);
+      if (existingIds.size > 0) {
+        console.log(`  Existing ${idPrefix}### IDs: ${existingIds.size}`);
+        
+        // Show highest existing ID
+        let maxNum = 0;
+        for (const id of existingIds) {
+          const num = parseIdNumber(id);
+          if (num !== undefined && num > maxNum) {
+            maxNum = num;
+          }
+        }
+        if (maxNum > 0) {
+          console.log(`  Highest: ${formatId(idPrefix, maxNum)}`);
+        }
+      } else {
+        console.log(`  Existing ${idPrefix}### IDs: ${dim('none')}`);
+      }
+      console.log();
+    }
+    
+    // Get next available ID using stats or scanning
+    const result = getNextAvailableId(idPrefix, dir, { useGaps: true, updateStats: true });
+    
+    console.log(`  Prefix:  ${highlight(idPrefix)} (${elementType})`);
+    console.log(`  Next ID: ${code(result.id)}`);
+    if (result.usedStats) {
+      console.log(`  Source:  ${dim('workspace idStats (fast)')}`);
+    } else {
+      console.log(`  Source:  ${dim('file scan (no idStats found)')}`);
+    }
+    console.log();
+    
+    // Show sequence with gaps
+    const nextNum = parseIdNumber(result.id) ?? ID_CONFIG.addOffset;
+    console.log(dim(`  Suggested sequence (gaps of 10):`));
+    console.log(dim(`    ${formatId(idPrefix, nextNum)}, ${formatId(idPrefix, nextNum + 10)}, ${formatId(idPrefix, nextNum + 20)}, ...`));
+  } else {
+    // No scanning, just show calculated ID
+    const nextId = formatId(idPrefix, ID_CONFIG.addOffset);
+    
+    console.log(`  Prefix:  ${highlight(idPrefix)} (${elementType})`);
+    console.log(`  Next ID: ${code(nextId)} ${dim('(from addOffset)')}`);
+    console.log();
+    console.log(dim(`  Tip: Use --scan (default) to check existing IDs in workspace`));
+  }
+  
   console.log();
 }
 
@@ -335,10 +352,70 @@ export function nextidCommand(): Command {
   const command = new Command('nextid');
   
   command
-    .description('Get the next available ID for a given prefix')
+    .description('Get the next available ID for a given prefix (scans workspace)')
     .argument('<prefix>', `ID prefix (${Object.keys(ID_PREFIXES).join(', ')})`)
-    .option('-s, --start <number>', 'Starting number (default: addOffset=1000, use "init" for initOffset=1)')
+    .option('-d, --dir <directory>', 'Workspace directory to scan', '.')
+    .option('--no-scan', 'Skip workspace scanning, use default offset')
     .action(showNextId);
+  
+  return command;
+}
+
+/**
+ * Sync ID stats from file contents to workspace document.
+ */
+function doSyncIds(options: { dir: string }): void {
+  const dir = options.dir;
+  
+  console.log();
+  console.log(header('Syncing ID Stats'));
+  console.log(dim('────────────────────────────────────────────────────────────'));
+  console.log();
+  
+  // Check for workspace file
+  const existingStats = readIdStats(dir);
+  
+  // Sync from files
+  const newStats = syncIdStats(dir);
+  
+  if (!newStats) {
+    console.error(chalk.red('No workspace file found in: ' + dir));
+    console.log();
+    console.log('A workspace.ubml.yaml file is required to store idStats.');
+    process.exit(1);
+  }
+  
+  if (Object.keys(newStats).length === 0) {
+    console.log('No IDs found in workspace files.');
+    console.log();
+    return;
+  }
+  
+  console.log('Updated idStats in workspace document:');
+  console.log();
+  
+  for (const [prefix, maxNum] of Object.entries(newStats).sort()) {
+    const oldNum = existingStats?.[prefix as keyof typeof ID_PREFIXES] ?? 0;
+    const changed = oldNum !== maxNum;
+    const indicator = changed ? chalk.green('→') : ' ';
+    console.log(`  ${prefix}: ${oldNum} ${indicator} ${highlight(String(maxNum))}`);
+  }
+  
+  console.log();
+  console.log(chalk.green('✓ idStats synced from file contents'));
+  console.log();
+}
+
+/**
+ * Create the syncids command.
+ */
+export function syncidsCommand(): Command {
+  const command = new Command('syncids');
+  
+  command
+    .description('Sync idStats in workspace document from actual file contents')
+    .option('-d, --dir <directory>', 'Workspace directory to scan', '.')
+    .action(doSyncIds);
   
   return command;
 }

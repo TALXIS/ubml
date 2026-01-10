@@ -15,32 +15,7 @@ import {
   getSuggestedWorkflow,
 } from '../schema-introspection';
 import { SCHEMA_VERSION } from '../../generated/metadata';
-
-// =============================================================================
-// Formatting Helpers
-// =============================================================================
-
-const INDENT = '  ';
-
-function header(text: string): string {
-  return chalk.bold.cyan(text);
-}
-
-function subheader(text: string): string {
-  return chalk.bold.white(text);
-}
-
-function dim(text: string): string {
-  return chalk.dim(text);
-}
-
-function code(text: string): string {
-  return chalk.cyan(text);
-}
-
-function highlight(text: string): string {
-  return chalk.yellow(text);
-}
+import { INDENT, header, subheader, dim, code, highlight } from '../formatters/text';
 
 // =============================================================================
 // Documentation Content
