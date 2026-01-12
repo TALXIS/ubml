@@ -78,11 +78,11 @@
     "prepublishOnly": "npm run verify-versions && npm run build && npm run test"
   },
   "devDependencies": {
-    "@types/eslint": "^8.56.0",
+    "@types/eslint": "^9.6.1",
     "@types/node": "^20.0.0",
     "@typescript-eslint/eslint-plugin": "^8.52.0",
     "@typescript-eslint/parser": "^8.52.0",
-    "eslint": "^8.0.0",
+    "eslint": "^9.39.2",
     "json-schema-to-typescript": "^15.0.4",
     "tsup": "^8.0.0",
     "tsx": "^4.21.0",
