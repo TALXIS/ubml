@@ -3,15 +3,17 @@
  */
 
 import { describe, it, expect } from 'vitest';
+import { SCHEMA_VERSION } from '../../src/constants.js';
 import { serialize } from '../../src/index.js';
 
 describe('Serializer', () => {
   describe('serialize', () => {
     it('should serialize simple objects', () => {
-      const obj = { ubml: '1.1', name: 'Test' };
+      const obj = { ubml: SCHEMA_VERSION, name: 'Test' };
+      
       const yaml = serialize(obj);
       
-      expect(yaml).toContain('ubml: "1.1"');
+      expect(yaml).toContain(`ubml: "${SCHEMA_VERSION}"`);
       expect(yaml).toContain('name: Test');
       expect(yaml.endsWith('\n')).toBe(true);
     });

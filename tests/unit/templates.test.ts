@@ -6,6 +6,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
+import { SCHEMA_VERSION } from '../../src/constants.js';
 import { parse } from '../../src/parser.js';
 import { createValidator } from '../../src/validator.js';
 
@@ -15,7 +16,7 @@ import { createValidator } from '../../src/validator.js';
 describe('CLI Templates', () => {
   describe('Process Template', () => {
     const processYaml = `
-ubml: "1.1"
+ubml: "${SCHEMA_VERSION}"
 processes:
   PR00001:
     name: "Test Process"
@@ -73,7 +74,7 @@ processes:
 
   describe('Actors Template', () => {
     const actorsYaml = `
-ubml: "1.1"
+ubml: "${SCHEMA_VERSION}"
 actors:
   AC00001:
     name: "Process Owner"
@@ -140,7 +141,7 @@ skills:
 
   describe('Entities Template', () => {
     const entitiesYaml = `
-ubml: "1.1"
+ubml: "${SCHEMA_VERSION}"
 entities:
   EN00001:
     name: "Order"
@@ -173,7 +174,7 @@ documents:
 
   describe('Metrics Template', () => {
     const metricsYaml = `
-ubml: "1.1"
+ubml: "${SCHEMA_VERSION}"
 kpis:
   KP00001:
     name: "Cycle Time"
@@ -219,7 +220,7 @@ kpis:
 
   describe('Hypotheses Template', () => {
     const hypothesesYaml = `
-ubml: "1.1"
+ubml: "${SCHEMA_VERSION}"
 hypothesisTrees:
   HT00001:
     name: "Process Improvement Analysis"

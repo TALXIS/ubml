@@ -8,6 +8,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
+import { SCHEMA_VERSION } from '../../src/constants.js';
 import {
   parse,
   createValidator,
@@ -25,7 +26,7 @@ describe('Browser-Safe API', () => {
   describe('parse()', () => {
     it('should parse valid YAML content', () => {
       const yaml = `
-ubml: "1.1"
+ubml: "${SCHEMA_VERSION}"
 processes:
   PR00001:
     id: PR00001
@@ -45,14 +46,14 @@ processes:
     });
 
     it('should detect document type from filename', () => {
-      const yaml = `ubml: "1.1"\nactors: {}`;
+      const yaml = `ubml: "${SCHEMA_VERSION}"\nactors: {}`;
       const result = parse(yaml, 'my-org.actors.ubml.yaml');
       
       expect(result.document?.meta.type).toBe('actors');
     });
 
     it('should return errors for invalid YAML', () => {
-      const invalidYaml = `ubml: "1.1"\n  invalid: indentation`;
+      const invalidYaml = `ubml: "${SCHEMA_VERSION}"\n  invalid: indentation`;
       const result = parse(invalidYaml);
       
       expect(result.ok).toBe(false);
@@ -72,7 +73,7 @@ processes:
     it('should validate content against document type', async () => {
       const validator = await createValidator();
       const content = {
-        ubml: '1.1',
+        ubml: SCHEMA_VERSION,
         processes: {
           PR00001: {
             name: 'Test',
@@ -117,7 +118,7 @@ processes:
   describe('parseAndValidate()', () => {
     it('should parse and validate in one call', async () => {
       const yaml = `
-ubml: "1.1"
+ubml: "${SCHEMA_VERSION}"
 processes:
   PR00001:
     name: "Test"

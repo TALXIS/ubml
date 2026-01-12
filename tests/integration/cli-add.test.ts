@@ -5,6 +5,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { SCHEMA_VERSION } from '../../src/constants.js';
 import { mkdtempSync, rmSync, existsSync, readdirSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
@@ -51,7 +52,7 @@ describe('CLI Add Command', () => {
    * Helper to create a minimal workspace for testing
    */
   function createMinimalWorkspace(): void {
-    writeFileSync(join(tempDir, 'workspace.ubml.yaml'), 'ubml: "1.1"\nname: test\n');
+    writeFileSync(join(tempDir, 'workspace.ubml.yaml'), 'ubml: "${SCHEMA_VERSION}"\nname: test\n');
   }
 
   describe('add without arguments', () => {
@@ -88,7 +89,7 @@ describe('CLI Add Command', () => {
 
       if (processFile) {
         const content = readFileSync(join(tempDir, processFile), 'utf8');
-        expect(content).toContain('ubml: "1.1"');
+        expect(content).toContain(`ubml: "${SCHEMA_VERSION}"`);
         expect(content).toContain('processes:');
       }
     });
@@ -123,7 +124,7 @@ describe('CLI Add Command', () => {
 
       if (actorsFile) {
         const content = readFileSync(join(tempDir, actorsFile), 'utf8');
-        expect(content).toContain('ubml: "1.1"');
+        expect(content).toContain(`ubml: "${SCHEMA_VERSION}"`);
       }
     });
   });
@@ -169,7 +170,7 @@ describe('CLI Add Command', () => {
 
       if (targetFile) {
         const content = readFileSync(join(tempDir, targetFile), 'utf8');
-        expect(content).toContain('ubml: "1.1"');
+        expect(content).toContain(`ubml: "${SCHEMA_VERSION}"`);
       }
     });
   });

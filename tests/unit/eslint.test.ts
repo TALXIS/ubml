@@ -5,6 +5,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
+import { SCHEMA_VERSION } from '../../src/constants.js';
 import { validUbmlRule } from '../../src/eslint/rules/valid-ubml.js';
 import type { Rule } from 'eslint';
 
@@ -73,7 +74,7 @@ describe('ESLint Plugin', () => {
     });
 
     it('should process UBML files', async () => {
-      const source = `ubml: "1.1"
+      const source = `ubml: "${SCHEMA_VERSION}"
 processes:
   PR00001:
     name: "Test Process"
@@ -91,7 +92,7 @@ processes:
     });
 
     it('should report parse errors with line numbers', async () => {
-      const source = `ubml: "1.1"
+      const source = `ubml: "${SCHEMA_VERSION}"
   invalid: indentation
 `;
       const { context, reports } = createMockContext('test.process.ubml.yaml', source);
@@ -113,7 +114,7 @@ processes:
     });
 
     it('should report validation errors with line numbers', async () => {
-      const source = `ubml: "1.1"
+      const source = `ubml: "${SCHEMA_VERSION}"
 processes:
   PR00001:
     name: "Test Process"
@@ -149,7 +150,7 @@ processes:
       // Line 5:     steps
       // Line 6:       ST00001
       // Line 7:         name (ST00001 value starts here - missing 'kind')
-      const source = `ubml: "1.1"
+      const source = `ubml: "${SCHEMA_VERSION}"
 processes:
   PR00001:
     name: "Test"
@@ -180,7 +181,7 @@ processes:
     });
 
     it('should validate actors document', async () => {
-      const source = `ubml: "1.1"
+      const source = `ubml: "${SCHEMA_VERSION}"
 actors:
   AC00001:
     name: "Test Actor"
@@ -204,7 +205,7 @@ actors:
     });
 
     it('should pass valid documents without errors', async () => {
-      const source = `ubml: "1.1"
+      const source = `ubml: "${SCHEMA_VERSION}"
 actors:
   AC00001:
     name: "Test Actor"

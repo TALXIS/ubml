@@ -6,6 +6,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
+import { SCHEMA_VERSION } from '../../src/constants.js';
 import {
   getDocumentTypeInfo,
   getAllDocumentTypes,
@@ -245,27 +246,27 @@ describe('Schema Introspection', () => {
     it('should return minimal template for process', () => {
       const template = createDocument('process');
       expect(template).toBeDefined();
-      expect(template.ubml).toBe('1.1');
+      expect(template.ubml).toBe(SCHEMA_VERSION);
       expect(template.processes).toBeDefined();
     });
 
     it('should return minimal template for actors', () => {
       const template = createDocument('actors');
       expect(template).toBeDefined();
-      expect(template.ubml).toBe('1.1');
+      expect(template.ubml).toBe(SCHEMA_VERSION);
     });
 
     it('should return minimal template for workspace', () => {
       const template = createDocument('workspace');
       expect(template).toBeDefined();
-      expect(template.ubml).toBe('1.1');
+      expect(template.ubml).toBe(SCHEMA_VERSION);
     });
 
     it('should return templates for all document types', () => {
       for (const type of DOCUMENT_TYPES) {
         const template = createDocument(type);
         expect(template).toBeDefined();
-        expect(template.ubml).toBe('1.1');
+        expect(template.ubml).toBe(SCHEMA_VERSION);
       }
     });
   });

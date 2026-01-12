@@ -3,6 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
+import { SCHEMA_VERSION } from '../../src/constants.js';
 import { parse, createValidator } from '../../src/index.js';
 
 describe('Validator', () => {
@@ -17,7 +18,7 @@ describe('Validator', () => {
     it('should validate valid process document', async () => {
       const validator = await createValidator();
       const content = {
-        ubml: '1.1',
+        ubml: SCHEMA_VERSION,
         processes: {
           PR00001: {
             name: 'Test Process',
@@ -38,7 +39,7 @@ describe('Validator', () => {
 
     it('should validate parsed document', async () => {
       const yaml = `
-ubml: "1.1"
+ubml: "${SCHEMA_VERSION}"
 processes:
   PR00001:
     name: "Test Process"

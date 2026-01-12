@@ -3,6 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
+import { SCHEMA_VERSION } from '../../src/constants.js';
 import { 
   formatValidationError, 
   formatEnhancedErrorToString, 
@@ -304,7 +305,7 @@ describe('formatValidationError', () => {
 
       const result = formatValidationError(error);
       expect(result.hint).toContain('ubml');
-      expect(result.example).toContain('ubml: "1.1"');
+      expect(result.example).toContain(`ubml: "${SCHEMA_VERSION}"`);
     });
   });
 

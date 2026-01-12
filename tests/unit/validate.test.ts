@@ -3,13 +3,14 @@
  */
 
 import { describe, it, expect } from 'vitest';
+import { SCHEMA_VERSION } from '../../src/constants.js';
 import { parse, validate } from '../../src/index.js';
 
 describe('validate', () => {
   it('should validate schema and references together', async () => {
     // Actor document
     const actorsYaml = `
-ubml: "1.1"
+ubml: "${SCHEMA_VERSION}"
 name: "Test Actors"
 actors:
   AC00001:
@@ -20,7 +21,7 @@ actors:
     
     // Process referencing the actor
     const processYaml = `
-ubml: "1.1"
+ubml: "${SCHEMA_VERSION}"
 name: "Test Process"
 processes:
   PR00001:
@@ -49,7 +50,7 @@ processes:
 
   it('should detect undefined references', async () => {
     const processYaml = `
-ubml: "1.1"
+ubml: "${SCHEMA_VERSION}"
 processes:
   PR00001:
     name: "Test"
@@ -72,7 +73,7 @@ processes:
 
   it('should detect duplicate IDs', async () => {
     const actors1 = parse(`
-ubml: "1.1"
+ubml: "${SCHEMA_VERSION}"
 actors:
   AC00001:
     name: "Manager"
@@ -81,7 +82,7 @@ actors:
 `, 'actors1.actors.ubml.yaml');
     
     const actors2 = parse(`
-ubml: "1.1"
+ubml: "${SCHEMA_VERSION}"
 actors:
   AC00001:
     name: "Different Manager"
@@ -97,7 +98,7 @@ actors:
 
   it('should warn about unused IDs with line numbers', async () => {
     const actorsYaml = `
-ubml: "1.1"
+ubml: "${SCHEMA_VERSION}"
 actors:
   AC00001:
     name: "Unused Actor"
@@ -117,7 +118,7 @@ actors:
 
   it('should suppress unused warnings when requested', async () => {
     const actorsYaml = `
-ubml: "1.1"
+ubml: "${SCHEMA_VERSION}"
 actors:
   AC00001:
     name: "Catalog Actor"
@@ -136,7 +137,7 @@ actors:
 
   it('should detect schema validation errors', async () => {
     const invalidYaml = `
-ubml: "1.1"
+ubml: "${SCHEMA_VERSION}"
 processes:
   PR00001:
     name: "Test"
@@ -152,7 +153,7 @@ processes:
 
   it('should validate multiple document types', async () => {
     const actors = parse(`
-ubml: "1.1"
+ubml: "${SCHEMA_VERSION}"
 actors:
   AC00001:
     name: "PM"
@@ -161,7 +162,7 @@ actors:
 `, 'actors.actors.ubml.yaml');
     
     const process = parse(`
-ubml: "1.1"
+ubml: "${SCHEMA_VERSION}"
 processes:
   PR00001:
     name: "Process"
