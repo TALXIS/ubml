@@ -6,7 +6,7 @@
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.io/schemas/1.2/fragments/metrics.fragment.yaml"
+$id: "https://ubml.talxis.com/schemas/1.2/fragments/metrics.fragment.yaml"
 title: "UBML Metrics Fragment"
 description: |
   Metrics and measurement structures for process performance,

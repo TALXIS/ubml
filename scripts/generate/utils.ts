@@ -19,7 +19,7 @@ const __dirname = dirname(__filename);
 // =============================================================================
 
 export const ROOT_DIR = join(__dirname, '..', '..');
-export const SCHEMAS_DIR = join(ROOT_DIR, 'schemas');
+export const SCHEMAS_ROOT = join(ROOT_DIR, 'schemas');
 export const OUTPUT_DIR = join(ROOT_DIR, 'src', 'generated');
 
 // =============================================================================
@@ -33,6 +33,9 @@ export const PACKAGE_VERSION = packageJson.version as string;
 
 /** Schema version (e.g., "1.1") */
 export const SCHEMA_VERSION = PACKAGE_VERSION.split('.').slice(0, 2).join('.');
+
+/** Versioned schemas directory (e.g., "schemas/1.2") */
+export const SCHEMAS_DIR = join(SCHEMAS_ROOT, SCHEMA_VERSION);
 
 // =============================================================================
 // File Operations

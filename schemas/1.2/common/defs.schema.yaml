@@ -10,7 +10,7 @@
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.io/schemas/1.2/common/defs.schema.yaml"
+$id: "https://ubml.talxis.com/schemas/1.2/common/defs.schema.yaml"
 title: "UBML Common Definitions"
 description: |
   Shared type definitions for UBML (Unified Business Modeling Language).

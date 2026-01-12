@@ -6,7 +6,7 @@
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.io/schemas/1.2/fragments/process.fragment.yaml"
+$id: "https://ubml.talxis.com/schemas/1.2/fragments/process.fragment.yaml"
 title: "UBML Process Fragment"
 description: |
   Processes are the core workflows containing steps, links, and control flow.

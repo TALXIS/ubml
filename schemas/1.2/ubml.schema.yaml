@@ -10,7 +10,7 @@
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.io/schemas/1.2/ubml.schema.yaml"
+$id: "https://ubml.talxis.com/schemas/1.2/ubml.schema.yaml"
 title: "UBML - Unified Business Modeling Language"
 description: |
   ╔══════════════════════════════════════════════════════════════════════════╗
@@ -80,8 +80,8 @@ description: |
   For VS Code support, add to settings.json:
   
     "yaml.schemas": {
-      "https://ubml.io/schemas/1.2/documents/process.document.yaml": "*.process.ubml.yaml",
-      "https://ubml.io/schemas/1.2/documents/actors.document.yaml": "*.actors.ubml.yaml",
+      "https://ubml.talxis.com/schemas/1.2/documents/process.document.yaml": "*.process.ubml.yaml",
+      "https://ubml.talxis.com/schemas/1.2/documents/actors.document.yaml": "*.actors.ubml.yaml",
       ...
     }
   

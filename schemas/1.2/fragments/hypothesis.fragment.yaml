@@ -6,7 +6,7 @@
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.io/schemas/1.2/fragments/hypothesis.fragment.yaml"
+$id: "https://ubml.talxis.com/schemas/1.2/fragments/hypothesis.fragment.yaml"
 title: "UBML Hypothesis Fragment"
 description: |
   Hypothesis trees provide structured problem framing using the SCQH 

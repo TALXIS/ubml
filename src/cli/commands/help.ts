@@ -444,7 +444,7 @@ function showVscodeHelp(): void {
   console.log();
   
   console.log(dim('─'.repeat(60)));
-  console.log(dim('Tip: The YAML extension uses UBML schemas from ubml.io'));
+  console.log(dim('Tip: The YAML extension uses UBML schemas from ubml.talxis.com'));
   console.log();
 }
 

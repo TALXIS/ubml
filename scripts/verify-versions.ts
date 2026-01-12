@@ -27,7 +27,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const ROOT_DIR = join(__dirname, '..');
-const SCHEMAS_DIR = join(ROOT_DIR, 'schemas');
+const SCHEMAS_ROOT = join(ROOT_DIR, 'schemas');
 const SRC_DIR = join(ROOT_DIR, 'src');
 
 // =============================================================================
@@ -109,6 +109,7 @@ function getAllYamlFiles(dir: string): string[] {
  */
 function verifySchemaFiles(schemaVersion: string): VersionIssue[] {
   const issues: VersionIssue[] = [];
+  const SCHEMAS_DIR = join(SCHEMAS_ROOT, schemaVersion);
   const schemaFiles = getAllYamlFiles(SCHEMAS_DIR);
 
   for (const file of schemaFiles) {
@@ -123,7 +124,7 @@ function verifySchemaFiles(schemaVersion: string): VersionIssue[] {
     }
 
     // Check $id URLs
-    const idPattern = /https:\/\/ubml\.io\/schemas\/(\d+\.\d+)\//g;
+    const idPattern = /https:\/\/ubml\.talxis\.com\/schemas\/(\d+\.\d+)\//g;
     let match;
     while ((match = idPattern.exec(content)) !== null) {
       if (match[1] !== schemaVersion) {

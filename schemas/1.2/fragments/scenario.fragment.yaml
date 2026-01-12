@@ -6,7 +6,7 @@
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.io/schemas/1.2/fragments/scenario.fragment.yaml"
+$id: "https://ubml.talxis.com/schemas/1.2/fragments/scenario.fragment.yaml"
 title: "UBML Scenario Fragment"
 description: |
   Scenarios enable simulation and "what-if" analysis by defining:

@@ -16,7 +16,7 @@
  * @module scripts/update-schema-versions
  */
 
-import { readFileSync, writeFileSync, readdirSync, statSync } from 'fs';
+import { readFileSync, writeFileSync, readdirSync, statSync, renameSync, existsSync } from 'fs';
 import { join, extname } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -25,7 +25,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const ROOT_DIR = join(__dirname, '..');
-const SCHEMAS_DIR = join(ROOT_DIR, 'schemas');
+const SCHEMAS_ROOT = join(ROOT_DIR, 'schemas');
 const EXAMPLE_DIR = join(ROOT_DIR, 'example');
 
 // =============================================================================
@@ -114,7 +114,7 @@ function updateSchemaContent(
   let changes = 0;
 
   // Pattern 1: $id URLs with version
-  const idPattern = /(https:\/\/ubml\.io\/schemas\/)(\d+\.\d+)(\/[^"]+)/g;
+  const idPattern = /(https:\/\/ubml\.talxis\.com\/schemas\/)(\d+\.\d+)(\/[^"]+)/g;
   const idMatches = content.match(idPattern);
   if (idMatches) {
     updated = updated.replace(idPattern, (match, prefix, oldVersion, suffix) => {
@@ -212,6 +212,48 @@ function processSchemaFile(filePath: string, schemaVersion: string): number {
 }
 
 // =============================================================================
+// Version Folder Management
+// =============================================================================
+
+/**
+ * Find the current version folder in schemas directory.
+ */
+function findCurrentVersionFolder(): string | null {
+  try {
+    const entries = readdirSync(SCHEMAS_ROOT);
+    for (const entry of entries) {
+      const fullPath = join(SCHEMAS_ROOT, entry);
+      const stat = statSync(fullPath);
+      if (stat.isDirectory() && /^\d+\.\d+$/.test(entry)) {
+        return entry;
+      }
+    }
+  } catch (error) {
+    console.error(`❌ Failed to read schemas directory: ${error}`);
+    process.exit(1);
+  }
+  return null;
+}
+
+/**
+ * Rename version folder if needed.
+ */
+function renameVersionFolder(oldVersion: string, newVersion: string): void {
+  const oldPath = join(SCHEMAS_ROOT, oldVersion);
+  const newPath = join(SCHEMAS_ROOT, newVersion);
+  
+  console.log(`📦 Renaming folder: schemas/${oldVersion}/ → schemas/${newVersion}/`);
+  
+  try {
+    renameSync(oldPath, newPath);
+    console.log(`✅ Folder renamed successfully\n`);
+  } catch (error) {
+    console.error(`❌ Failed to rename folder: ${error}`);
+    process.exit(1);
+  }
+}
+
+// =============================================================================
 // Main
 // =============================================================================
 
@@ -222,9 +264,25 @@ function main(): void {
   console.log(`📦 Package version: ${fullVersion}`);
   console.log(`📋 Schema version:  ${schemaVersion}\n`);
 
-  // Update schema files
+  // Check if version folder needs renaming
+  const currentFolder = findCurrentVersionFolder();
+  if (currentFolder && currentFolder !== schemaVersion) {
+    console.log(`📁 Current folder: schemas/${currentFolder}/`);
+    console.log(`📁 Target version: ${schemaVersion}\n`);
+    renameVersionFolder(currentFolder, schemaVersion);
+  }
+
+  // Update schema files in versioned folder
+  const SCHEMAS_DIR = join(SCHEMAS_ROOT, schemaVersion);
+  
+  if (!existsSync(SCHEMAS_DIR)) {
+    console.error(`❌ Schema folder not found: schemas/${schemaVersion}/`);
+    console.error(`   Please create the folder or check your package.json version`);
+    process.exit(1);
+  }
+  
   const schemaFiles = getAllYamlFiles(SCHEMAS_DIR);
-  console.log(`📁 Found ${schemaFiles.length} schema files\n`);
+  console.log(`📁 Found ${schemaFiles.length} schema files in schemas/${schemaVersion}/\n`);
 
   let totalChanges = 0;
   let filesUpdated = 0;

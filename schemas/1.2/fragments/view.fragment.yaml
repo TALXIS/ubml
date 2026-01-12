@@ -6,7 +6,7 @@
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.io/schemas/1.2/fragments/view.fragment.yaml"
+$id: "https://ubml.talxis.com/schemas/1.2/fragments/view.fragment.yaml"
 title: "UBML View Fragment"
 description: |
   Views are custom perspectives on the process model that highlight

@@ -7,7 +7,7 @@
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.io/schemas/1.2/documents/views.document.yaml"
+$id: "https://ubml.talxis.com/schemas/1.2/documents/views.document.yaml"
 title: "Views"
 description: |
   View documents define custom perspectives and diagram configurations.

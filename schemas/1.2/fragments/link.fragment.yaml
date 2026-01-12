@@ -6,7 +6,7 @@
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.io/schemas/1.2/fragments/link.fragment.yaml"
+$id: "https://ubml.talxis.com/schemas/1.2/fragments/link.fragment.yaml"
 title: "UBML Link Fragment"
 description: |
   Links represent relationships between steps. In UBML, links unify three 

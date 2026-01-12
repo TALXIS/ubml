@@ -51,7 +51,7 @@ ${chalk.bold('Learn More:')}
   ${chalk.cyan('ubml schema --workflow')}   Recommended modeling workflow
   ${chalk.cyan('ubml docs examples')}       See code examples
 
-${chalk.dim('Documentation: https://ubml.io/docs')}
+${chalk.dim('Documentation: https://ubml.talxis.com/docs')}
 `);
 
   // Add commands in logical order

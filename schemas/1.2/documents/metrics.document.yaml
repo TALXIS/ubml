@@ -7,7 +7,7 @@
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.io/schemas/1.2/documents/metrics.document.yaml"
+$id: "https://ubml.talxis.com/schemas/1.2/documents/metrics.document.yaml"
 title: "Metrics"
 description: |
   Metrics documents define Key Performance Indicators (KPIs) and 

@@ -52,7 +52,7 @@ function hasUbmlFiles(dir: string): boolean {
 function generateVscodeSchemaSettings(): Record<string, string[]> {
   const settings: Record<string, string[]> = {};
   for (const type of DOCUMENT_TYPES) {
-    const schemaUrl = `https://ubml.io/schemas/${SCHEMA_VERSION}/${SCHEMA_PATHS.documents[type]}`;
+    const schemaUrl = `https://ubml.talxis.com/schemas/${SCHEMA_VERSION}/${SCHEMA_PATHS.documents[type]}`;
     // Support both patterns: prefix.type.ubml.yaml AND type.ubml.yaml
     settings[schemaUrl] = [
       `*.${type}.ubml.yaml`,   // Full pattern: organization.actors.ubml.yaml

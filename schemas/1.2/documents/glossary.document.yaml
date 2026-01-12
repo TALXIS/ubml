@@ -7,7 +7,7 @@
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.io/schemas/1.2/documents/glossary.document.yaml"
+$id: "https://ubml.talxis.com/schemas/1.2/documents/glossary.document.yaml"
 title: "Glossary"
 description: |
   Glossary documents define business terminology and definitions.
