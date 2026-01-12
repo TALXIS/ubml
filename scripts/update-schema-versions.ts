@@ -26,6 +26,7 @@ const __dirname = dirname(__filename);
 
 const ROOT_DIR = join(__dirname, '..');
 const SCHEMAS_DIR = join(ROOT_DIR, 'schemas');
+const EXAMPLE_DIR = join(ROOT_DIR, 'example');
 
 // =============================================================================
 // Version Validation
@@ -164,6 +165,27 @@ function updateSchemaContent(
 }
 
 /**
+ * Update ubml version in example YAML files.
+ */
+function updateExampleContent(
+  content: string,
+  schemaVersion: string
+): { updated: string; changes: number } {
+  let updated = content;
+  let changes = 0;
+
+  // Pattern: ubml: "X.Y" at the beginning of the file
+  const ubmlPattern = /^ubml:\s*"(\d+\.\d+)"/m;
+  const match = content.match(ubmlPattern);
+  if (match && match[1] !== schemaVersion) {
+    updated = content.replace(ubmlPattern, `ubml: "${schemaVersion}"`);
+    changes = 1;
+  }
+
+  return { updated, changes };
+}
+
+/**
  * Process a single schema file.
  */
 function processSchemaFile(filePath: string, schemaVersion: string): number {
@@ -200,6 +222,7 @@ function main(): void {
   console.log(`📦 Package version: ${fullVersion}`);
   console.log(`📋 Schema version:  ${schemaVersion}\n`);
 
+  // Update schema files
   const schemaFiles = getAllYamlFiles(SCHEMAS_DIR);
   console.log(`📁 Found ${schemaFiles.length} schema files\n`);
 
@@ -217,10 +240,48 @@ function main(): void {
     }
   }
 
-  console.log(`\n✅ Updated ${filesUpdated} file${filesUpdated !== 1 ? 's' : ''} (${totalChanges} change${totalChanges !== 1 ? 's' : ''})`);
+  console.log(`\n✅ Updated ${filesUpdated} schema file${filesUpdated !== 1 ? 's' : ''} (${totalChanges} change${totalChanges !== 1 ? 's' : ''})`);
   
   if (filesUpdated === 0) {
     console.log('   All schema files already up to date');
+  }
+
+  // Update example files
+  console.log('\n📝 Updating example files...\n');
+  
+  let exampleFilesUpdated = 0;
+
+  const exampleFiles = getAllYamlFiles(EXAMPLE_DIR);
+  
+  for (const file of exampleFiles) {
+    const relativePath = file.replace(ROOT_DIR + '/', '');
+    let content: string;
+    
+    try {
+      content = readFileSync(file, 'utf8');
+    } catch (error) {
+      console.error(`❌ Failed to read ${relativePath}: ${error}`);
+      process.exit(1);
+    }
+
+    const { updated, changes } = updateExampleContent(content, schemaVersion);
+
+    if (changes > 0) {
+      try {
+        writeFileSync(file, updated, 'utf8');
+        console.log(`✏️  ${relativePath}`);
+        exampleFilesUpdated++;
+      } catch (error) {
+        console.error(`❌ Failed to write ${relativePath}: ${error}`);
+        process.exit(1);
+      }
+    }
+  }
+
+  if (exampleFilesUpdated > 0) {
+    console.log(`\n✅ Updated ${exampleFilesUpdated} example file${exampleFilesUpdated !== 1 ? 's' : ''}`);
+  } else {
+    console.log('✅ All example files already up to date');
   }
 }
 
