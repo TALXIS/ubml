@@ -10,26 +10,19 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
 import {
-  getAllDocumentTypes,
   getDocumentTypeInfo,
-  getAllElementTypes,
   getElementTypeInfo,
   getSuggestedWorkflow,
-  getHelpTopics,
   getHelpTopicsByCategory,
   findHelpTopic,
   getIdPrefixCategoryMap,
   getConceptInfo,
-  type HelpTopic,
   type HelpTopicCategory,
 } from '../../schema/index.js';
 import { 
-  SCHEMA_VERSION, 
   ID_PREFIXES, 
   ID_CONFIG, 
-  formatId,
   type IdPrefix,
-  DOCUMENT_TYPES,
   type DocumentType,
 } from '../../metadata.js';
 import { INDENT, header, subheader, dim, code, highlight } from '../formatters/text';
@@ -545,7 +538,7 @@ Topics:
           case 'element':
             showElementHelp(helpTopic.name);
             break;
-          case 'static':
+          case 'static': {
             // Static topics still use the TOPICS map for content
             const handler = TOPICS[helpTopic.name] ?? TOPICS[normalizedTopic];
             if (handler) {
@@ -554,6 +547,7 @@ Topics:
               showTopicNotFound(topic);
             }
             break;
+          }
         }
         return;
       }

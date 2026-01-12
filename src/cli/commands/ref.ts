@@ -11,7 +11,6 @@ import chalk from 'chalk';
 import {
   getAllElementTypes,
   getElementTypeInfo,
-  type ElementTypeInfo,
   getIdPrefixInfo,
 } from '../../schema/index.js';
 import { 
@@ -22,7 +21,7 @@ import {
   type IdPrefix,
 } from '../../metadata.js';
 import { scanWorkspaceIds, getNextAvailableId, readIdStats, syncIdStats } from '../../node/id-scanner';
-import { INDENT, header, subheader, dim, highlight, code } from '../formatters/text';
+import { header, subheader, dim, highlight, code } from '../formatters/text';
 
 // =============================================================================
 // Syntax Command

@@ -21,7 +21,8 @@
     "*.d.ts",
     "*.js",
     "*.mjs",
-    "*.cjs"
+    "*.cjs",
+    "src/generated/**"
   ],
   "rules": {
     "@typescript-eslint/no-explicit-any": "off",

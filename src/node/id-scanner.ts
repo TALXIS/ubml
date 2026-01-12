@@ -7,8 +7,8 @@
  * generation. Falls back to file scanning when stats are missing.
  */
 
-import { readdirSync, readFileSync, writeFileSync, existsSync } from 'fs';
-import { join, dirname } from 'path';
+import { readdirSync, readFileSync, writeFileSync } from 'fs';
+import { join } from 'path';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 import {
   ID_CONFIG,

@@ -215,7 +215,7 @@ export function getElementTypeInfo(elementType: string): ElementTypeInfo | undef
   const capitalizedType = elementType.charAt(0).toUpperCase() + elementType.slice(1);
 
   // Find the fragment containing this element
-  for (const [fragName, schema] of Object.entries(fragmentSchemas)) {
+  for (const [_fragName, schema] of Object.entries(fragmentSchemas)) {
     const defs = (schema as Record<string, unknown>).$defs as Record<string, Record<string, unknown>> | undefined;
     if (!defs) continue;
 
@@ -557,7 +557,7 @@ export function getConceptInfo(conceptName: string): {
   const capitalizedName = conceptName.charAt(0).toUpperCase() + conceptName.slice(1);
 
   // Search all fragment schemas for the concept definition
-  for (const [fragName, schema] of Object.entries(fragmentSchemas)) {
+  for (const [_fragName, schema] of Object.entries(fragmentSchemas)) {
     const defs = (schema as Record<string, unknown>).$defs as Record<string, Record<string, unknown>> | undefined;
     if (!defs) continue;
 

@@ -31,18 +31,7 @@ function toKebabCase(name: string): string {
     .replace(/^-+|-+$/g, '');
 }
 
-/**
- * Check if a directory is empty (ignoring hidden files like .git).
- */
-function isDirectoryEmpty(dir: string): boolean {
-  try {
-    const files = readdirSync(dir);
-    // Consider empty if only hidden files exist
-    return files.filter((f) => !f.startsWith('.')).length === 0;
-  } catch {
-    return true;
-  }
-}
+
 
 /**
  * Check if UBML files already exist in a directory.

@@ -9,16 +9,11 @@
 
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { resolve, basename, relative } from 'path';
+import { resolve, basename } from 'path';
 import { readdirSync, readFileSync, statSync } from 'fs';
 import { parse as parseYaml } from 'yaml';
 import { 
-  ID_PREFIXES, 
-  DOCUMENT_TYPES,
   type DocumentType,
-  type IdPrefix,
-  getIdPrefix,
-  isValidId,
   detectDocumentType,
 } from '../../metadata.js';
 import { INDENT, header, subheader, dim, highlight, success } from '../formatters/text';

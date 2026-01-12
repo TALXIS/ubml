@@ -14,8 +14,6 @@ import { serialize } from '../../index';
 import {
   getDocumentTypeInfo,
   getSuggestedNextStep,
-  getSuggestedWorkflow,
-  createDocument,
 } from '../../schema/index.js';
 import { 
   DOCUMENT_TYPES, 
@@ -346,7 +344,7 @@ function generateActorItems(
  * Generate skill items.
  */
 function generateSkillItems(
-  section: typeof TEMPLATE_DATA[DocumentType]['sections'][number]
+  _section: typeof TEMPLATE_DATA[DocumentType]['sections'][number]
 ): SectionItem[] {
   return [
     {

@@ -13,7 +13,6 @@ import {
   shouldBeNested,
   getEnumValueMistakeHint,
   SCHEMA_VERSION,
-  type PatternHintData,
 } from '../../metadata.js';
 
 /**
@@ -161,7 +160,7 @@ function formatAdditionalPropertiesError(
  */
 function formatEnumError(
   error: RawAjvError, 
-  schemaContext?: SchemaContext
+  _schemaContext?: SchemaContext
 ): EnhancedError {
   const allowedValues = (error.params?.allowedValues as string[]) || [];
   const actualValue = String(error.data ?? '');
@@ -246,7 +245,7 @@ function formatPatternError(
  */
 function formatRequiredError(
   error: RawAjvError,
-  schemaContext?: SchemaContext
+  _schemaContext?: SchemaContext
 ): EnhancedError {
   const missingProp = error.params?.missingProperty as string;
   
@@ -288,7 +287,7 @@ function formatRequiredError(
  */
 function formatTypeError(
   error: RawAjvError, 
-  schemaContext?: SchemaContext
+  _schemaContext?: SchemaContext
 ): EnhancedError {
   const expectedType = error.params?.type as string;
   const actualValue = error.data;
@@ -317,7 +316,7 @@ function formatTypeError(
  */
 function formatConstError(
   error: RawAjvError,
-  schemaContext?: SchemaContext
+  _schemaContext?: SchemaContext
 ): EnhancedError {
   const expectedValue = error.params?.allowedValue;
   const actualValue = error.data;
@@ -333,7 +332,7 @@ function formatConstError(
  */
 function formatOneOfError(
   error: RawAjvError,
-  schemaContext?: SchemaContext
+  _schemaContext?: SchemaContext
 ): EnhancedError {
   const passingSchemas = error.params?.passingSchemas;
   
@@ -355,7 +354,7 @@ function formatOneOfError(
  */
 function formatLengthError(
   error: RawAjvError,
-  schemaContext?: SchemaContext
+  _schemaContext?: SchemaContext
 ): EnhancedError {
   const limit = error.params?.limit as number;
   const actualValue = error.data;
@@ -378,7 +377,7 @@ function formatLengthError(
  */
 function formatRangeError(
   error: RawAjvError,
-  schemaContext?: SchemaContext
+  _schemaContext?: SchemaContext
 ): EnhancedError {
   const limit = error.params?.limit as number;
   const actualValue = error.data;

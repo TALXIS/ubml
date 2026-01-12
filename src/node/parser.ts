@@ -6,7 +6,7 @@
 
 import { resolve, basename } from 'path';
 import { type FileSystem, nodeFS } from './fs.js';
-import { parse, type ParseResult, type UBMLDocument } from '../parser.js';
+import { parse, type ParseResult } from '../parser.js';
 
 /**
  * Options for parsing a file.

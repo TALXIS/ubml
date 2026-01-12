@@ -7,7 +7,7 @@
 
 import type { FormatterResult, ValidationMessage } from './common';
 import { VERSION, PACKAGE_NAME, REPOSITORY_URL } from '../../index';
-import { ERROR_CODES, iterateMessages } from './common';
+import { ERROR_CODES } from './common';
 
 interface SarifResult {
   ruleId: string;

@@ -7,7 +7,7 @@
  * @module ubml/schema/derive
  */
 
-import { defsSchema, rootSchema } from '../generated/bundled.js';
+import { defsSchema } from '../generated/bundled.js';
 import type { IdPrefix } from '../metadata.js';
 import { getCategorySortOrder } from '../metadata.js';
 

@@ -104,7 +104,7 @@ export function validateCommand(): Command {
 
       try {
         isDirectory = statSync(absolutePath).isDirectory();
-      } catch (err) {
+      } catch {
         console.error(`Error: Path not found: ${absolutePath}`);
         process.exit(2);
       }

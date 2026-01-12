@@ -7,7 +7,7 @@
  * @module ubml
  */
 
-import { parseDocument as parseYamlDocument, Document, isMap, isSeq, Pair, Scalar, YAMLMap, YAMLSeq } from 'yaml';
+import { parseDocument as parseYamlDocument, Document, isMap, isSeq, Pair, Scalar } from 'yaml';
 import { detectDocumentType, detectDocumentTypeFromContent, type DocumentType } from './metadata.js';
 
 // Re-export for convenience

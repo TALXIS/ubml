@@ -5,7 +5,7 @@
 import chalk from 'chalk';
 import type { FormatterResult, ValidationMessage } from './common';
 import { groupMessagesByFile, formatLocation, formatPath, SUCCESS_MESSAGES } from './common';
-import { formatValidationError, formatEnhancedErrorToString } from './validation-errors';
+import { formatValidationError } from './validation-errors';
 import type { RawAjvError, SchemaContext } from '../../validator.js';
 
 export interface StylishOptions {

@@ -10,8 +10,6 @@ import { parseFile } from './parser.js';
 import { 
   createValidator,
   validate,
-  type Validator, 
-  type ValidationResult, 
   type ValidationError, 
   type ValidationWarning,
   type RawAjvError,
@@ -224,7 +222,7 @@ export async function validateFile(
 async function findUBMLFiles(
   dir: string, 
   fs: FileSystem,
-  workspaceFile?: string
+  _workspaceFile?: string
 ): Promise<{ files: string[]; workspaceFile?: string }> {
   // First, look for a workspace file
   const workspacePatterns = ['*.workspace.ubml.yaml', '*.workspace.ubml.yml'];
