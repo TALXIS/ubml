@@ -407,7 +407,7 @@ $defs:
         description: "KPIs to display (for metrics views)."
         type: array
         items:
-          $ref: "../defs/refs.defs.yaml#/$defs/KPIRef"
+          $ref: "../defs/refs.defs.yaml#/$defs/KpiRef"
       
       audience:
         description: |

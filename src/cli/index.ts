@@ -26,7 +26,7 @@ import { schemaCommand } from './commands/schema';
 import { addCommand } from './commands/add';
 import { showCommand } from './commands/show';
 import { helpCommand } from './commands/help';
-import { syntaxCommand, examplesCommand, idsCommand, enumsCommand, nextidCommand, syncidsCommand } from './commands/ref';
+import { syntaxCommand, idsCommand, enumsCommand, nextidCommand, syncidsCommand } from './commands/ref';
 
 /**
  * Create and configure the CLI program.
@@ -47,9 +47,9 @@ ${chalk.bold('Getting Started:')}
   ${chalk.cyan('ubml validate .')}          Validate all files
 
 ${chalk.bold('Learn More:')}
-  ${chalk.cyan('ubml docs quickstart')}     Quick start guide
+  ${chalk.cyan('ubml help quickstart')}     Quick start guide
   ${chalk.cyan('ubml schema --workflow')}   Recommended modeling workflow
-  ${chalk.cyan('ubml docs examples')}       See code examples
+  ${chalk.cyan('ubml help examples')}       See code examples
 
 ${chalk.dim('Documentation: https://ubml.talxis.com/docs')}
 `);
@@ -64,7 +64,6 @@ ${chalk.dim('Documentation: https://ubml.talxis.com/docs')}
   
   // Quick reference commands
   program.addCommand(syntaxCommand());    // Quick syntax lookup
-  program.addCommand(examplesCommand());  // Show examples
   program.addCommand(idsCommand());       // ID patterns
   program.addCommand(enumsCommand());     // Enum values
   program.addCommand(nextidCommand());    // Next available ID

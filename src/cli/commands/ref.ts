@@ -60,60 +60,6 @@ function showSyntax(elementType: string): void {
 }
 
 // =============================================================================
-// Examples Command
-// =============================================================================
-
-function showExamples(typeOrProperty: string): void {
-  // Parse: could be "duration" or "step.kind"
-  const parts = typeOrProperty.split('.');
-  const elementType = parts[0];
-  const propName = parts[1];
-  
-  const info = getElementTypeInfo(elementType);
-  if (!info) {
-    console.error(chalk.red(`Unknown type: ${elementType}`));
-    process.exit(1);
-  }
-  
-  console.log();
-  
-  if (propName) {
-    // Show examples for specific property
-    const prop = info.properties.find(p => p.name === propName);
-    if (!prop || !prop.examples) {
-      console.log(`No examples found for ${typeOrProperty}`);
-      return;
-    }
-    
-    console.log(header(`${elementType}.${propName} Examples`));
-    console.log(dim('────────────────────────────────────────────────────────────'));
-    console.log();
-    prop.examples.forEach(ex => {
-      const str = typeof ex === 'string' ? `"${ex}"` : JSON.stringify(ex, null, 2);
-      console.log(`  ${str}`);
-    });
-  } else {
-    // Show all examples for element type
-    console.log(header(`${info.type.charAt(0).toUpperCase() + info.type.slice(1)} Examples`));
-    console.log(dim('────────────────────────────────────────────────────────────'));
-    console.log();
-    
-    for (const prop of info.properties) {
-      if (prop.examples && prop.examples.length > 0) {
-        console.log(`  ${highlight(prop.name)}:`);
-        prop.examples.slice(0, 2).forEach(ex => {
-          const str = typeof ex === 'string' ? `"${ex}"` : JSON.stringify(ex);
-          console.log(`    ${str}`);
-        });
-        console.log();
-      }
-    }
-  }
-  
-  console.log();
-}
-
-// =============================================================================
 // IDs Command
 // =============================================================================
 
@@ -276,20 +222,6 @@ export function syntaxCommand(): Command {
     .description('Show compact syntax reference for an element type')
     .argument('<element>', 'Element type (e.g., step, actor, entity)')
     .action(showSyntax);
-  
-  return command;
-}
-
-/**
- * Create the examples command.
- */
-export function examplesCommand(): Command {
-  const command = new Command('examples');
-  
-  command
-    .description('Show examples for a type or property')
-    .argument('<type>', 'Type or property (e.g., duration, step.kind)')
-    .action(showExamples);
   
   return command;
 }

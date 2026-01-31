@@ -11,6 +11,7 @@ import chalk from 'chalk';
 import { existsSync, writeFileSync, readdirSync } from 'fs';
 import { join, resolve, basename } from 'path';
 import { serialize } from '../../index';
+import { findWorkspaceFile } from '../../node/id-scanner';
 import {
   getDocumentTypeInfo,
   getSuggestedNextStep,
@@ -503,6 +504,12 @@ function addDocument(
   options: { dir: string; force: boolean }
 ): void {
   const dir = resolve(options.dir);
+  
+  // Warn if not in a workspace
+  if (!findWorkspaceFile(dir)) {
+    console.log(chalk.yellow('Note: No workspace found. Run "ubml init ." first.'));
+  }
+  
   const info = getDocumentTypeInfo(type);
   if (!info) {
     console.error(chalk.red(`Error: Unknown document type: ${type}`));
@@ -644,10 +651,7 @@ Document Types:
       if (!DOCUMENT_TYPES.includes(type as DocumentType)) {
         console.error(chalk.red(`Error: Unknown document type "${type}"`));
         console.error();
-        console.error('Available types:');
-        for (const t of DOCUMENT_TYPES) {
-          console.error(INDENT + highlight(t));
-        }
+        console.error('Available types: ' + DOCUMENT_TYPES.join(', '));
         console.error();
         console.error('Run ' + code('ubml add') + ' to see details.');
         process.exit(1);

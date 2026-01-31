@@ -12,6 +12,7 @@ import chalk from 'chalk';
 import { mkdirSync, writeFileSync, existsSync, readdirSync, readFileSync } from 'fs';
 import { join, resolve, basename } from 'path';
 import { serialize } from '../../index';
+import { findWorkspaceFile } from '../../node/id-scanner';
 import { 
   DOCUMENT_TYPES, 
   SCHEMA_VERSION, 
@@ -171,6 +172,13 @@ interface InitOptions {
  * Initialize a workspace in the current directory.
  */
 function initCurrentDirectory(name: string, options: InitOptions): void {
+  // Validate name
+  if (!name || name.trim() === '' || (name !== '.' && !/^[a-zA-Z0-9._-]+$/.test(name))) {
+    console.error(chalk.red('Error: Invalid workspace name.'));
+    console.error('Use letters, numbers, hyphens, underscores, or "." for current directory.');
+    process.exit(1);
+  }
+
   // Determine workspace directory
   // If name is "." or an absolute/relative path, use it directly
   // Otherwise, create a subdirectory with that name
@@ -178,6 +186,16 @@ function initCurrentDirectory(name: string, options: InitOptions): void {
     ? resolve(name)
     : resolve('.', name);
   const safeName = toKebabCase(name === '.' ? basename(process.cwd()) : name);
+
+  // Check if already inside a workspace
+  if (name !== '.' && !options.force) {
+    const parent = findWorkspaceFile(resolve('.'));
+    if (parent) {
+      console.error(chalk.yellow('Warning: Already inside workspace ' + basename(parent)));
+      console.error('Use --force to create nested workspace, or use "ubml init ."');
+      process.exit(1);
+    }
+  }
 
   // Create directory if it doesn't exist (when creating new subdirectory)
   if (workspaceDir !== resolve('.')) {
