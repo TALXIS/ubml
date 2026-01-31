@@ -52,6 +52,11 @@ describe('CLI Init Command', () => {
     it('should create a new UBML workspace directory', () => {
       const result = runUbml('init test-project');
 
+      if (result.exitCode !== 0) {
+        console.error('CLI failed with exit code:', result.exitCode);
+        console.error('stderr:', result.stderr);
+        console.error('stdout:', result.stdout);
+      }
       expect(result.exitCode).toBe(0);
       expect(existsSync(join(tempDir, 'test-project'))).toBe(true);
     });
