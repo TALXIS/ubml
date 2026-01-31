@@ -13,7 +13,7 @@ import {
   type DocumentType,
   type IdPrefix,
 } from '../metadata.js';
-import { documentSchemas, typeSchemas, refsDefsSchema, primitivesDefsSchema, sharedDefsSchema } from '../generated/bundled.js';
+import { documentSchemas, typeSchemas, refsDefsSchema } from '../generated/bundled.js';
 import type {
   SchemaCliMetadata,
   DocumentTypeInfo,

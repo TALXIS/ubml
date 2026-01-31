@@ -8,7 +8,7 @@
  */
 
 import { readdirSync, readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
-import { join, dirname } from 'path';
+import { join } from 'path';
 import { parse as parseYaml } from 'yaml';
 import {
   ID_CONFIG,
