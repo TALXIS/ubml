@@ -109,6 +109,18 @@ describe('CLI Init Command', () => {
       expect(ubmlFiles.length).toBe(1);
     });
 
+    it('should create .gitignore with .ubml/ directory', () => {
+      const result = runUbml('init test-project --minimal');
+
+      expect(result.exitCode).toBe(0);
+      const projectDir = join(tempDir, 'test-project');
+      const gitignorePath = join(projectDir, '.gitignore');
+      
+      expect(existsSync(gitignorePath)).toBe(true);
+      const content = readFileSync(gitignorePath, 'utf8');
+      expect(content).toContain('.ubml/');
+    });
+
     it.skip('should support --full flag', () => {
       // Skip: --full flag may not be implemented
       const result = runUbml('init test-project --full');

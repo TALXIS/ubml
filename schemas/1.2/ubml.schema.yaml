@@ -366,37 +366,6 @@ properties:
   # METADATA
   # ══════════════════════════════════════════════════════════════════════════
   
-  metadata:
-    description: "Document metadata."
-    type: object
-    additionalProperties: false
-    properties:
-      createdAt:
-        type: string
-        format: date-time
-      createdBy:
-        type: string
-      updatedAt:
-        type: string
-        format: date-time
-      updatedBy:
-        type: string
-      approvedAt:
-        type: string
-        format: date-time
-      approvedBy:
-        type: string
-  
-  owner:
-    description: "Document owner."
-    $ref: "defs/refs.defs.yaml#/$defs/ActorRef"
-  
-  stakeholders:
-    description: "Key stakeholders."
-    type: array
-    items:
-      $ref: "defs/refs.defs.yaml#/$defs/ActorRef"
-  
   tags:
     description: "Tags for filtering and organization."
     type: array

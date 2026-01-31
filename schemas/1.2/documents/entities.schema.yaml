@@ -139,22 +139,6 @@ properties:
       "^LO\\d{5,}$":
         $ref: "../types/location.types.yaml#/$defs/Location"
   
-  metadata:
-    description: "Document metadata."
-    type: object
-    additionalProperties: false
-    properties:
-      createdAt:
-        type: string
-        format: date-time
-      createdBy:
-        type: string
-      updatedAt:
-        type: string
-        format: date-time
-      updatedBy:
-        type: string
-  
   tags:
     description: "Tags for filtering and organization."
     type: array

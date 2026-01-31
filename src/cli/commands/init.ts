@@ -94,7 +94,6 @@ function createDocumentTemplate(type: TemplateType, name?: string): unknown {
         ...base,
         name: name ?? 'UBML Workspace',
         description: `${name ?? 'UBML'} workspace - add your project description here`,
-        status: 'draft',
         organization: {
           name: 'Your Organization',
           department: 'Department',
@@ -237,6 +236,26 @@ function createWorkspaceFiles(
   // Create VS Code settings directory
   const vscodeDir = join(workspaceDir, '.vscode');
   mkdirSync(vscodeDir, { recursive: true });
+
+  // Create or update .gitignore
+  const gitignorePath = join(workspaceDir, '.gitignore');
+  let gitignoreContent = '';
+  if (existsSync(gitignorePath)) {
+    try {
+      gitignoreContent = readFileSync(gitignorePath, 'utf-8');
+    } catch {
+      // If we can't read, start fresh
+    }
+  }
+  
+  // Add .ubml/ to .gitignore if not already present
+  if (!gitignoreContent.includes('.ubml/')) {
+    const newLine = gitignoreContent && !gitignoreContent.endsWith('\n') ? '\n' : '';
+    const comment = gitignoreContent ? '' : '# UBML cache directory\n';
+    gitignoreContent += `${newLine}${comment}.ubml/\n`;
+    writeFileSync(gitignorePath, gitignoreContent);
+    createdFiles.push(gitignorePath);
+  }
 
   // Create settings.json
   const settingsFile = join(vscodeDir, 'settings.json');

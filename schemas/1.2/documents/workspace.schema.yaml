@@ -79,17 +79,6 @@ properties:
       Recommend semantic versioning (e.g., "1.0.0").
     type: string
   
-  status:
-    description: |
-      Workspace status:
-      - draft: Work in progress
-      - review: Under stakeholder review
-      - approved: Formally approved
-      - archived: No longer active
-    type: string
-    enum: [draft, review, approved, archived]
-    default: draft
-  
   organization:
     description: |
       Organization this workspace belongs to.
@@ -160,11 +149,6 @@ properties:
     type: object
     additionalProperties: false
     properties:
-      processLevel:
-        description: "Default process level."
-        type: integer
-        minimum: 1
-        maximum: 6
       currency:
         description: "Default currency code (ISO 4217)."
         type: string
@@ -172,56 +156,6 @@ properties:
       timezone:
         description: "Default timezone (IANA name)."
         type: string
-      workingHours:
-        description: "Default working hours."
-        type: string
-  
-  terminology:
-    description: |
-      Custom terminology mappings.
-      Allows organizations to use their own terms while maintaining
-      UBML compatibility.
-      
-      Example:
-        terminology:
-          step: "Activity"
-          actor: "Role"
-          process: "Workflow"
-    type: object
-    additionalProperties:
-      type: string
-  
-  metadata:
-    description: |
-      Workspace metadata for tracking and governance.
-    type: object
-    additionalProperties: false
-    properties:
-      createdAt:
-        type: string
-        format: date-time
-      createdBy:
-        type: string
-      updatedAt:
-        type: string
-        format: date-time
-      updatedBy:
-        type: string
-      approvedAt:
-        type: string
-        format: date-time
-      approvedBy:
-        type: string
-  
-  owner:
-    description: "Workspace owner."
-    $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
-  
-  stakeholders:
-    description: "Key stakeholders."
-    type: array
-    items:
-      $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
   
   tags:
     description: "Tags for filtering and organization."
@@ -232,22 +166,3 @@ properties:
   custom:
     description: "User-defined custom fields."
     $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"
-  
-  idStats:
-    description: |
-      ID sequence tracking for the workspace.
-      Similar to database sequences, this tracks the highest used ID for each
-      prefix to enable fast next-ID generation without scanning all files.
-      
-      Updated automatically by CLI tools when creating new elements.
-      
-      Example:
-        idStats:
-          AC: 45      # Actors: next available is AC00046
-          PR: 12      # Processes: next available is PR00013
-          ST: 234     # Steps: next available is ST00235
-          EN: 67      # Entities: next available is EN00068
-    type: object
-    additionalProperties:
-      type: integer
-      minimum: 0

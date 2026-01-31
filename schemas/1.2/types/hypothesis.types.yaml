@@ -294,11 +294,6 @@ $defs:
         description: "Person responsible for validating this node."
         $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
       
-      dueDate:
-        description: "Target date for validation."
-        type: string
-        format: date
-      
       evidence:
         description: |
           Evidence supporting or refuting this node.
@@ -420,16 +415,6 @@ $defs:
         type: array
         items:
           $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
-      
-      createdAt:
-        description: "When the analysis was created."
-        type: string
-        format: date-time
-      
-      updatedAt:
-        description: "When the analysis was last updated."
-        type: string
-        format: date-time
       
       tags:
         description: "Tags for filtering and views."

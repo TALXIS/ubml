@@ -3,13 +3,13 @@
  * 
  * Manages ID sequences for UBML workspaces.
  * 
- * Uses workspace-stored idStats (like database sequences) for fast next-ID
- * generation. Falls back to file scanning when stats are missing.
+ * Uses a git-ignored cache file (.ubml/id-cache.json) for fast next-ID
+ * generation. Falls back to file scanning when cache is missing.
  */
 
-import { readdirSync, readFileSync, writeFileSync } from 'fs';
-import { join } from 'path';
-import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
+import { readdirSync, readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
+import { join, dirname } from 'path';
+import { parse as parseYaml } from 'yaml';
 import {
   ID_CONFIG,
   ID_PREFIXES,
@@ -63,18 +63,48 @@ export function findWorkspaceFile(dir: string): string | undefined {
 }
 
 /**
- * Read idStats from the workspace document.
- * Returns undefined if workspace file doesn't exist or has no idStats.
+ * ID statistics cache file structure.
+ * Stored in .ubml/id-cache.json (git-ignored).
+ */
+export interface IdStatsCache {
+  version: number;
+  maxIds: IdStats;
+}
+
+/**
+ * Get the path to the ID cache file for a workspace.
+ */
+function getIdCachePath(dir: string): string {
+  return join(dir, '.ubml', 'id-cache.json');
+}
+
+/**
+ * Ensure the .ubml directory exists.
+ */
+function ensureUbmlDir(dir: string): void {
+  const ubmlDir = join(dir, '.ubml');
+  if (!existsSync(ubmlDir)) {
+    mkdirSync(ubmlDir, { recursive: true });
+  }
+}
+
+/**
+ * Read idStats from the cache file.
+ * Returns undefined if cache file doesn't exist or is invalid.
  */
 export function readIdStats(dir: string): IdStats | undefined {
-  const workspaceFile = findWorkspaceFile(dir);
-  if (!workspaceFile) return undefined;
+  const cachePath = getIdCachePath(dir);
   
   try {
-    const content = readFileSync(workspaceFile, 'utf8');
-    const parsed = parseYaml(content) as Record<string, unknown>;
-    if (parsed && typeof parsed.idStats === 'object' && parsed.idStats !== null) {
-      return parsed.idStats as IdStats;
+    if (!existsSync(cachePath)) {
+      return undefined;
+    }
+    
+    const content = readFileSync(cachePath, 'utf8');
+    const cache = JSON.parse(content) as IdStatsCache;
+    
+    if (cache && cache.version === 1 && typeof cache.maxIds === 'object') {
+      return cache.maxIds;
     }
   } catch {
     // File can't be read or parsed
@@ -83,20 +113,18 @@ export function readIdStats(dir: string): IdStats | undefined {
 }
 
 /**
- * Write idStats to the workspace document.
- * Creates or updates the idStats property.
+ * Write idStats to the cache file.
+ * Creates the .ubml directory if it doesn't exist.
  */
 export function writeIdStats(dir: string, stats: IdStats): boolean {
-  const workspaceFile = findWorkspaceFile(dir);
-  if (!workspaceFile) return false;
-  
   try {
-    const content = readFileSync(workspaceFile, 'utf8');
-    const parsed = parseYaml(content) as Record<string, unknown>;
+    ensureUbmlDir(dir);
+    const cachePath = getIdCachePath(dir);
     
     // Merge with existing stats (only update, don't remove)
-    const existingStats = (parsed.idStats as IdStats) ?? {};
+    const existingStats = readIdStats(dir) ?? {};
     const mergedStats: IdStats = { ...existingStats };
+    
     for (const [prefix, value] of Object.entries(stats)) {
       const existingValue = mergedStats[prefix as IdPrefix] ?? 0;
       if (value !== undefined && value > existingValue) {
@@ -104,11 +132,12 @@ export function writeIdStats(dir: string, stats: IdStats): boolean {
       }
     }
     
-    parsed.idStats = mergedStats;
+    const cache: IdStatsCache = {
+      version: 1,
+      maxIds: mergedStats,
+    };
     
-    // Write back with preserved formatting
-    const newContent = stringifyYaml(parsed, { lineWidth: 0 });
-    writeFileSync(workspaceFile, newContent, 'utf8');
+    writeFileSync(cachePath, JSON.stringify(cache, null, 2), 'utf8');
     return true;
   } catch {
     return false;
@@ -357,15 +386,12 @@ export function getNextAvailableIds(
 
 /**
  * Sync idStats from actual file contents.
- * Use this to initialize stats or recover from inconsistencies.
+ * Use this to initialize cache or recover from inconsistencies.
  * 
  * @param dir - The workspace directory to scan
- * @returns The synced stats, or undefined if no workspace file
+ * @returns The synced stats
  */
-export function syncIdStats(dir: string): IdStats | undefined {
-  const workspaceFile = findWorkspaceFile(dir);
-  if (!workspaceFile) return undefined;
-  
+export function syncIdStats(dir: string): IdStats {
   // Scan all files to find actual IDs
   const scan = scanWorkspaceIds(dir);
   const stats: IdStats = {};
@@ -384,7 +410,7 @@ export function syncIdStats(dir: string): IdStats | undefined {
     }
   }
   
-  // Write to workspace
+  // Write to cache
   if (Object.keys(stats).length > 0) {
     writeIdStats(dir, stats);
   }
