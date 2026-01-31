@@ -21,9 +21,9 @@ npm test
 
 | Type | Pattern | Location |
 |------|---------|----------|
-| Shared definitions | `*.defs.yaml` | `schemas/1.2/defs/` |
-| Type definitions | `*.types.yaml` | `schemas/1.2/types/` |
-| Document schemas | `*.schema.yaml` | `schemas/1.2/documents/` |
+| Shared definitions | `*.defs.yaml` | `schemas/{version}/defs/` |
+| Type definitions | `*.types.yaml` | `schemas/{version}/types/` |
+| Document schemas | `*.schema.yaml` | `schemas/{version}/documents/` |
 
 Every property must have a description explaining purpose, not just type.
 

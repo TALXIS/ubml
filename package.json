@@ -8,12 +8,7 @@
     "business-modeling",
     "process-modeling",
     "yaml-schema",
-    "json-schema",
     "bpmn",
-    "dsl",
-    "validation",
-    "parser",
-    "serializer",
     "cli"
   ],
   "homepage": "https://github.com/TALXIS/ubml",
@@ -63,7 +58,7 @@
   ],
   "scripts": {
     "build": "npm run generate && tsup",
-    "generate": "tsx scripts/generate/index.ts",
+    "generate": "npm run update-schema-versions && tsx scripts/generate/index.ts",
     "update-schema-versions": "tsx scripts/update-schema-versions.ts",
     "verify-versions": "tsx scripts/verify-versions.ts",
     "validate:example": "tsx bin/ubml.ts validate ./example",
@@ -74,7 +69,6 @@
     "lint:fix": "eslint src --ext .ts --fix",
     "typecheck": "tsc --noEmit",
     "docs": "typedoc src/index.ts --out docs/api",
-    "prebuild": "npm run update-schema-versions && npm run generate",
     "prepublishOnly": "npm run verify-versions && npm run build && npm run test"
   },
   "devDependencies": {

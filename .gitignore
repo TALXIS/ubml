@@ -49,6 +49,7 @@ pnpm-debug.log*
 
 # Auto-generated files (run 'npm run generate' to recreate)
 src/generated/
+src/constants.ts
 
 # Allow bin folder for CLI scripts (override global gitignore)
 !bin/
