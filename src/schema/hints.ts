@@ -14,12 +14,7 @@ import {
   type PatternHintData,
   type NestedPropertyHintData,
   type EnumHintData,
-} from '../metadata.js';
-
-// Re-export with simpler names for consumers
-export type PatternHint = PatternHintData;
-export type NestedPropertyHint = NestedPropertyHintData;
-export type EnumHint = EnumHintData;
+} from '../generated/data.js';
 
 // =============================================================================
 // Pattern Hints
@@ -28,14 +23,14 @@ export type EnumHint = EnumHintData;
 /**
  * Get pattern hint for a regex pattern.
  */
-export function getPatternHint(pattern: string): PatternHint | undefined {
+export function getPatternHint(pattern: string): PatternHintData | undefined {
   return PATTERN_HINTS.find((h) => h.pattern === pattern);
 }
 
 /**
  * Get pattern hint by prefix (e.g., 'AC', 'PR').
  */
-export function getPatternHintByPrefix(prefix: string): PatternHint | undefined {
+export function getPatternHintByPrefix(prefix: string): PatternHintData | undefined {
   return PATTERN_HINTS.find((h) => h.prefix === prefix);
 }
 
@@ -46,7 +41,7 @@ export function getPatternHintByPrefix(prefix: string): PatternHint | undefined 
 /**
  * Get nested property hint for a property that might be misplaced.
  */
-export function getNestedPropertyHint(propertyName: string): NestedPropertyHint | undefined {
+export function getNestedPropertyHint(propertyName: string): NestedPropertyHintData | undefined {
   return NESTED_PROPERTY_HINTS.find((h) => h.childProperties.includes(propertyName));
 }
 
@@ -74,7 +69,7 @@ export function shouldBeNested(
 /**
  * Get enum hint for a property name.
  */
-export function getEnumHint(propertyName: string): EnumHint | undefined {
+export function getEnumHint(propertyName: string): EnumHintData | undefined {
   return ENUM_HINTS.find((h) => h.propertyNames.includes(propertyName));
 }
 

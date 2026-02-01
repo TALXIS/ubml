@@ -7,7 +7,7 @@
  * @module ubml/schema/id-utils
  */
 
-import { ID_CONFIG, ID_PREFIXES, type IdPrefix, type ElementType } from '../metadata.js';
+import { ID_CONFIG, ID_PREFIXES, type IdPrefix, type ElementType } from '../generated/data.js';
 
 // =============================================================================
 // ID Formatting

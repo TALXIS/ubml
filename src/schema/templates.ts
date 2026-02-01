@@ -6,7 +6,8 @@
  * @module ubml/schema/templates
  */
 
-import { SCHEMA_VERSION, type DocumentType, type IdPrefix } from '../metadata.js';
+import type { DocumentType, IdPrefix } from '../generated/data.js';
+import { SCHEMA_VERSION } from '../constants.js';
 import { getDocumentTypeInfo } from './introspection.js';
 import type { DocumentTypeInfo, SectionInfo } from './types.js';
 import { formatId, getInitStartNumber, getAddStartNumber } from './id-utils.js';

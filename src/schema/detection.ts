@@ -11,7 +11,7 @@ import {
   SCHEMA_PATHS, 
   CONTENT_DETECTION_CONFIG,
   type DocumentType 
-} from '../metadata.js';
+} from '../generated/data.js';
 
 // =============================================================================
 // Filename-based Detection

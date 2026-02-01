@@ -7,7 +7,7 @@
  * @module ubml/schema/types
  */
 
-import type { DocumentType, IdPrefix } from '../metadata.js';
+import type { DocumentType, IdPrefix } from '../generated/data.js';
 
 /**
  * CLI metadata from schema x-ubml-cli extension.

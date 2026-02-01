@@ -12,7 +12,7 @@ import {
   ID_PREFIXES,
   type DocumentType,
   type IdPrefix,
-} from '../metadata.js';
+} from '../generated/data.js';
 import { documentSchemas, typeSchemas, refsDefsSchema } from '../generated/bundled.js';
 import { getTypeString } from './utils.js';
 import type {
