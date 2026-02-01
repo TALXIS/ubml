@@ -19,6 +19,7 @@
 
 import { Command } from 'commander';
 import chalk from 'chalk';
+import updateNotifier from 'update-notifier';
 import { VERSION } from '../index';
 import { validateCommand } from './commands/validate';
 import { initCommand } from './commands/init';
@@ -76,6 +77,22 @@ ${chalk.dim('Documentation: https://ubml.talxis.com/docs')}
  * Run the CLI with the given arguments.
  */
 export async function run(args: string[]): Promise<void> {
+  // Check for updates
+  const pkg = { name: 'ubml', version: VERSION };
+  const notifier = updateNotifier({ 
+    pkg,
+    updateCheckInterval: 1000 * 60 * 60 * 24 // Check once per day
+  });
+  
+  // Show update notification if available
+  if (notifier.update && notifier.update.latest !== VERSION) {
+    notifier.notify({
+      message: `Update available ${chalk.dim('{currentVersion}')} → ${chalk.green('{latestVersion}')}\n` +
+        `Run ${chalk.cyan('npm install -g ubml')} to update`,
+      isGlobal: true
+    });
+  }
+
   const program = createProgram();
   await program.parseAsync(['node', 'ubml', ...args]);
 }
