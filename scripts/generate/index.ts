@@ -33,6 +33,7 @@ import {
   discoverDocumentTypes,
   discoverTypes,
   ensureOutputDir,
+  cleanupGeneratedFiles,
   OUTPUT_DIR,
   ROOT_DIR,
 } from './utils.js';
@@ -47,7 +48,7 @@ import {
   extractValidationPatterns,
   extractCommonProperties,
   extractCategoryConfig,
-} from './extract-metadata.js';
+} from './extract-metadata/index.js';
 
 import { bundleSchemas, generateBundledTs } from './bundle-schemas.js';
 import { generateDataTs } from './generate-data.js';
@@ -61,6 +62,11 @@ import { generateConstantsTs } from './generate-constants.js';
 
 async function main() {
   console.log('🔧 Generating UBML code from schemas...\n');
+
+  // Clean up old generated files first
+  console.log('🧹 Cleaning up old generated files...');
+  cleanupGeneratedFiles();
+  console.log('   Cleared stale generated code\n');
 
   ensureOutputDir();
 

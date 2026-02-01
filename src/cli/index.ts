@@ -23,7 +23,7 @@ import { VERSION } from '../index';
 import { validateCommand } from './commands/validate';
 import { initCommand } from './commands/init';
 import { schemaCommand } from './commands/schema';
-import { addCommand } from './commands/add';
+import { addCommand } from './commands/add/index';
 import { showCommand } from './commands/show';
 import { helpCommand } from './commands/help';
 import { syntaxCommand, idsCommand, enumsCommand, nextidCommand, syncidsCommand } from './commands/ref';

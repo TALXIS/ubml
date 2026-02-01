@@ -42,7 +42,7 @@ export {
   getConceptInfo,
   type HelpTopic,
   type HelpTopicCategory,
-} from './introspection.js';
+} from './introspection/index.js';
 
 // =============================================================================
 // ID Utilities

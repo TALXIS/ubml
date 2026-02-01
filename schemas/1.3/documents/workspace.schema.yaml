@@ -1,0 +1,180 @@
+# ============================================================================
+# UBML Workspace Document Schema
+# ============================================================================
+# Schema for .workspace.ubml.yaml files - the root workspace configuration.
+#
+# FILE PATTERN: *.workspace.ubml.yaml
+# ============================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://ubml.talxis.com/schemas/1.3/documents/workspace.schema.yaml"
+title: "Workspace"
+description: |
+  The workspace document is the root configuration file for a UBML project.
+  
+  WHAT IS A WORKSPACE?
+  A workspace is a collection of related process models, actors, entities,
+  and other artifacts that together describe a business domain or initiative.
+  
+  WORKSPACE STRUCTURE:
+  A typical UBML workspace contains:
+  - One workspace.ubml.yaml (this file)
+  - One or more process files (*.process.ubml.yaml)
+  - Actor definitions (*.actors.ubml.yaml)
+  - Information model (*.entities.ubml.yaml)
+  - And other domain-specific files
+  
+  FILE NAMING: *.workspace.ubml.yaml
+  Example: acme-order-management.workspace.ubml.yaml
+
+# CLI metadata - structured data for tooling
+x-ubml-cli:
+  category: core
+  categoryDisplayName: "Core Modeling"
+  workflowOrder: 1
+  shortDescription: "Root configuration file for a UBML project."
+  defaultFilename: "workspace"
+  detectBy:
+    - organization
+    - documents
+  gettingStarted:
+    - "Create a workspace file with name and description"
+    - "Add process files for your business processes"
+    - "Add actor files to define roles and teams"
+    - "Add entity files for your information model"
+  exampleFilename: "acme-project.workspace.ubml.yaml"
+
+# Common properties that appear in all/most document types
+# Used by generators to filter out non-section properties
+x-ubml-common-properties:
+  - ubml
+  - name
+  - description
+  - metadata
+  - tags
+  - custom
+  - version
+  - status
+
+type: object
+additionalProperties: false
+required: [ubml, name]
+
+properties:
+  ubml:
+    description: |
+      UBML version identifier.
+      Must be "1.3" for this schema version.
+    type: string
+    const: "1.3"
+  
+  name:
+    description: |
+      Workspace name.
+      Should be descriptive and unique within your organization.
+      
+      Examples:
+        - "ACME Order Management"
+        - "Customer Onboarding Transformation"
+        - "Supply Chain Optimization"
+    type: string
+  
+  description:
+    description: |
+      Detailed workspace description.
+      Explain the scope, objectives, and context of this workspace.
+    type: string
+  
+  version:
+    description: |
+      Workspace version for change tracking.
+      Recommend semantic versioning (e.g., "1.0.0").
+    type: string
+  
+  organization:
+    description: |
+      Organization this workspace belongs to.
+    type: object
+    additionalProperties: false
+    properties:
+      name:
+        description: "Organization name."
+        type: string
+      department:
+        description: "Department or business unit."
+        type: string
+      contact:
+        description: "Primary contact email."
+        type: string
+        format: email
+  
+  scope:
+    description: |
+      Scope definition for the workspace.
+    type: object
+    additionalProperties: false
+    properties:
+      inScope:
+        description: "What is included in this workspace."
+        type: array
+        items:
+          type: string
+      outOfScope:
+        description: "What is explicitly excluded."
+        type: array
+        items:
+          type: string
+      assumptions:
+        description: "Key assumptions."
+        type: array
+        items:
+          type: string
+      constraints:
+        description: "Known constraints."
+        type: array
+        items:
+          type: string
+  
+  files:
+    description: |
+      Explicit file references (optional).
+      By default, all .ubml.yaml files in the workspace directory are included.
+      Use this to specify explicit includes/excludes or order.
+    type: object
+    additionalProperties: false
+    properties:
+      include:
+        description: "Glob patterns for files to include."
+        type: array
+        items:
+          type: string
+        default: ["**/*.ubml.yaml"]
+      exclude:
+        description: "Glob patterns for files to exclude."
+        type: array
+        items:
+          type: string
+  
+  defaults:
+    description: |
+      Default values applied to all elements in the workspace.
+    type: object
+    additionalProperties: false
+    properties:
+      currency:
+        description: "Default currency code (ISO 4217)."
+        type: string
+        pattern: "^[A-Z]{3}$"
+      timezone:
+        description: "Default timezone (IANA name)."
+        type: string
+  
+  tags:
+    description: "Tags for filtering and organization."
+    type: array
+    items:
+      type: string
+  
+  custom:
+    description: "User-defined custom fields."
+    $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

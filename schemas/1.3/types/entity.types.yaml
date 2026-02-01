@@ -1,0 +1,277 @@
+# ============================================================================
+# UBML Entity Types Schema
+# ============================================================================
+# Defines data entities, attributes, and relationships in the information model.
+#
+# ============================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://ubml.talxis.com/schemas/1.3/types/entity.types.yaml"
+title: "UBML Entity Types"
+description: |
+  Data entities representing the structured business objects in a process.
+  
+  Entities are business objects that:
+  - Are created, read, updated, or deleted by process steps
+  - Have structured attributes with defined types
+  - Have relationships to other entities
+
+$defs:
+
+  # ==========================================================================
+  # RELATIONSHIP
+  # ==========================================================================
+
+  Relationship:
+    description: |
+      Defines a relationship between entities in the information model.
+      
+      RELATIONSHIP TYPES:
+      ┌────────────────┬───────────────────────────────────────────────┐
+      │ Type           │ Description                                   │
+      ├────────────────┼───────────────────────────────────────────────┤
+      │ one-to-one     │ Each A has exactly one B                      │
+      │ one-to-many    │ Each A has zero or more Bs                    │
+      │ many-to-one    │ Many As belong to one B                       │
+      │ many-to-many   │ Many As relate to many Bs                     │
+      └────────────────┴───────────────────────────────────────────────┘
+      
+      Example:
+        relationships:
+          lines:
+            target: EN00002
+            type: one-to-many
+            description: "Order contains multiple line items"
+    type: object
+    additionalProperties: false
+    required: [target, type]
+    properties:
+      target:
+        description: "Target entity ID."
+        $ref: "../defs/refs.defs.yaml#/$defs/EntityRef"
+      
+      type:
+        description: "Cardinality of the relationship."
+        type: string
+        enum: [one-to-one, one-to-many, many-to-one, many-to-many]
+        x-ubml:
+          propertyNames: ["type"]
+          valueMistakes:
+            "1:1":
+              value: "1:1"
+              hint: "Use 'one-to-one' not '1:1'."
+            "1:n":
+              value: "1:n"
+              hint: "Use 'one-to-many' not '1:n'."
+            "n:1":
+              value: "n:1"
+              hint: "Use 'many-to-one' not 'n:1'."
+            "n:m":
+              value: "n:m"
+              hint: "Use 'many-to-many' not 'n:m' or 'n:n'."
+            hasMany:
+              value: "hasMany"
+              hint: "Use 'one-to-many'. Rails-style associations aren't supported."
+            belongsTo:
+              value: "belongsTo"
+              hint: "Use 'many-to-one'. Rails-style associations aren't supported."
+      
+      description:
+        description: "Description of the relationship semantics."
+        type: string
+      
+      required:
+        description: "Whether this relationship is required."
+        type: boolean
+        default: false
+
+  # ==========================================================================
+  # ATTRIBUTE
+  # ==========================================================================
+
+  Attribute:
+    description: |
+      A single attribute/field of an entity or document.
+      
+      Data types follow common industry standards:
+      - string: Text values
+      - number: Numeric values (integer or decimal)
+      - boolean: True/false values
+      - date: Date only (YYYY-MM-DD)
+      - datetime: Date and time (ISO 8601)
+      - duration: Time duration (e.g., "1d", "2.5h")
+      - money: Currency amount with optional currency code
+      - reference: Reference to another entity
+      
+      Example:
+        attributes:
+          orderValue:
+            type: money
+            required: true
+            description: "Total value of the order"
+          customerId:
+            type: reference
+            ref: EN003
+            required: true
+    type: object
+    additionalProperties: false
+    required: [type]
+    properties:
+      type:
+        description: "Data type of the attribute."
+        type: string
+        enum: [string, number, boolean, date, datetime, duration, money, reference]
+        x-ubml:
+          propertyNames: ["type"]
+          valueMistakes:
+            int:
+              value: "int"
+              hint: "Use 'number' for all numeric types (integer and decimal)."
+            integer:
+              value: "integer"
+              hint: "Use 'number' for all numeric types."
+            float:
+              value: "float"
+              hint: "Use 'number' for all numeric types."
+            decimal:
+              value: "decimal"
+              hint: "Use 'number' for all numeric types."
+            text:
+              value: "text"
+              hint: "Use 'string' for text values."
+            varchar:
+              value: "varchar"
+              hint: "Use 'string' for text values."
+            bool:
+              value: "bool"
+              hint: "Use 'boolean' not 'bool'."
+            timestamp:
+              value: "timestamp"
+              hint: "Use 'datetime' for date and time values."
+            currency:
+              value: "currency"
+              hint: "Use 'money' for currency/monetary amounts."
+            ref:
+              value: "ref"
+              hint: "Use 'reference' for entity references."
+      
+      description:
+        description: "Description of the attribute."
+        type: string
+      
+      required:
+        description: "Whether this attribute is required."
+        type: boolean
+        default: false
+      
+      ref:
+        description: |
+          For type=reference, the target entity ID.
+        $ref: "../defs/refs.defs.yaml#/$defs/EntityRef"
+      
+      default:
+        description: "Default value for the attribute."
+        oneOf:
+          - type: string
+          - type: number
+          - type: boolean
+      
+      enum:
+        description: "Allowed values for this attribute."
+        type: array
+        items:
+          oneOf:
+            - type: string
+            - type: number
+
+  # ==========================================================================
+  # ENTITY
+  # ==========================================================================
+
+  Entity:
+    description: |
+      A data entity in the information model.
+      
+      Entities represent business objects that:
+      - Are created, read, updated, or deleted by process steps
+      - Have structured attributes with defined types
+      - Have relationships to other entities
+      
+      ENTITY EXAMPLES:
+      - Order, Customer, Product, Invoice
+      - Contract, Case, Request, Incident
+      - Employee, Department, Project, Task
+      
+      ENTITY vs DOCUMENT:
+      Entities are structured data objects in systems.
+      Documents are physical or digital files with content.
+      
+      Example:
+        EN00001:
+          name: Sales Order
+          description: "Customer order with line items"
+          attributes:
+            orderId:
+              type: string
+              required: true
+            orderDate:
+              type: date
+              required: true
+            totalValue:
+              type: money
+          relationships:
+            customer:
+              target: EN00002
+              type: many-to-one
+    type: object
+    additionalProperties: false
+    required: [name]
+    properties:
+      name:
+        description: "Human-readable entity name."
+        type: string
+      
+      description:
+        description: "Detailed description of the entity."
+        type: string
+      
+      attributes:
+        description: |
+          Entity attributes, keyed by attribute name.
+        type: object
+        additionalProperties:
+          $ref: "#/$defs/Attribute"
+      
+      relationships:
+        description: |
+          Relationships to other entities, keyed by relationship name.
+        type: object
+        additionalProperties:
+          $ref: "#/$defs/Relationship"
+      
+      system:
+        description: |
+          System or application where this entity is mastered.
+          Used for data lineage and integration planning.
+          
+          Example: "SAP ERP", "Salesforce CRM"
+        type: string
+      
+      lifecycle:
+        description: |
+          Entity lifecycle states, if applicable.
+          
+          Example: ["Draft", "Submitted", "Approved", "Closed"]
+        type: array
+        items:
+          type: string
+      
+      tags:
+        description: "Tags for filtering and views."
+        type: array
+        items:
+          type: string
+      
+      custom:
+        description: "User-defined custom fields."
+        $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

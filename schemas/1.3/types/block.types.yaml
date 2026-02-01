@@ -1,0 +1,146 @@
+# ============================================================================
+# UBML Block Types Schema
+# ============================================================================
+# Defines block types for control flow grouping.
+#
+# ============================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://ubml.talxis.com/schemas/1.3/types/block.types.yaml"
+title: "UBML Block Types"
+description: |
+  Control flow blocks for grouping steps with execution semantics.
+  
+  Blocks define HOW steps execute (sequentially, in parallel, etc.)
+  while phases define WHAT stage of the process (organizational view).
+
+$defs:
+
+  # ==========================================================================
+  # BLOCK DEFINITION
+  # ==========================================================================
+
+  Block:
+    description: |
+      Control flow block for grouping steps with execution semantics.
+      
+      OPERATORS:
+      - seq: sequential execution (default)
+      - par: parallel execution (all branches run concurrently)
+      - alt: alternative paths (exactly one branch based on guards)
+      - opt: optional execution (executes if guard is true)
+      - loop: repeated execution
+      - break: exit enclosing block
+      
+      BLOCKS vs PHASES:
+      ┌─────────────┬─────────────────────────┬─────────────────────────┐
+      │             │ BLOCKS (BK###)          │ PHASES (PH###)          │
+      ├─────────────┼─────────────────────────┼─────────────────────────┤
+      │ Purpose     │ Execution semantics     │ Organizational view     │
+      │ Operators   │ par, alt, loop, opt     │ lifecycle, delivery     │
+      │ Affects     │ Routing & scheduling    │ Nothing (metadata only) │
+      │ Question    │ "How does this run?"    │ "What stage is this?"   │
+      │ Simulation  │ Yes, changes behavior   │ No effect               │
+      └─────────────┴─────────────────────────┴─────────────────────────┘
+    type: object
+    additionalProperties: false
+    required: [name]
+    properties:
+      name:
+        description: "Human-readable block name."
+        type: string
+      
+      operator:
+        description: |
+          Block operator defining execution semantics.
+          
+          WHEN TO USE EACH:
+          - seq: Steps run one after another (default)
+          - par: Steps run at the same time (concurrent work)
+          - alt: Exactly one path chosen based on conditions
+          - opt: Path may or may not execute based on condition
+          - loop: Repeat steps until condition is false
+          - break: Exit the enclosing block early
+          
+          COMMON MISTAKE: Using 'alt' when you mean 'opt'.
+          Use 'alt' for mutually exclusive paths (only ONE executes).
+          Use 'opt' for optional work (might skip entirely).
+          
+          Examples:
+            seq: "First approve, then notify, then close"
+            par: "Inspect electrical AND inspect plumbing simultaneously"
+            alt: "Route by priority: urgent path OR normal path"
+            opt: "If high-value customer, perform extra validation"
+            loop: "Repeat rework cycle until quality threshold met"
+        type: string
+        enum: [seq, par, alt, opt, loop, break]
+        default: seq
+        examples:
+          - seq
+          - par
+          - alt
+        x-ubml:
+          propertyNames: ["operator"]
+          valueMistakes:
+            parallel:
+              value: "parallel"
+              hint: "Use 'par' for parallel execution."
+            alternative:
+              value: "alternative"
+              hint: "Use 'alt' for alternative/exclusive paths."
+            optional:
+              value: "optional"
+              hint: "Use 'opt' for optional execution."
+            sequence:
+              value: "sequence"
+              hint: "Use 'seq' for sequential execution."
+            xor:
+              value: "xor"
+              hint: "Use 'alt' for exclusive choice. BPMN XOR gateway maps to 'alt' blocks."
+            and:
+              value: "and"
+              hint: "Use 'par' for AND/parallel splits."
+            or:
+              value: "or"
+              hint: "For inclusive OR, use 'opt' blocks. For exclusive choice, use 'alt'."
+            exclusive:
+              value: "exclusive"
+              hint: "Use 'alt' for exclusive gateway semantics."
+            gateway:
+              value: "gateway"
+              hint: "Use 'alt' for exclusive, 'par' for parallel. Gateway is a BPMN term."
+      
+      guard:
+        description: |
+          Condition for opt/alt/loop blocks.
+          For loop operator: loop continues while guard is true.
+        $ref: "../defs/primitives.defs.yaml#/$defs/Expression"
+      
+      maxIterations:
+        description: |
+          Maximum iterations for loop operator.
+          Prevents infinite loops in simulation.
+        type: integer
+        minimum: 1
+      
+      steps:
+        description: "Step IDs in this block."
+        type: array
+        items:
+          $ref: "../defs/refs.defs.yaml#/$defs/StepRef"
+      
+      operands:
+        description: |
+          Nested blocks (for alt branches or parallel regions).
+          Keyed by block ID (BK### pattern).
+        type: object
+        additionalProperties: false
+        patternProperties:
+          "^BK\\d{5,}$":
+            $ref: "#/$defs/Block"
+      
+      annotations:
+        description: "Notes and markers attached to this block."
+        type: array
+        items:
+          $ref: "../defs/shared.defs.yaml#/$defs/Annotation"

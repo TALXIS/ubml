@@ -1,0 +1,110 @@
+# ============================================================================
+# UBML Scenarios Document Schema
+# ============================================================================
+# Schema for .scenarios.ubml.yaml files - simulation scenario definitions.
+#
+# FILE PATTERN: *.scenarios.ubml.yaml
+# ============================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://ubml.talxis.com/schemas/1.3/documents/scenarios.schema.yaml"
+title: "Scenarios"
+description: |
+  Scenario documents define simulation scenarios for "what-if" analysis.
+  
+  WHAT IS A SCENARIO?
+  A scenario captures the conditions and assumptions for simulating
+  process execution:
+  - Work arrivals (how work enters the system)
+  - Work mix (distribution of case types)
+  - Work attributes (characteristics affecting processing)
+  - Evidence (historical data for validation)
+  
+  WHY DEFINE SCENARIOS?
+  Scenarios enable:
+  - Capacity planning
+  - Bottleneck identification
+  - Process improvement validation
+  - Resource optimization
+  
+  FILE NAMING: *.scenarios.ubml.yaml
+  Examples:
+    - baseline-2024.scenarios.ubml.yaml
+    - growth-scenarios.scenarios.ubml.yaml
+    - peak-season.scenarios.ubml.yaml
+
+# CLI metadata - structured data for tooling
+x-ubml-cli:
+  category: analysis
+  categoryDisplayName: "Analysis & Planning"
+  workflowOrder: 7
+  shortDescription: "Define simulation scenarios for what-if analysis."
+  defaultFilename: "baseline"
+  detectBy:
+    - scenarios
+  gettingStarted:
+    - "Define a baseline scenario with current volumes"
+    - "Add work arrival patterns"
+    - "Define work mix distribution"
+    - "Create alternative scenarios for comparison"
+  exampleFilename: "baseline.scenarios.ubml.yaml"
+
+type: object
+additionalProperties: false
+required: [ubml]
+
+properties:
+  ubml:
+    description: |
+      UBML version identifier.
+      Must be "1.3" for this schema version.
+    type: string
+    const: "1.3"
+  
+  name:
+    description: |
+      Optional document name.
+      If not provided, the filename is used.
+    type: string
+  
+  description:
+    description: |
+      Document description.
+      Explain what scenarios are defined in this file.
+    type: string
+  
+  scenarios:
+    description: |
+      Scenario definitions, keyed by scenario ID.
+      
+      Scenario IDs follow the SC### pattern (e.g., SC00001, SC00002).
+      
+      Example:
+        scenarios:
+          SC00001:
+            name: "Current State Baseline"
+            description: "2024 Q1 baseline scenario"
+            arrivals:
+              pattern: poisson
+              rate: 50
+              rateUnit: per-day
+            workMix:
+              - name: Standard
+                probability: 0.8
+              - name: Complex
+                probability: 0.2
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^SC\\d{5,}$":
+        $ref: "../types/scenario.types.yaml#/$defs/Scenario"
+  
+  tags:
+    description: "Tags for filtering and organization."
+    type: array
+    items:
+      type: string
+  
+  custom:
+    description: "User-defined custom fields."
+    $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

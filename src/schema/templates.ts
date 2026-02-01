@@ -8,7 +8,7 @@
 
 import type { DocumentType, IdPrefix } from '../generated/data.js';
 import { SCHEMA_VERSION } from '../constants.js';
-import { getDocumentTypeInfo } from './introspection.js';
+import { getDocumentTypeInfo } from './introspection/index.js';
 import type { DocumentTypeInfo, SectionInfo } from './types.js';
 import { formatId, getInitStartNumber, getAddStartNumber } from './id-utils.js';
 

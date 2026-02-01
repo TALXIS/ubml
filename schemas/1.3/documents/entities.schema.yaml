@@ -1,0 +1,150 @@
+# ============================================================================
+# UBML Entities Document Schema
+# ============================================================================
+# Schema for .entities.ubml.yaml files - information model definitions.
+#
+# FILE PATTERN: *.entities.ubml.yaml
+# ============================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://ubml.talxis.com/schemas/1.3/documents/entities.schema.yaml"
+title: "Entities"
+description: |
+  Entity documents define the information model - the data objects,
+  documents, and locations relevant to business processes.
+  
+  WHAT IS AN INFORMATION MODEL?
+  The information model describes the data landscape:
+  - Entities: Business objects (Order, Customer, Product)
+  - Documents: Files and forms (Contract, Invoice, Report)
+  - Locations: Physical/logical places (Warehouse, Office, Region)
+  
+  WHY DEFINE ENTITIES?
+  Entity definitions enable:
+  - Data flow visualization
+  - Integration planning
+  - Requirements documentation
+  - System design
+  
+  FILE NAMING: *.entities.ubml.yaml
+  Examples:
+    - order-model.entities.ubml.yaml
+    - customer-data.entities.ubml.yaml
+    - master-data.entities.ubml.yaml
+
+# CLI metadata - structured data for tooling
+x-ubml-cli:
+  category: core
+  categoryDisplayName: "Core Modeling"
+  workflowOrder: 4
+  shortDescription: "Define the information model - data objects, documents, and locations."
+  defaultFilename: "entities"
+  detectBy:
+    - entities
+  gettingStarted:
+    - "Define entities for your core business objects"
+    - "Add attributes with types and relationships"
+    - "Add documents that flow through processes"
+    - "Optionally add locations for physical context"
+  exampleFilename: "entities.ubml.yaml"
+  exampleFilenameAlternative: "data-model.entities.ubml.yaml"
+  templateDefaults:
+    entities:
+      type: "business-object"
+
+type: object
+additionalProperties: false
+required: [ubml]
+
+properties:
+  ubml:
+    description: |
+      UBML version identifier.
+      Must be "1.3" for this schema version.
+    type: string
+    const: "1.3"
+  
+  name:
+    description: |
+      Optional document name.
+      If not provided, the filename is used.
+    type: string
+  
+  description:
+    description: |
+      Document description.
+      Explain what information model elements are defined in this file.
+    type: string
+  
+  entities:
+    description: |
+      Entity definitions, keyed by entity ID.
+      
+      Entity IDs follow the EN### pattern (e.g., EN00001, EN00002).
+      
+      Example:
+        entities:
+          EN00001:
+            name: "Sales Order"
+            description: "Customer order with line items"
+            attributes:
+              orderId:
+                type: string
+                required: true
+              totalValue:
+                type: money
+            relationships:
+              customer:
+                target: EN00002
+                type: many-to-one
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^EN\\d{5,}$":
+        $ref: "../types/entity.types.yaml#/$defs/Entity"
+  
+  documents:
+    description: |
+      Document definitions, keyed by document ID.
+      
+      Document IDs follow the DC### pattern (e.g., DC001, DC002).
+      
+      Example:
+        documents:
+          DC001:
+            name: "Purchase Order"
+            format: pdf
+            requiresSignature: true
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^DC\\d{5,}$":
+        $ref: "../types/document.types.yaml#/$defs/Document"
+  
+  locations:
+    description: |
+      Location definitions, keyed by location ID.
+      
+      Location IDs follow the LO### pattern (e.g., LO001, LO002).
+      
+      Example:
+        locations:
+          LO001:
+            name: "Main Warehouse"
+            type: warehouse
+            address: "123 Industrial Blvd"
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^LO\\d{5,}$":
+        $ref: "../types/location.types.yaml#/$defs/Location"
+  
+  tags:
+    description: "Tags for filtering and organization."
+    type: array
+    items:
+      type: string
+  
+  custom:
+    description: "User-defined custom fields."
+    $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

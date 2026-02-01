@@ -1,0 +1,115 @@
+# ============================================================================
+# UBML Process Document Schema
+# ============================================================================
+# Schema for .process.ubml.yaml files - process definitions.
+#
+# FILE PATTERN: *.process.ubml.yaml
+# ============================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://ubml.talxis.com/schemas/1.3/documents/process.schema.yaml"
+title: "Process"
+description: |
+  Process documents define business processes with steps, links, and control flow.
+  
+  WHAT IS A PROCESS DOCUMENT?
+  A process document contains one or more related processes that describe
+  how work flows through an organization. Processes can be hierarchical
+  (L1 strategic to L4 work instructions) and can reference each other.
+  
+  PROCESS COMPONENTS:
+  - Steps: Activities, tasks, decisions, events, milestones
+  - Links: Connections between steps (routing and scheduling)
+  - Blocks: Control flow groupings (parallel, alternative, loops)
+  - Phases: Organizational groupings (lifecycle, delivery)
+  
+  FILE NAMING: *.process.ubml.yaml
+  Examples:
+    - order-fulfillment.process.ubml.yaml
+    - customer-onboarding.process.ubml.yaml
+    - invoice-processing.process.ubml.yaml
+
+# CLI metadata - structured data for tooling
+x-ubml-cli:
+  category: core
+  categoryDisplayName: "Core Modeling"
+  workflowOrder: 3
+  shortDescription: "Define business processes with steps, links, and control flow."
+  defaultFilename: "sample"
+  detectBy:
+    - processes
+  gettingStarted:
+    - "Define the process with id, name, and description"
+    - "Add steps for each activity in the process"
+    - "Add links to connect steps and define flow"
+    - "Optionally add phases and blocks for organization"
+  exampleFilename: "process.ubml.yaml"
+  exampleFilenameAlternative: "order-fulfillment.process.ubml.yaml"
+  templateDefaults:
+    processes:
+      steps:
+        ST00001:
+          name: "First Step"
+          kind: "action"
+          description: "First step description"
+
+type: object
+additionalProperties: false
+required: [ubml, processes]
+
+properties:
+  ubml:
+    description: |
+      UBML version identifier.
+      Must be "1.3" for this schema version.
+    type: string
+    const: "1.3"
+  
+  name:
+    description: |
+      Optional document name.
+      If not provided, the filename is used.
+    type: string
+  
+  description:
+    description: |
+      Document description.
+      Explain what processes are contained in this file.
+    type: string
+  
+  processes:
+    description: |
+      Process definitions, keyed by process ID.
+      
+      Process IDs follow the PR### pattern (e.g., PR00001, PR00002).
+      
+      Example:
+        processes:
+          PR00001:
+            name: "Order Fulfillment"
+            description: "End-to-end order processing"
+            steps:
+              ST00001:
+                name: "Receive Order"
+                kind: start
+              ST00002:
+                name: "Validate Order"
+                kind: action
+            links:
+              - from: ST00001
+                to: ST00002
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^PR\\d{5,}$":
+        $ref: "../types/process.types.yaml#/$defs/Process"
+  
+  tags:
+    description: "Tags for filtering and organization."
+    type: array
+    items:
+      type: string
+  
+  custom:
+    description: "User-defined custom fields."
+    $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

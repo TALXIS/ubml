@@ -13,7 +13,7 @@ import { compile, type Options } from 'json-schema-to-typescript';
 import { join } from 'path';
 import { readdirSync } from 'fs';
 import { createBanner, loadYamlFile, SCHEMAS_DIR, SCHEMA_VERSION } from './utils.js';
-import type { RefInfo } from './extract-metadata.js';
+import type { RefInfo } from './extract-metadata/index.js';
 
 // =============================================================================
 // Error Collection

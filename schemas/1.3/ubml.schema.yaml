@@ -1,0 +1,377 @@
+# ============================================================================
+# UBML Root Schema
+# ============================================================================
+# Unified Business Modeling Language - Master Schema
+#
+# 
+# This is the master schema for validating complete UBML files that combine
+# multiple document types into a single file. For modular files, use the
+# document-specific schemas in the documents/ directory.
+# ============================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://ubml.talxis.com/schemas/1.3/ubml.schema.yaml"
+title: "UBML - Unified Business Modeling Language"
+description: |
+  ╔══════════════════════════════════════════════════════════════════════════╗
+  ║  UBML - UNIFIED BUSINESS MODELING LANGUAGE                               ║
+  ║  Version 1.3                                                             ║
+  ╚══════════════════════════════════════════════════════════════════════════╝
+  
+  UBML is a YAML-based domain-specific language for business process modeling.
+  It supports the full lifecycle of process improvement projects:
+  
+  PROBLEM FRAMING
+     Hypothesis trees with SCQH (Situation-Complication-Question-Hypothesis)
+  
+  PROCESS MODELING  
+     Multi-level processes (L1-L4), steps, links, blocks, phases
+  
+  ACTORS & RESOURCES
+     Roles, teams, systems, skills, resource pools, equipment
+  
+  INFORMATION MODEL
+     Entities, documents, locations, relationships
+  
+  METRICS & ANALYSIS
+     KPIs, ROI analysis, simulation scenarios
+  
+  PROCESS MINING
+     Event log integration, activity mapping, conformance checking
+  
+  STRATEGY
+     Value streams, capabilities, products, services, portfolios
+  
+  ════════════════════════════════════════════════════════════════════════════
+  
+  FILE TYPES:
+  
+  For modular projects, use separate files with these patterns:
+  
+  ┌────────────────────────────────┬────────────────────────────────────────┐
+  │ File Pattern                   │ Purpose                                │
+  ├────────────────────────────────┼────────────────────────────────────────┤
+  │ *.workspace.ubml.yaml          │ Root workspace configuration           │
+  │ *.process.ubml.yaml            │ Process definitions                    │
+  │ *.actors.ubml.yaml             │ Actors, skills, resource pools         │
+  │ *.entities.ubml.yaml           │ Entities, documents, locations         │
+  │ *.scenarios.ubml.yaml          │ Simulation scenarios                   │
+  │ *.hypotheses.ubml.yaml         │ Hypothesis trees                       │
+  │ *.strategy.ubml.yaml           │ Value streams, capabilities            │
+  │ *.metrics.ubml.yaml            │ KPIs and ROI analyses                  │
+  │ *.mining.ubml.yaml             │ Process mining configuration           │
+  │ *.views.ubml.yaml              │ Custom views and diagrams              │
+  │ *.links.ubml.yaml              │ Cross-process links                    │
+  │ *.glossary.ubml.yaml           │ Terminology and definitions            │
+  └────────────────────────────────┴────────────────────────────────────────┘
+  
+  This root schema validates combined files containing multiple sections.
+  
+  ════════════════════════════════════════════════════════════════════════════
+  
+  GETTING STARTED:
+  
+  1. Create a workspace file (myproject.workspace.ubml.yaml)
+  2. Add process files for your workflows
+  3. Define actors and their skills
+  4. Model your information (entities, documents)
+  5. Add metrics and scenarios for analysis
+  
+  For VS Code support, add to settings.json:
+  
+    "yaml.schemas": {
+      "https://ubml.talxis.com/schemas/1.3/documents/process.schema.yaml": "*.process.ubml.yaml",
+      "https://ubml.talxis.com/schemas/1.3/documents/actors.schema.yaml": "*.actors.ubml.yaml",
+      ...
+    }
+  
+  ════════════════════════════════════════════════════════════════════════════
+
+type: object
+additionalProperties: false
+required: [ubml]
+
+properties:
+  
+  # ══════════════════════════════════════════════════════════════════════════
+  # VERSION
+  # ══════════════════════════════════════════════════════════════════════════
+  
+  ubml:
+    description: |
+      UBML version identifier.
+      Must be "1.3" for this schema version.
+    type: string
+    const: "1.3"
+  
+  # ══════════════════════════════════════════════════════════════════════════
+  # WORKSPACE METADATA
+  # ══════════════════════════════════════════════════════════════════════════
+  
+  name:
+    description: "Workspace or document name."
+    type: string
+  
+  description:
+    description: "Detailed description."
+    type: string
+  
+  version:
+    description: "Document version (e.g., '1.0.0')."
+    type: string
+  
+  status:
+    description: "Document status."
+    type: string
+    enum: [draft, review, approved, archived]
+  
+  # ══════════════════════════════════════════════════════════════════════════
+  # PROCESS MODELING
+  # ══════════════════════════════════════════════════════════════════════════
+  
+  processes:
+    description: |
+      Process definitions.
+      Keyed by process ID (PR### pattern).
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^PR\\d{5,}$":
+        $ref: "types/process.types.yaml#/$defs/Process"
+  
+  # ══════════════════════════════════════════════════════════════════════════
+  # ACTORS & RESOURCES
+  # ══════════════════════════════════════════════════════════════════════════
+  
+  actors:
+    description: |
+      Actor definitions.
+      Keyed by actor ID (AC### pattern).
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^AC\\d{5,}$":
+        $ref: "types/actor.types.yaml#/$defs/Actor"
+  
+  skills:
+    description: |
+      Skill definitions.
+      Keyed by skill ID (SK### pattern).
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^SK\\d{5,}$":
+        $ref: "types/resource.types.yaml#/$defs/Skill"
+  
+  resourcePools:
+    description: |
+      Resource pool definitions.
+      Keyed by pool ID (RP### pattern).
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^RP\\d{5,}$":
+        $ref: "types/resource.types.yaml#/$defs/ResourcePool"
+  
+  equipment:
+    description: |
+      Equipment definitions.
+      Keyed by equipment ID (EQ### pattern).
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^EQ\\d{5,}$":
+        $ref: "types/resource.types.yaml#/$defs/Equipment"
+  
+  # ══════════════════════════════════════════════════════════════════════════
+  # INFORMATION MODEL
+  # ══════════════════════════════════════════════════════════════════════════
+  
+  entities:
+    description: |
+      Entity definitions.
+      Keyed by entity ID (EN### pattern).
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^EN\\d{5,}$":
+        $ref: "types/entity.types.yaml#/$defs/Entity"
+  
+  documents:
+    description: |
+      Document definitions.
+      Keyed by document ID (DC### pattern).
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^DC\\d{5,}$":
+        $ref: "types/entity.types.yaml#/$defs/Document"
+  
+  locations:
+    description: |
+      Location definitions.
+      Keyed by location ID (LO### pattern).
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^LO\\d{5,}$":
+        $ref: "types/entity.types.yaml#/$defs/Location"
+  
+  # ══════════════════════════════════════════════════════════════════════════
+  # SCENARIOS & SIMULATION
+  # ══════════════════════════════════════════════════════════════════════════
+  
+  scenarios:
+    description: |
+      Scenario definitions.
+      Keyed by scenario ID (SC### pattern).
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^SC\\d{5,}$":
+        $ref: "types/scenario.types.yaml#/$defs/Scenario"
+  
+  # ══════════════════════════════════════════════════════════════════════════
+  # HYPOTHESIS TREES
+  # ══════════════════════════════════════════════════════════════════════════
+  
+  hypothesisTrees:
+    description: |
+      Hypothesis tree definitions.
+      Keyed by tree ID (HT### pattern).
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^HT\\d{5,}$":
+        $ref: "types/hypothesis.types.yaml#/$defs/HypothesisTree"
+  
+  # ══════════════════════════════════════════════════════════════════════════
+  # STRATEGY
+  # ══════════════════════════════════════════════════════════════════════════
+  
+  valueStreams:
+    description: |
+      Value stream definitions.
+      Keyed by value stream ID (VS### pattern).
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^VS\\d{5,}$":
+        $ref: "types/strategy.types.yaml#/$defs/ValueStream"
+  
+  capabilities:
+    description: |
+      Capability definitions.
+      Keyed by capability ID (CP### pattern).
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^CP\\d{5,}$":
+        $ref: "types/strategy.types.yaml#/$defs/Capability"
+  
+  products:
+    description: |
+      Product definitions.
+      Keyed by product ID (PD### pattern).
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^PD\\d{5,}$":
+        $ref: "types/strategy.types.yaml#/$defs/Product"
+  
+  services:
+    description: |
+      Service definitions.
+      Keyed by service ID (SV### pattern).
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^SV\\d{5,}$":
+        $ref: "types/strategy.types.yaml#/$defs/Service"
+  
+  portfolios:
+    description: |
+      Portfolio definitions.
+      Keyed by portfolio ID (PF### pattern).
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^PF\\d{5,}$":
+        $ref: "types/strategy.types.yaml#/$defs/Portfolio"
+  
+  # ══════════════════════════════════════════════════════════════════════════
+  # METRICS & ROI
+  # ══════════════════════════════════════════════════════════════════════════
+  
+  kpis:
+    description: |
+      KPI definitions.
+      Keyed by KPI ID (KP### pattern).
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^KP\\d{5,}$":
+        $ref: "types/metrics.types.yaml#/$defs/KPI"
+  
+  roiAnalyses:
+    description: |
+      ROI analysis definitions.
+      Keyed by ROI ID (ROI### pattern).
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^ROI\\d{5,}$":
+        $ref: "types/metrics.types.yaml#/$defs/ROI"
+  
+  # ══════════════════════════════════════════════════════════════════════════
+  # PROCESS MINING
+  # ══════════════════════════════════════════════════════════════════════════
+  
+  miningSources:
+    description: |
+      Mining source definitions.
+      Keyed by source ID (MS### pattern).
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^MS\\d{5,}$":
+        $ref: "types/mining.types.yaml#/$defs/MiningSource"
+  
+  # ══════════════════════════════════════════════════════════════════════════
+  # VIEWS
+  # ══════════════════════════════════════════════════════════════════════════
+  
+  views:
+    description: |
+      View definitions.
+      Keyed by view ID (VW### pattern).
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^VW\\d{5,}$":
+        $ref: "types/view.types.yaml#/$defs/View"
+  
+  # ══════════════════════════════════════════════════════════════════════════
+  # CROSS-REFERENCES
+  # ══════════════════════════════════════════════════════════════════════════
+  
+  links:
+    description: |
+      Cross-process links.
+    type: array
+    items:
+      $ref: "types/link.types.yaml#/$defs/Link"
+  
+  # ══════════════════════════════════════════════════════════════════════════
+  # METADATA
+  # ══════════════════════════════════════════════════════════════════════════
+  
+  tags:
+    description: "Tags for filtering and organization."
+    type: array
+    items:
+      type: string
+  
+  custom:
+    description: "User-defined custom fields."
+    $ref: "defs/shared.defs.yaml#/$defs/CustomFields"

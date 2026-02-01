@@ -17,7 +17,7 @@ export interface SchemaCliMetadata {
   categoryDisplayName: string;
   workflowOrder: number;
   shortDescription: string;
-  defaultFilename?: string;
+  defaultFilename: string;
   gettingStarted: string[];
   exampleFilename: string;
   exampleFilenameAlternative?: string;

@@ -8,7 +8,7 @@
  */
 
 import { createBanner } from './utils.js';
-import type { TemplateData } from './extract-metadata.js';
+import type { TemplateData } from './extract-metadata/index.js';
 
 // =============================================================================
 // Types (also exported in the generated file)

@@ -17,7 +17,7 @@ import type {
   ValidationPatterns,
   CommonPropertiesConfig,
   CategoryConfig,
-} from './extract-metadata.js';
+} from './extract-metadata/index.js';
 
 // =============================================================================
 // Generate data.ts

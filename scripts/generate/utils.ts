@@ -73,6 +73,37 @@ export function ensureOutputDir(): void {
   }
 }
 
+/**
+ * Clean up old generated files to prevent stale code.
+ * Clears content of all generated .ts files before regeneration.
+ * This ensures removed types/schemas don't leave orphaned code.
+ */
+export function cleanupGeneratedFiles(): void {
+  // Clean generated directory
+  if (existsSync(OUTPUT_DIR)) {
+    const files = readdirSync(OUTPUT_DIR).filter(f => f.endsWith('.ts'));
+    
+    for (const file of files) {
+      const filepath = join(OUTPUT_DIR, file);
+      try {
+        writeFileSync(filepath, '// Cleared by cleanup - will be regenerated\n');
+      } catch (error) {
+        // Ignore errors - file might be in use
+      }
+    }
+  }
+
+  // Clean constants.ts in src root
+  const constantsPath = join(ROOT_DIR, 'src', 'constants.ts');
+  if (existsSync(constantsPath)) {
+    try {
+      writeFileSync(constantsPath, '// Cleared by cleanup - will be regenerated\n');
+    } catch (error) {
+      // Ignore errors
+    }
+  }
+}
+
 // =============================================================================
 // Discovery Functions
 // =============================================================================

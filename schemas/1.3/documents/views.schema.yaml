@@ -1,0 +1,110 @@
+# ============================================================================
+# UBML Views Document Schema
+# ============================================================================
+# Schema for .views.ubml.yaml files - custom view and diagram configurations.
+#
+# FILE PATTERN: *.views.ubml.yaml
+# ============================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://ubml.talxis.com/schemas/1.3/documents/views.schema.yaml"
+title: "Views"
+description: |
+  View documents define custom perspectives and diagram configurations.
+  
+  WHAT IS A VIEW?
+  A view is a filtered, styled perspective on the process model:
+  - Executive views (high-level, key metrics)
+  - Operational views (detailed, full RACI)
+  - System views (integrations, data flows)
+  - Comparison views (as-is vs. to-be)
+  
+  WHY DEFINE VIEWS?
+  Views enable:
+  - Stakeholder-specific presentations
+  - Focused documentation
+  - Diagram customization
+  - Comparison and analysis
+  
+  FILE NAMING: *.views.ubml.yaml
+  Examples:
+    - executive-dashboard.views.ubml.yaml
+    - training-materials.views.ubml.yaml
+    - comparison-views.views.ubml.yaml
+
+# CLI metadata - structured data for tooling
+x-ubml-cli:
+  category: advanced
+  categoryDisplayName: "Advanced"
+  workflowOrder: 10
+  shortDescription: "Define custom perspectives and diagram configurations."
+  defaultFilename: "views"
+  detectBy:
+    - views
+  gettingStarted:
+    - "Identify your target audience"
+    - "Create a view with appropriate filters"
+    - "Configure what to show/hide"
+    - "Add custom styling if needed"
+  exampleFilename: "executive-dashboard.views.ubml.yaml"
+
+type: object
+additionalProperties: false
+required: [ubml]
+
+properties:
+  ubml:
+    description: |
+      UBML version identifier.
+      Must be "1.3" for this schema version.
+    type: string
+    const: "1.3"
+  
+  name:
+    description: |
+      Optional document name.
+      If not provided, the filename is used.
+    type: string
+  
+  description:
+    description: |
+      Document description.
+      Explain what views are defined in this file.
+    type: string
+  
+  views:
+    description: |
+      View definitions, keyed by view ID.
+      
+      View IDs follow the VW### pattern (e.g., VW00001, VW00002).
+      
+      Example:
+        views:
+          VW00001:
+            name: "Executive Overview"
+            description: "High-level process view for leadership"
+            type: process
+            process: PR00001
+            filters:
+              - type: kind
+                include: [milestone, subprocess, event]
+            show:
+              steps: true
+              links: true
+              actors: false
+              metrics: true
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^VW\\d{5,}$":
+        $ref: "../types/view.types.yaml#/$defs/View"
+  
+  tags:
+    description: "Tags for filtering and organization."
+    type: array
+    items:
+      type: string
+  
+  custom:
+    description: "User-defined custom fields."
+    $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

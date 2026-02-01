@@ -1,0 +1,179 @@
+# ============================================================================
+# UBML Glossary Document Schema
+# ============================================================================
+# Schema for .glossary.ubml.yaml files - terminology and definitions.
+#
+# FILE PATTERN: *.glossary.ubml.yaml
+# ============================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://ubml.talxis.com/schemas/1.3/documents/glossary.schema.yaml"
+title: "Glossary"
+description: |
+  Glossary documents define business terminology and definitions.
+  
+  WHY A GLOSSARY?
+  A glossary ensures consistent terminology across:
+  - Process documentation
+  - Stakeholder communication
+  - Team collaboration
+  - Training materials
+  
+  GLOSSARY ENTRIES:
+  Each entry includes:
+  - Term: The word or phrase
+  - Definition: Clear explanation
+  - Aliases: Alternative names
+  - Context: Where/how it's used
+  
+  FILE NAMING: *.glossary.ubml.yaml
+  Examples:
+    - business-terms.glossary.ubml.yaml
+    - technical-glossary.glossary.ubml.yaml
+    - domain-vocabulary.glossary.ubml.yaml
+
+# CLI metadata - structured data for tooling
+x-ubml-cli:
+  category: advanced
+  categoryDisplayName: "Advanced"
+  workflowOrder: 9
+  shortDescription: "Define business terminology and definitions."
+  defaultFilename: "glossary"
+  detectBy:
+    - terms
+    - glossary
+  gettingStarted:
+    - "Identify key terms in your domain"
+    - "Write clear, concise definitions"
+    - "Add aliases for common variations"
+    - "Categorize for easier navigation"
+  exampleFilename: "business-terms.glossary.ubml.yaml"
+
+type: object
+additionalProperties: false
+required: [ubml]
+
+properties:
+  ubml:
+    description: |
+      UBML version identifier.
+      Must be "1.3" for this schema version.
+    type: string
+    const: "1.3"
+  
+  name:
+    description: |
+      Optional document name.
+      If not provided, the filename is used.
+    type: string
+  
+  description:
+    description: |
+      Document description.
+      Explain what terminology is covered in this glossary.
+    type: string
+  
+  terms:
+    description: |
+      Glossary term definitions, keyed by TM### ID.
+      
+      Each term has a unique ID (TM#####) used for cross-referencing.
+      
+      Example:
+        terms:
+          TM00001:
+            term: "Order Fulfillment"
+            definition: "The complete process from receiving an order to delivering the product"
+            aliases: ["Order Processing", "Order Completion"]
+            category: "Process"
+          TM00002:
+            term: "SLA"
+            definition: "Service Level Agreement - contractual commitment for service delivery"
+            aliases: ["Service Level Agreement"]
+            category: "Governance"
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^TM\\d{5,}$":
+        type: object
+        additionalProperties: false
+        required: [term, definition]
+        properties:
+          term:
+            description: "The term being defined."
+            type: string
+          
+          definition:
+            description: "Clear, concise definition of the term."
+            type: string
+          
+          aliases:
+            description: "Alternative names or abbreviations."
+            type: array
+            items:
+              type: string
+          
+          category:
+            description: |
+              Category for grouping terms.
+              
+              Examples: "Process", "Technical", "Business", "Legal"
+            type: string
+          
+          context:
+            description: "Where or how this term is used."
+            type: string
+          
+          examples:
+            description: "Usage examples."
+            type: array
+            items:
+              type: string
+          
+          relatedTerms:
+            description: |
+              Related glossary terms (references to other TM### IDs).
+            type: array
+            items:
+              $ref: "../defs/refs.defs.yaml#/$defs/TermRef"
+          
+          source:
+            description: "Source or authority for the definition."
+            type: string
+          
+          tags:
+            description: "Tags for filtering."
+            type: array
+            items:
+              type: string
+  
+  categories:
+    description: |
+      Category definitions for organizing terms.
+      
+      Example:
+        categories:
+          - name: "Process"
+            description: "Process-related terminology"
+          - name: "Technical"
+            description: "Technical and IT terms"
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [name]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+  
+  tags:
+    description: "Tags for filtering and organization."
+    type: array
+    items:
+      type: string
+  
+  custom:
+    description: "User-defined custom fields."
+    $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

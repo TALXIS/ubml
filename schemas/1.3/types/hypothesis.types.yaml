@@ -1,0 +1,427 @@
+# ============================================================================
+# UBML Hypothesis Types Schema
+# ============================================================================
+# Defines hypothesis trees and the SCQH problem framing framework.
+#
+# ============================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://ubml.talxis.com/schemas/1.3/types/hypothesis.types.yaml"
+title: "UBML Hypothesis Types"
+description: |
+  Hypothesis trees provide structured problem framing using the SCQH 
+  (Situation-Complication-Question-Hypothesis) framework from the 
+  Minto Pyramid Principle.
+  
+  WHAT IS SCQH?
+  The SCQH framework structures problem-solving communication:
+  - Situation: The current state or context
+  - Complication: What changed or what's the problem
+  - Question: The key question that arises
+  - Hypothesis: The proposed answer to validate/invalidate
+  
+  WHY HYPOTHESIS TREES?
+  Hypothesis trees decompose complex questions into testable sub-hypotheses.
+  This enables:
+  - Structured analysis and prioritization
+  - Evidence-based decision making
+  - Clear communication of reasoning
+  - Tracking validation progress
+
+$defs:
+
+  # ==========================================================================
+  # SCQH CONTEXT
+  # ==========================================================================
+
+  SCQH:
+    description: |
+      Situation-Complication-Question-Hypothesis framing context.
+      
+      The SCQH framework (from Barbara Minto's Pyramid Principle)
+      structures problem framing for clear communication.
+      
+      EXAMPLE - Process Improvement Project:
+      
+        SCQH:
+          situation: |
+            Order processing currently takes 5 days on average,
+            involving 3 departments and 12 handoffs.
+          
+          complication: |
+            Customer expectations have shifted to 2-day delivery,
+            and competitors are achieving this target.
+          
+          question: |
+            How can we reduce order processing time to 2 days
+            while maintaining quality and without major investment?
+          
+          hypothesis: |
+            By eliminating redundant approvals and automating
+            data entry, we can achieve 2-day processing.
+      
+      EXAMPLE - Strategic Analysis:
+      
+        SCQH:
+          situation: |
+            We are a mid-sized logistics company with 15% market share
+            in the regional B2B delivery market.
+          
+          complication: |
+            A major e-commerce player is entering our market
+            with aggressive pricing and same-day delivery.
+          
+          question: |
+            Should we compete on speed, differentiate on service,
+            or focus on a defensible niche?
+          
+          hypothesis: |
+            We should focus on high-value B2B logistics where
+            reliability matters more than speed.
+    type: object
+    additionalProperties: false
+    x-ubml:
+      humanName: "SCQH Framework"
+      nestedProperties:
+        - situation
+        - complication
+        - question
+        - hypothesis
+      misplacementHint: "These properties belong inside 'SCQH:', not at the tree level"
+      misplacementExample: |
+        SCQH:
+          situation: "Current state description"
+          complication: "What changed"
+          question: "Key question"
+          hypothesis: "Proposed answer"
+    properties:
+      situation:
+        description: |
+          The current state, background, or context.
+          
+          This is the "stable state" that existed before the complication.
+          It should be factual and uncontroversial.
+          
+          Good situation statements:
+          - Describe the relevant context concisely
+          - Are accepted as true by all stakeholders
+          - Set the stage for the complication
+        type: string
+      
+      complication:
+        description: |
+          What changed or what's the problem.
+          
+          The complication creates tension that demands a response.
+          It's what makes the situation unstable or unsatisfactory.
+          
+          Common complication patterns:
+          - Something changed (new competitor, regulation, technology)
+          - Something went wrong (quality issue, cost overrun)
+          - An opportunity emerged (new market, acquisition target)
+          - Current approach is inadequate (capacity, capability gap)
+        type: string
+      
+      question:
+        description: |
+          The key question that arises from the situation and complication.
+          
+          The question should be:
+          - Specific and answerable
+          - Directly relevant to the audience
+          - Framed to lead to actionable insights
+          
+          Question types:
+          - What should we do?
+          - How should we do it?
+          - Why is this happening?
+          - Which option should we choose?
+        type: string
+      
+      hypothesis:
+        description: |
+          The proposed answer or thesis statement.
+          
+          The hypothesis is your best current answer to the question.
+          It should be:
+          - Specific and testable
+          - Falsifiable (can be proven wrong)
+          - Actionable if validated
+          
+          The hypothesis tree below this context decomposes the
+          main hypothesis into sub-hypotheses that can be validated
+          independently.
+        type: string
+
+  # ==========================================================================
+  # HYPOTHESIS NODE
+  # ==========================================================================
+
+  HypothesisNode:
+    description: |
+      A node in the hypothesis tree structure.
+      
+      Hypothesis trees decompose a main hypothesis into supporting
+      sub-hypotheses that can be independently validated.
+      
+      NODE TYPES:
+      - hypothesis: A testable claim (can be true or false)
+      - question: A question that needs answering
+      - evidence: Supporting evidence or data point
+      - insight: Derived insight or conclusion
+      - recommendation: Actionable recommendation
+      
+      VALIDATION STATUS:
+      - untested: Not yet validated
+      - validated: Confirmed as true
+      - invalidated: Confirmed as false
+      - partial: Partially validated (some aspects true)
+      
+      OPERATORS (for grouping children):
+      - and: All children must be true for parent to be true
+      - or: Any child being true makes parent true
+      - mece: Mutually Exclusive, Collectively Exhaustive grouping
+      
+      EXAMPLE - Sub-hypothesis breakdown:
+      
+        Main: "We can reduce processing time to 2 days"
+        ├── "Approval delays account for 60% of time" (evidence)
+        │   ├── "Manager approval takes 1.5 days average"
+        │   └── "Finance approval takes 1 day average"
+        └── "Approvals can be streamlined" (hypothesis)
+            ├── "Auto-approve orders under $10K" (recommendation)
+            └── "Parallel instead of sequential approvals" (recommendation)
+    type: object
+    additionalProperties: false
+    required: [text]
+    properties:
+      text:
+        description: |
+          The hypothesis, question, or insight text.
+          Should be a complete, clear statement.
+        type: string
+      
+      type:
+        description: "Node type classification."
+        type: string
+        enum: [hypothesis, question, evidence, insight, recommendation]
+        default: hypothesis
+        x-ubml:
+          propertyNames: ["type"]
+          valueMistakes:
+            answer:
+              value: "answer"
+              hint: "Use 'hypothesis' for proposed answers, or 'recommendation' for actionable conclusions."
+            finding:
+              value: "finding"
+              hint: "Use 'evidence' for findings and observations, or 'insight' for derived conclusions."
+            conclusion:
+              value: "conclusion"
+              hint: "Use 'insight' for conclusions, or 'recommendation' for actionable outcomes."
+            data:
+              value: "data"
+              hint: "Use 'evidence' for data points and observations."
+            action:
+              value: "action"
+              hint: "Use 'recommendation' for suggested actions."
+      
+      status:
+        description: |
+          Validation status of this node.
+          Only applicable for hypothesis and evidence types.
+        type: string
+        enum: [untested, validated, invalidated, partial]
+        default: untested
+        x-ubml:
+          propertyNames: ["status"]
+          valueMistakes:
+            confirmed:
+              value: "confirmed"
+              hint: "Use 'validated' for confirmed hypotheses."
+            rejected:
+              value: "rejected"
+              hint: "Use 'invalidated' for rejected/disproven hypotheses."
+            pending:
+              value: "pending"
+              hint: "Use 'untested' for hypotheses not yet validated."
+            open:
+              value: "open"
+              hint: "Use 'untested' for open/unverified hypotheses."
+            "true":
+              value: "true"
+              hint: "Use 'validated' to indicate the hypothesis was proven true."
+            "false":
+              value: "false"
+              hint: "Use 'invalidated' to indicate the hypothesis was proven false."
+      
+      confidence:
+        description: |
+          Confidence level in the validation (0-1).
+          1.0 = high confidence, 0.5 = uncertain
+        type: number
+        minimum: 0
+        maximum: 1
+      
+      operator:
+        description: |
+          Logical operator for child nodes:
+          - and: All children must be true
+          - or: Any child can be true
+          - mece: MECE grouping (consulting standard)
+        type: string
+        enum: [and, or, mece]
+        default: and
+        x-ubml:
+          propertyNames: ["operator"]
+          valueMistakes:
+            all:
+              value: "all"
+              hint: "Use 'and' to require all children to be true."
+            any:
+              value: "any"
+              hint: "Use 'or' to require any child to be true."
+            exclusive:
+              value: "exclusive"
+              hint: "Use 'mece' for Mutually Exclusive, Collectively Exhaustive groupings."
+      
+      priority:
+        description: |
+          Priority for investigation/validation.
+          Helps prioritize analysis efforts.
+        $ref: "../defs/shared.defs.yaml#/$defs/Priority"
+      
+      owner:
+        description: "Person responsible for validating this node."
+        $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
+      
+      evidence:
+        description: |
+          Evidence supporting or refuting this node.
+          Free-form text describing the evidence.
+        type: string
+      
+      source:
+        description: |
+          Source of the evidence or claim.
+          Citation, document reference, or interview.
+        type: string
+      
+      notes:
+        description: "Additional notes or context."
+        type: string
+      
+      children:
+        description: |
+          Child nodes (sub-hypotheses, supporting evidence, etc.).
+          Keyed by node ID (HY### pattern).
+        type: object
+        additionalProperties: false
+        patternProperties:
+          "^HY\\d{5,}$":
+            $ref: "#/$defs/HypothesisNode"
+      
+      tags:
+        description: "Tags for filtering and views."
+        type: array
+        items:
+          type: string
+      
+      custom:
+        description: "User-defined custom fields."
+        $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"
+
+  # ==========================================================================
+  # HYPOTHESIS TREE
+  # ==========================================================================
+
+  HypothesisTree:
+    description: |
+      A complete hypothesis tree with SCQH context.
+      
+      The hypothesis tree is a key artifact in consulting and
+      strategic analysis, enabling structured problem decomposition.
+      
+      TREE STRUCTURE:
+      - Root node contains the main hypothesis (from SCQH)
+      - Children decompose into sub-hypotheses
+      - Leaves are typically evidence or recommendations
+      
+      BEST PRACTICES:
+      - Use MECE (Mutually Exclusive, Collectively Exhaustive) groupings
+      - Keep trees focused (max 3-4 levels deep)
+      - Validate bottom-up (evidence → sub-hypotheses → main)
+      - Update status as validation progresses
+      
+      EXAMPLE - Complete Tree:
+      
+        hypothesisTrees:
+          HT00001:
+            name: "Process Optimization Analysis"
+            SCQH:
+              situation: "Current order processing takes 5 days"
+              complication: "Customers expect 2-day delivery"
+              question: "How to reduce to 2 days?"
+              hypothesis: "Streamline approvals and automate data entry"
+            root:
+              id: H001
+              text: "We can achieve 2-day processing"
+              operator: and
+              children:
+                - id: H002
+                  text: "Approval delays can be reduced by 2 days"
+                  children: [...]
+                - id: H003
+                  text: "Automation can save 0.5 days"
+                  children: [...]
+    type: object
+    additionalProperties: false
+    required: [name, root]
+    properties:
+      name:
+        description: "Human-readable name for the hypothesis tree."
+        type: string
+      
+      description:
+        description: "Detailed description of the analysis."
+        type: string
+      
+      SCQH:
+        description: "SCQH problem framing context."
+        $ref: "#/$defs/SCQH"
+      
+      root:
+        description: |
+          Root node of the hypothesis tree.
+          Keyed by node ID (HY### pattern). Typically has one entry.
+        type: object
+        additionalProperties: false
+        patternProperties:
+          "^HY\\d{5,}$":
+            $ref: "#/$defs/HypothesisNode"
+      
+      status:
+        description: |
+          Overall status of the hypothesis tree analysis.
+        type: string
+        enum: [draft, in-progress, validated, invalidated, closed]
+        default: draft
+      
+      owner:
+        description: "Person responsible for this analysis."
+        $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
+      
+      stakeholders:
+        description: "Key stakeholders for the analysis."
+        type: array
+        items:
+          $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
+      
+      tags:
+        description: "Tags for filtering and views."
+        type: array
+        items:
+          type: string
+      
+      custom:
+        description: "User-defined custom fields."
+        $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"
