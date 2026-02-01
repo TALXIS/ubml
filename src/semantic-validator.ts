@@ -7,48 +7,32 @@
 
 import { isValidId, REFERENCE_FIELDS, type DocumentType, getIdPrefix } from './metadata.js';
 import type { UBMLDocument } from './parser.js';
+import { levenshteinDistance } from './utils/index.js';
 
 // =============================================================================
 // Fuzzy Matching Utilities
 // =============================================================================
 
 /**
- * Calculate Levenshtein distance between two strings.
+ * Similarity threshold for same-prefix ID matches.
+ * Higher threshold for same prefix since they're more likely to be related.
  */
-function levenshteinDistance(a: string, b: string): number {
-  if (a.length === 0) return b.length;
-  if (b.length === 0) return a.length;
+const SAME_PREFIX_SIMILARITY_THRESHOLD = 4;
 
-  const matrix: number[][] = [];
+/**
+ * Similarity threshold for different-prefix ID matches.
+ * Lower threshold for different prefixes to avoid false positives.
+ */
+const DIFFERENT_PREFIX_SIMILARITY_THRESHOLD = 2;
 
-  for (let i = 0; i <= b.length; i++) {
-    matrix[i] = [i];
-  }
-
-  for (let j = 0; j <= a.length; j++) {
-    matrix[0][j] = j;
-  }
-
-  for (let i = 1; i <= b.length; i++) {
-    for (let j = 1; j <= a.length; j++) {
-      if (b.charAt(i - 1) === a.charAt(j - 1)) {
-        matrix[i][j] = matrix[i - 1][j - 1];
-      } else {
-        matrix[i][j] = Math.min(
-          matrix[i - 1][j - 1] + 1,
-          matrix[i][j - 1] + 1,
-          matrix[i - 1][j] + 1
-        );
-      }
-    }
-  }
-
-  return matrix[b.length][a.length];
-}
+/**
+ * Maximum number of ID suggestions to return.
+ */
+const MAX_SUGGESTIONS = 3;
 
 /**
  * Find similar IDs in a set of defined IDs.
- * Returns up to 3 suggestions with similarity scores.
+ * Returns up to MAX_SUGGESTIONS with similarity scores.
  */
 function findSimilarIds(
   targetId: string,
@@ -65,17 +49,17 @@ function findSimilarIds(
     // Calculate distance
     const distance = levenshteinDistance(targetId, id);
     
-    // Only suggest if reasonably similar (distance <= 4 for same prefix, <= 2 for different)
-    const threshold = samePrefix ? 4 : 2;
+    // Only suggest if reasonably similar
+    const threshold = samePrefix ? SAME_PREFIX_SIMILARITY_THRESHOLD : DIFFERENT_PREFIX_SIMILARITY_THRESHOLD;
     if (distance <= threshold) {
       suggestions.push({ id, distance: samePrefix ? distance : distance + 2 });
     }
   }
 
-  // Sort by distance and return top 3
+  // Sort by distance and return top suggestions
   return suggestions
     .sort((a, b) => a.distance - b.distance)
-    .slice(0, 3);
+    .slice(0, MAX_SUGGESTIONS);
 }
 
 /**

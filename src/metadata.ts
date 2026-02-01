@@ -240,167 +240,30 @@ export function getCategoryDisplayName(categoryKey: string): string {
 // DOCUMENT TYPE DETECTION
 // ============================================================================
 
-/**
- * Detect document type from filename pattern.
- *
- * Supports two patterns:
- * 1. Full pattern: prefix.type.ubml.yaml (e.g., organization.actors.ubml.yaml)
- * 2. Simple pattern: type.ubml.yaml (e.g., actors.ubml.yaml)
- *
- * @example
- * detectDocumentType('foo.process.ubml.yaml') // → 'process'
- * detectDocumentType('process.ubml.yaml')     // → 'process'
- * detectDocumentType('actors.ubml.yaml')      // → 'actors'
- * detectDocumentType('generic.ubml.yaml')     // → undefined
- */
-export function detectDocumentType(filename: string): DocumentType | undefined {
-  const lower = filename.toLowerCase();
-  for (const type of DOCUMENT_TYPES) {
-    // Match both patterns: *.type.ubml.yaml AND type.ubml.yaml
-    if (
-      lower.includes(`.${type}.ubml.yaml`) ||
-      lower.includes(`.${type}.ubml.yml`) ||
-      lower.endsWith(`${type}.ubml.yaml`) ||
-      lower.endsWith(`${type}.ubml.yml`)
-    ) {
-      return type;
-    }
-  }
-  return undefined;
-}
-
-/**
- * Detect document type from parsed content by examining properties.
- * Useful for generic .ubml.yaml files without type in filename.
- * Detection rules are derived from x-ubml-cli.detectBy in schemas.
- */
-export function detectDocumentTypeFromContent(content: unknown): DocumentType | undefined {
-  if (!content || typeof content !== 'object') {
-    return undefined;
-  }
-
-  const obj = content as Record<string, unknown>;
-
-  // Score each document type by how many detectBy properties are present
-  let bestMatch: DocumentType | undefined;
-  let bestScore = 0;
-
-  for (const [docType, detectProps] of Object.entries(CONTENT_DETECTION_CONFIG)) {
-    const score = detectProps.filter((prop) => prop in obj).length;
-    if (score > bestScore) {
-      bestScore = score;
-      bestMatch = docType as DocumentType;
-    }
-  }
-
-  return bestMatch;
-}
-
-/**
- * Get all glob patterns for finding UBML files.
- * Includes both full pattern (*.type.ubml.yaml) and simple pattern (type.ubml.yaml).
- */
-export function getUBMLFilePatterns(): string[] {
-  const patterns: string[] = [];
-  for (const type of DOCUMENT_TYPES) {
-    patterns.push(`**/*.${type}.ubml.yaml`); // Full pattern: prefix.type.ubml.yaml
-    patterns.push(`**/${type}.ubml.yaml`); // Simple pattern: type.ubml.yaml
-  }
-  return patterns;
-}
-
-/**
- * Check if a filename is a valid UBML file.
- */
-export function isUBMLFile(filename: string): boolean {
-  return detectDocumentType(filename) !== undefined;
-}
-
-/**
- * Get the schema path for a file based on its suffix.
- * Supports both full pattern (*.type.ubml.yaml) and simple pattern (type.ubml.yaml).
- */
-export function getSchemaPathForFileSuffix(filepath: string): string | undefined {
-  for (const type of DOCUMENT_TYPES) {
-    if (
-      filepath.endsWith(`.${type}.ubml.yaml`) ||
-      filepath.endsWith(`.${type}.ubml.yml`) ||
-      filepath.endsWith(`${type}.ubml.yaml`) ||
-      filepath.endsWith(`${type}.ubml.yml`)
-    ) {
-      return SCHEMA_PATHS.documents[type];
-    }
-  }
-  return undefined;
-}
+// Re-export detection functions from schema/detection.ts (single source of truth)
+export {
+  detectDocumentType,
+  detectDocumentTypeFromContent,
+  getUBMLFilePatterns,
+  isUBMLFile,
+  getSchemaPathForFileSuffix,
+} from './schema/detection.js';
 
 // ============================================================================
 // PATTERN HINT UTILITIES
 // ============================================================================
 
-/**
- * Get pattern hint for a regex pattern.
- */
-export function getPatternHint(pattern: string): PatternHintData | undefined {
-  return PATTERN_HINTS.find((h) => h.pattern === pattern);
-}
+// Re-export hint functions from schema/hints.ts (single source of truth)
+export {
+  getPatternHint,
+  getPatternHintByPrefix,
+  getNestedPropertyHint,
+  shouldBeNested,
+  getEnumHint,
+  getEnumValueMistakeHint,
+  getEnumValues,
+} from './schema/hints.js';
 
 // ============================================================================
-// NESTED PROPERTY HINT UTILITIES
+// ID UTILITIES
 // ============================================================================
-
-/**
- * Get nested property hint for a property that might be misplaced.
- */
-export function getNestedPropertyHint(propertyName: string): NestedPropertyHintData | undefined {
-  return NESTED_PROPERTY_HINTS.find((h) => h.childProperties.includes(propertyName));
-}
-
-/**
- * Check if a property should be nested inside another property.
- */
-export function shouldBeNested(
-  propertyName: string
-): { parent: string; hint: string; example: string } | undefined {
-  const hint = getNestedPropertyHint(propertyName);
-  if (hint) {
-    return {
-      parent: hint.parentProperty,
-      hint: hint.misplacementHint,
-      example: hint.misplacementExample,
-    };
-  }
-  return undefined;
-}
-
-// ============================================================================
-// ENUM HINT UTILITIES
-// ============================================================================
-
-/**
- * Get enum hint for a property name.
- */
-export function getEnumHint(propertyName: string): EnumHintData | undefined {
-  return ENUM_HINTS.find((h) => h.propertyNames.includes(propertyName));
-}
-
-/**
- * Get hint for an invalid enum value on a specific property.
- *
- * Because multiple enum types can share the same property name (e.g., "kind" for
- * Phase.kind, Step.kind, Loop.kind), we first try to find an enum that has the
- * specific invalid value in its valueMistakes, then fall back to the first match.
- */
-export function getEnumValueMistakeHint(
-  propertyName: string,
-  invalidValue: string
-): string | undefined {
-  // First, try to find an enum hint that specifically has this invalid value
-  // This handles cases like "task" which should match Step.kind, not Phase.kind
-  for (const enumHint of ENUM_HINTS) {
-    if (enumHint.propertyNames.includes(propertyName) && enumHint.valueMistakes?.[invalidValue]) {
-      return enumHint.valueMistakes[invalidValue].hint;
-    }
-  }
-  return undefined;
-}

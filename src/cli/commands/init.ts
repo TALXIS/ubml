@@ -21,18 +21,7 @@ import {
   formatId,
 } from '../../metadata.js';
 import { INDENT, success, highlight, code, dim } from '../formatters/text';
-
-/**
- * Convert a name to kebab-case for filenames.
- */
-function toKebabCase(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
-
-
+import { toKebabCase } from '../../utils/index.js';
 
 /**
  * Check if UBML files already exist in a directory.

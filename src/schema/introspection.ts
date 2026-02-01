@@ -14,6 +14,7 @@ import {
   type IdPrefix,
 } from '../metadata.js';
 import { documentSchemas, typeSchemas, refsDefsSchema } from '../generated/bundled.js';
+import { getTypeString } from './utils.js';
 import type {
   SchemaCliMetadata,
   DocumentTypeInfo,
@@ -53,30 +54,6 @@ function extractIdPrefix(sectionSchema: Record<string, unknown>): string | null 
     if (match) return match[1];
   }
   return null;
-}
-
-/**
- * Get JSON Schema type as a readable string.
- */
-function getTypeString(schema: Record<string, unknown>): string {
-  if (schema.$ref) {
-    const ref = schema.$ref as string;
-    const match = ref.match(/#\/\$defs\/(\w+)/);
-    return match ? match[1] : 'object';
-  }
-  if (schema.type === 'array') {
-    const items = schema.items as Record<string, unknown> | undefined;
-    if (items?.$ref) {
-      const ref = items.$ref as string;
-      const match = ref.match(/#\/\$defs\/(\w+)/);
-      return match ? `${match[1]}[]` : 'array';
-    }
-    return `${items?.type ?? 'any'}[]`;
-  }
-  if (schema.enum) {
-    return 'enum';
-  }
-  return (schema.type as string) ?? 'any';
 }
 
 // =============================================================================

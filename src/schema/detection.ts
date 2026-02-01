@@ -6,7 +6,12 @@
  * @module ubml/schema/detection
  */
 
-import { DOCUMENT_TYPES, SCHEMA_PATHS, type DocumentType } from '../metadata.js';
+import { 
+  DOCUMENT_TYPES, 
+  SCHEMA_PATHS, 
+  CONTENT_DETECTION_CONFIG,
+  type DocumentType 
+} from '../metadata.js';
 
 // =============================================================================
 // Filename-based Detection
@@ -44,6 +49,7 @@ export function detectDocumentType(filename: string): DocumentType | undefined {
 /**
  * Detect document type from parsed content by examining properties.
  * Useful for generic .ubml.yaml files without type in filename.
+ * Detection rules are derived from x-ubml-cli.detectBy in schemas.
  */
 export function detectDocumentTypeFromContent(content: unknown): DocumentType | undefined {
   if (!content || typeof content !== 'object') {
@@ -52,21 +58,19 @@ export function detectDocumentTypeFromContent(content: unknown): DocumentType | 
 
   const obj = content as Record<string, unknown>;
 
-  // Check for type-specific root properties
-  if ('processes' in obj) return 'process';
-  if ('actors' in obj) return 'actors';
-  if ('entities' in obj) return 'entities';
-  if ('hypothesisTrees' in obj) return 'hypotheses';
-  if ('kpis' in obj || 'metrics' in obj) return 'metrics';
-  if ('scenarios' in obj) return 'scenarios';
-  if ('valueStreams' in obj || 'capabilities' in obj) return 'strategy';
-  if ('miningSources' in obj) return 'mining';
-  if ('views' in obj) return 'views';
-  if ('links' in obj && !('processes' in obj)) return 'links';
-  if ('terms' in obj || 'glossary' in obj) return 'glossary';
-  if ('organization' in obj || 'documents' in obj) return 'workspace';
+  // Score each document type by how many detectBy properties are present
+  let bestMatch: DocumentType | undefined;
+  let bestScore = 0;
 
-  return undefined;
+  for (const [docType, detectProps] of Object.entries(CONTENT_DETECTION_CONFIG)) {
+    const score = detectProps.filter((prop) => prop in obj).length;
+    if (score > bestScore) {
+      bestScore = score;
+      bestMatch = docType as DocumentType;
+    }
+  }
+
+  return bestMatch;
 }
 
 // =============================================================================

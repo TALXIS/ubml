@@ -109,10 +109,13 @@ export {
 export {
   detectDocumentType,
   detectDocumentTypeFromContent,
+} from './schema/detection.js';
+
+export {
   isDocumentType,
   DOCUMENT_TYPES,
   type DocumentType,
-} from './detect.js';
+} from './metadata.js';
 
 // ============================================================================
 // TYPES (Browser-Safe)

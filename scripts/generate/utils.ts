@@ -73,15 +73,6 @@ export function ensureOutputDir(): void {
   }
 }
 
-/**
- * Write content to a file with a success message.
- */
-export function writeGeneratedFile(filename: string, content: string): void {
-  const filepath = join(OUTPUT_DIR, filename);
-  writeFileSync(filepath, content, 'utf8');
-  console.log(`   ✓ src/generated/${filename}`);
-}
-
 // =============================================================================
 // Discovery Functions
 // =============================================================================
@@ -107,17 +98,6 @@ export function discoverTypes(): string[] {
 // =============================================================================
 // Code Generation Helpers
 // =============================================================================
-
-/**
- * Escape a string for use in TypeScript code, wrapped in quotes.
- */
-export function escapeForTs(str: string): string {
-  const escaped = str
-    .replace(/\\/g, '\\\\')
-    .replace(/'/g, "\\'")
-    .replace(/\n/g, '\\n');
-  return `'${escaped}'`;
-}
 
 /**
  * Create a TypeScript banner comment.

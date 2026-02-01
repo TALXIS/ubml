@@ -60,7 +60,7 @@ export async function parseFile<T = unknown>(
   
   // Add filepath to the document meta if successful
   if (result.document) {
-    (result.document as any).meta.filepath = absolutePath;
+    result.document.meta.filepath = absolutePath;
   }
   
   return result;

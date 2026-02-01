@@ -59,6 +59,8 @@ export interface DocumentMeta {
   type: DocumentType | undefined;
   /** Original filename (if provided) */
   filename?: string;
+  /** Absolute file path (Node.js only) */
+  filepath?: string;
 }
 
 /**

@@ -32,16 +32,7 @@ import {
   getSectionComment,
 } from '../../templates.js';
 import { INDENT, success, highlight, code, dim } from '../formatters/text';
-
-/**
- * Convert a name to kebab-case for filenames.
- */
-function toKebabCase(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
+import { toKebabCase } from '../../utils/index.js';
 
 /**
  * Find existing UBML files in a directory.
