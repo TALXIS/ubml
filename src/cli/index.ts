@@ -37,7 +37,7 @@ export function createProgram(): Command {
 
   program
     .name('ubml')
-    .description('UBML - Unified Business Modeling Language CLI\n\n' +
+    .description(`UBML - Unified Business Modeling Language CLI v${VERSION}\n\n` +
       'Capture how your business works in structured, validated YAML files.')
     .version(VERSION)
     .addHelpText('after', `
