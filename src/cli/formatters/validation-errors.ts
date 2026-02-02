@@ -146,6 +146,11 @@ function formatAdditionalPropertiesError(
     'duration': 'If this is at the process level, use it inside individual steps instead.',
     'raci': 'RACI should be inside a step definition.',
     'guard': 'Guards belong on links or steps, not at the process level.',
+    'owner': 'Steps use RACI for responsibility. Add: RACI: { responsible: [AC00001] }',
+    'properties': 'Entities use "attributes" (typed) or "custom" (freeform). Not "properties".',
+    'goal': 'Goals belong in strategy (valueStreams), hypotheses (SCQH), or metrics (KPIs). Processes describe HOW work happens.',
+    'objective': 'Objectives belong in strategy or hypotheses documents. Processes describe HOW, not WHY.',
+    'target': 'Targets belong in metrics.ubml.yaml as KPI definitions. Link process to KPIs via references.',
   };
   
   if (misplacementHints[invalidProp]) {

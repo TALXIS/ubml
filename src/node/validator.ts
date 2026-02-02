@@ -279,6 +279,25 @@ async function findUBMLFiles(
 }
 
 /**
+ * Find UBML files that don't match expected naming patterns.
+ * These files will be skipped during validation but should trigger warnings.
+ */
+async function findSkippedUBMLFiles(
+  dir: string,
+  fs: FileSystem,
+  validFiles: string[]
+): Promise<string[]> {
+  // Find all files ending in .ubml.yaml or .ubml.yml
+  const allUBMLFiles = await fs.glob('**/*.ubml.{yaml,yml}', { cwd: dir });
+  
+  // Create a set of valid files for quick lookup
+  const validSet = new Set(validFiles);
+  
+  // Find files that aren't in the valid set
+  return allUBMLFiles.filter(file => !validSet.has(file));
+}
+
+/**
  * Validate all UBML documents in a workspace directory.
  * 
  * If a workspace file exists with a `documents` array, those files are validated.
@@ -367,6 +386,15 @@ export async function validateWorkspace(
   // Validate workspace structure
   const structureResult = validateWorkspaceStructure(documents);
 
+  // Check for skipped UBML files (files not matching expected patterns)
+  const skippedFiles = await findSkippedUBMLFiles(absoluteDir, fs, files);
+  const skippedWarnings: WorkspaceWarning[] = skippedFiles.map(file => ({
+    code: 'SKIPPED_FILE',
+    message: `File "${file}" not validated (doesn't match *.{type}.ubml.yaml pattern)`,
+    suggestion: 'Valid patterns: *.process.ubml.yaml, *.actors.ubml.yaml, *.entities.ubml.yaml, etc.',
+    files: [file],
+  }));
+
   // Distribute validation errors/warnings to file results
   for (const error of validationResult.errors) {
     if (error.filepath) {
@@ -397,6 +425,6 @@ export async function validateWorkspace(
     warningCount: totalWarnings,
     fileCount: files.length,
     workspaceFile,
-    structureWarnings: structureResult.warnings,
+    structureWarnings: [...structureResult.warnings, ...skippedWarnings],
   };
 }
