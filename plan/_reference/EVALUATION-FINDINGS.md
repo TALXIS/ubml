@@ -6,8 +6,8 @@
 > **Status**: Historical reference - preserves context from evaluation sessions
 > 
 > **Note**: This document captures what was discovered during testing. For actionable plans based on these findings, see:
-> - `CLI-UX-IMPROVEMENTS.md` - Remaining CLI/UX work
-> - `KNOWLEDGE-LAYER-FIXES.md` - Schema fixes needed
+> - [03-cli-error-messages.md](../03-cli-error-messages.md), [04-templates-examples.md](../04-templates-examples.md), [05-schema-discovery-validation.md](../05-schema-discovery-validation.md) — CLI/UX work
+> - [01-knowledge-layer-schema.md](../01-knowledge-layer-schema.md) — Schema fixes
 
 ---
 
@@ -109,7 +109,7 @@ Two comprehensive blind tests revealed that UBML's core architecture is solid bu
 | `avgDuration: 90 days` | ❌ Wrong property + format | Naming + format | High | Property is `duration`, format is `90d` |
 | `nextStep: ST00002` on Step | ❌ Not a property | Structural difference | By design | Use `links` array separately |
 | `actors: [AC00001, AC00004]` on Step | ❌ Not a property | Semantic misunderstanding | By design | Use RACI matrix |
-| `source` (singular) on Insight | ✅ Exists but limiting | Schema limitation | High | Should be `sources` (array) - see KNOWLEDGE-LAYER-FIXES.md F1 |
+| `source` (singular) on Insight | ✅ Exists but limiting | Schema limitation | High | Should be `sources` (array) - see plan 01 F1 |
 | `attribution: "Jan Tilsch"` | ✅ Works but no linkage | Missed opportunity | Medium | Should accept `ActorRef \| string` - see F4 |
 | `notes` on Insight | ✅ Exists | Redundant field | Low | Remove - duplicates `context` - see F5 |
 | `default: proposed` on status | ❌ Principle violation | Hidden default | Medium | Remove - violates P4.4 - see F3 |
@@ -417,7 +417,7 @@ Based on evaluation findings, these areas still need attention:
 - Reference hints showing defined actors
 - `participants`/`actors` misplacement hint
 
-See `plan/CLI-UX-IMPROVEMENTS.md` for detailed implementation proposals.
+See plans [03](../03-cli-error-messages.md), [04](../04-templates-examples.md), [05](../05-schema-discovery-validation.md), and [09](../09-cli-convenience-tooling.md) for detailed implementation proposals.
 
 ### Note on Completed Work
 - File splitting refactoring (Phase 6) has been completed - see `sandbox/cetin-ftth-eval/` for details

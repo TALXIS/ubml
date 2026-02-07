@@ -8,4 +8,4 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 Initial development. Schema structure and core concepts are stabilizing.
 
-See `/docs/OPEN-TOPICS.md` for active design questions.
+See `/plan/README.md` for the roadmap and `/plan/00-design-decisions.md` for open design questions.

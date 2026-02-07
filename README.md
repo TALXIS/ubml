@@ -238,7 +238,7 @@ import ubml from 'ubml/eslint';                 // ESLint plugin
 - **ESLint integration** for linting UBML files
 - **Universal** — Works in browser, Node, Deno, Bun (zero Node dependencies)
 
-📖 See full API documentation and code examples in the [Developer Guide](./docs/DEVELOPER.md) (coming soon)
+📖 Full API documentation and developer guide coming soon
 
 ---
 

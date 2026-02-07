@@ -1160,7 +1160,7 @@ Quantitative measurements on Scenarios use the term `observations` (type `Observ
 3. **Modified types**: `derivedFrom` property added to core model types
 4. **Scenario property**: `observations` (type `Observation`) for quantitative measurements
 5. **New file patterns**: `*.sources.ubml.yaml`, `*.insights.ubml.yaml`
-7. **Deferred**: LLM extraction, indexing/caching — see OPEN-TOPICS.md
+7. **Deferred**: LLM extraction, indexing/caching — see `plan/00-design-decisions.md` (deferred items) and `plan/10-future-considerations.md`
 
 ### Principles Applied
 

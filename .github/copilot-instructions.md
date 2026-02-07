@@ -36,7 +36,7 @@ Note: Some duplication exists - check for hardcoded element types, validation lo
 - `WORKSPACE-SEMANTICS.md` - How concepts relate
 - `PRINCIPLES.md` - Non-negotiable rules
 - `DESIGN-DECISIONS.md` - Rationale for major choices (add new decisions here)
-- `OPEN-TOPICS.md` - Unresolved questions
+- `plan/00-design-decisions.md` - Open design questions and unresolved topics
 
 ## Architecture Notes
 

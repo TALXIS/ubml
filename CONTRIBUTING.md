@@ -14,7 +14,7 @@ npm test
 
 1. Read `/docs/PRINCIPLES.md` before modifying the language
 2. For significant changes, add a decision record to `/docs/DESIGN-DECISIONS.md`
-3. Update `/docs/OPEN-TOPICS.md` for unresolved questions
+3. Track unresolved design questions in `/plan/00-design-decisions.md`
 4. Run `npm test` and `npm run typecheck` before committing
 
 ## Schema Files
