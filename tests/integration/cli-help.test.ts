@@ -29,9 +29,9 @@ describe('CLI Help Command', () => {
    * Helper to run ubml CLI command
    */
   function runUbml(args: string): { stdout: string; stderr: string; exitCode: number } {
-    const ubmlBin = join(originalCwd, 'bin', 'ubml.ts');
+    const ubmlBin = join(originalCwd, 'dist', 'cli.js');
     try {
-      const stdout = execSync(`npx tsx ${ubmlBin} ${args}`, {
+      const stdout = execSync(`node ${ubmlBin} ${args}`, {
         cwd: tempDir,
         encoding: 'utf8',
         stdio: ['pipe', 'pipe', 'pipe'],
