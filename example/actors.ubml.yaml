@@ -30,6 +30,30 @@ actors:
     type: system
     kind: system
     description: "System for storing and managing customer documents"
+  
+  AC00005:
+    name: "Product Manager - Cloud"
+    type: role
+    kind: human
+    description: "Product manager for cloud platform"
+  
+  AC00006:
+    name: "Product Manager - IoT"
+    type: role
+    kind: human
+    description: "Product manager for IoT platform"
+  
+  AC00007:
+    name: "VP Customer Success"
+    type: role
+    kind: human
+    description: "Vice President of Customer Success"
+  
+  AC00008:
+    name: "Chief Strategy Officer"
+    type: role
+    kind: human
+    description: "Chief Strategy Officer responsible for corporate strategy"
 
 skills:
   SK00001:

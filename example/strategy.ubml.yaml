@@ -1,0 +1,337 @@
+ubml: "1.4"
+
+# Example Strategy Document demonstrating Management Consulting Frameworks
+# - Three Horizons strategic planning
+# - BCG Growth-Share Matrix portfolio classification
+# - Customer journey mapping
+
+valueStreams:
+  VS00001:
+    name: "Order to Cash"
+    description: "End-to-end value stream from customer order to payment collection"
+    customer: AC00001  # Customer role
+    triggeringEvent: "Customer places order"
+    endingEvent: "Payment received and reconciled"
+    
+    stages:
+      - name: "Order Capture"
+        description: "Customer discovers product, evaluates options, and places order"
+        processes:
+          - PR00001  # Customer Onboarding process
+        
+        # Customer journey metadata (NEW)
+        customerTouchpoints:
+          - "E-commerce website"
+          - "Sales representative phone call"
+          - "Email order confirmation"
+        
+        customerEmotionalState: "curious"
+        
+        painPoints:
+          - "Unclear product pricing on website"
+          - "Long wait time for sales callback (24+ hours)"
+          - "Confusing checkout process with too many steps"
+        
+        momentsOfTruth:
+          - "First pricing quote received - makes or breaks the deal"
+          - "Order confirmation arrives within 5 minutes"
+        
+        customerValue: "Customer understands total cost and delivery timeline"
+      
+      - name: "Order Fulfillment"
+        description: "Pick, pack, and ship the order"
+        
+        customerTouchpoints:
+          - "Shipping notification email"
+          - "Package tracking website"
+          - "Delivery confirmation SMS"
+        
+        customerEmotionalState: "anxious"
+        
+        painPoints:
+          - "No real-time tracking updates"
+          - "Delivery windows too wide (8am-6pm)"
+        
+        momentsOfTruth:
+          - "Package arrives on promised date or not"
+          - "Package arrives undamaged"
+        
+        customerValue: "Customer receives correct products on time"
+      
+      - name: "Payment & Reconciliation"
+        description: "Invoice, collect payment, reconcile"
+        
+        customerTouchpoints:
+          - "Invoice email"
+          - "Payment portal"
+          - "Receipt confirmation"
+        
+        customerEmotionalState: "confident"
+        
+        painPoints:
+          - "Invoice details don't match order confirmation"
+          - "Payment portal doesn't support all payment methods"
+        
+        customerValue: "Customer completes transaction efficiently"
+    
+    valueOutcome: "Customer receives correct products on time and pays the right amount"
+    owner: AC00002  # VP Operations
+
+capabilities:
+  CP00001:
+    name: "Process Customer Orders"
+    description: "Receive, validate, and fulfill customer orders efficiently"
+    level: 2
+    
+    # NEW: Strategic Horizon classification
+    strategicHorizon: h1  # Core business - maintain and defend
+    
+    maturity: 3  # Defined - standardized processes
+    targetMaturity: 4  # Managed - measured and controlled
+    
+    strategicImportance: essential  # Must be good, but not differentiating
+    
+    processes:
+      - PR00001  # Customer Onboarding
+    
+    owner: AC00002  # VP Operations
+  
+  CP00002:
+    name: "Deliver Omnichannel Customer Experience"
+    description: "Seamless customer experience across web, mobile, phone, and in-person channels"
+    level: 2
+    
+    # NEW: Horizon 2 - emerging opportunity
+    strategicHorizon: h2  # Invest and grow
+    
+    maturity: 2  # Repeatable - some processes in place
+    targetMaturity: 4  # Managed
+    
+    strategicImportance: differentiating  # Competitive advantage
+    
+    owner: AC00003  # Chief Digital Officer
+  
+  CP00003:
+    name: "Leverage AI for Predictive Customer Service"
+    description: "Use AI to predict customer needs and proactively solve problems"
+    level: 3
+    
+    # NEW: Horizon 3 - future option
+    strategicHorizon: h3  # Explore and experiment
+    
+    maturity: 1  # Initial - ad-hoc, experimental
+    targetMaturity: 3  # Defined
+    
+    strategicImportance: differentiating  # Future competitive advantage
+    
+    owner: AC00003  # Chief Digital Officer
+
+products:
+  PD00001:
+    name: "Enterprise Platform - Legacy Edition"
+    description: "Mature enterprise software platform with 60% market share"
+    
+    lifecycle: maturity
+    
+    price:
+      amount: 100000
+      currency: USD
+    
+    cost:
+      amount: 20000
+      currency: USD
+    
+    margin: 80
+    
+    # NEW: Strategic Horizon
+    strategicHorizon: h1  # Core business - harvest cash
+    
+    # NEW: BCG Growth-Share Matrix classification
+    portfolioClassification: cash-cow  # Low growth, high share
+    marketGrowthRate: low  # Market growing at 3% annually
+    relativeMarketShare: high  # 60% vs competitor's 25% = 2.4x
+    strategicAction: maintain  # Defend position, harvest cash flow
+    
+    owner: AC00004  # Product Manager - Enterprise
+  
+  PD00002:
+    name: "Cloud Platform - Next Generation"
+    description: "New cloud-native platform in rapidly growing cloud market"
+    
+    lifecycle: growth
+    
+    price:
+      amount: 75000
+      currency: USD
+    
+    cost:
+      amount: 30000
+      currency: USD
+    
+    margin: 60
+    
+    # NEW: Strategic Horizon
+    strategicHorizon: h1  # Core business - but fast growing
+    
+    # NEW: BCG classification
+    portfolioClassification: star  # High growth, high share
+    marketGrowthRate: high  # Market growing at 40% annually
+    relativeMarketShare: high  # 35% vs competitor's 25% = 1.4x
+    strategicAction: invest  # Invest heavily to maintain leadership
+    
+    owner: AC00005  # Product Manager - Cloud
+  
+  PD00003:
+    name: "IoT Sensor Platform"
+    description: "IoT and edge computing platform in emerging market"
+    
+    lifecycle: introduction
+    
+    price:
+      amount: 50000
+      currency: USD
+    
+    cost:
+      amount: 45000
+      currency: USD
+    
+    margin: 10
+    
+    # NEW: Strategic Horizon
+    strategicHorizon: h2  # Emerging opportunity - selective investment
+    
+    # NEW: BCG classification
+    portfolioClassification: question-mark  # High growth, low share
+    marketGrowthRate: high  # Market growing at 60% annually
+    relativeMarketShare: low  # 8% vs market leader's 45% = 0.18x
+    strategicAction: invest  # Selectively invest if winnable
+    
+    owner: AC00006  # Product Manager - IoT
+    
+    tags:
+      - emerging-market
+      - high-risk
+      - strategic-bet
+  
+  PD00004:
+    name: "On-Premise Legacy Tool"
+    description: "Old on-premise tool in declining market with low share"
+    
+    lifecycle: decline
+    
+    price:
+      amount: 25000
+      currency: USD
+    
+    cost:
+      amount: 22000
+      currency: USD
+    
+    margin: 12
+    
+    # NEW: Strategic Horizon
+    strategicHorizon: h1  # Core business - but divesting
+    
+    # NEW: BCG classification
+    portfolioClassification: dog  # Low growth, low share
+    marketGrowthRate: low  # Market declining at -5% annually
+    relativeMarketShare: low  # 12% vs leader's 40% = 0.3x
+    strategicAction: divest  # Exit the business, free resources
+    
+    owner: AC00004  # Product Manager - Enterprise
+    
+    tags:
+      - end-of-life
+      - divest-candidate
+
+services:
+  SV00001:
+    name: "Premium Support"
+    description: "24/7 premium customer support service"
+    
+    type: support
+    deliveryModel: "24/7 phone and chat"
+    
+    basePrice:
+      amount: 10000
+      currency: USD
+    
+    # NEW: Strategic classification
+    strategicHorizon: h1  # Core business
+    
+    portfolioClassification: cash-cow  # Mature, profitable service
+    marketGrowthRate: low
+    relativeMarketShare: high
+    strategicAction: maintain  # Defend and harvest
+    
+    owner: AC00007  # VP Customer Success
+  
+  SV00002:
+    name: "AI-Powered Proactive Monitoring"
+    description: "Next-generation service using AI to predict and prevent issues"
+    
+    type: managed
+    deliveryModel: "Cloud-based automated monitoring with human escalation"
+    
+    basePrice:
+      amount: 15000
+      currency: USD
+    
+    # NEW: Strategic classification
+    strategicHorizon: h2  # Emerging opportunity
+    
+    portfolioClassification: question-mark  # New service, uncertain
+    marketGrowthRate: high  # AI services market growing fast
+    relativeMarketShare: low  # Just launched, small share
+    strategicAction: invest  # Strategic investment
+    
+    owner: AC00003  # Chief Digital Officer
+    
+    tags:
+      - ai-enabled
+      - competitive-differentiator
+
+portfolios:
+  PF00001:
+    name: "Product Portfolio"
+    description: "Complete product portfolio with BCG matrix classification"
+    type: product
+    
+    products:
+      - PD00001  # Cash cow - Legacy Enterprise
+      - PD00002  # Star - Cloud Platform
+      - PD00003  # Question mark - IoT
+      - PD00004  # Dog - On-premise legacy
+    
+    strategy: |
+      Portfolio strategy based on BCG Growth-Share Matrix:
+      
+      STARS (invest heavily):
+      - Cloud Platform (PD00002): Market leader in high-growth market
+        → Invest to defend leadership position and build future cash cow
+      
+      CASH COWS (maintain and harvest):
+      - Legacy Enterprise Platform (PD00001): Dominant in mature market
+        → Maintain market share, maximize cash flow to fund stars
+      
+      QUESTION MARKS (selective investment):
+      - IoT Sensor Platform (PD00003): High growth but low share
+        → Evaluate: Can we achieve leadership? If yes, invest. If no, divest.
+        → Decision criteria: technology advantage, partnership opportunities, customer traction
+      
+      DOGS (harvest or divest):
+      - On-premise Legacy Tool (PD00004): Declining market, weak position
+        → Plan orderly exit over 18 months
+        → Migrate customers to Cloud Platform where possible
+        → Sunset without new investment
+      
+      PORTFOLIO BALANCE:
+      - Currently: 1 star, 1 cash cow, 1 question mark, 1 dog
+      - Target: Grow stars, maintain cash cows, resolve question marks, exit dogs
+      - Investment allocation: 60% to stars, 30% to cash cows, 10% to question marks
+    
+    investmentBudget:
+      amount: 5000000
+      currency: USD
+    
+    owner: AC00008  # Chief Strategy Officer
