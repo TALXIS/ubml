@@ -33,10 +33,11 @@ UBML is for everyone who needs to understand how a business works:
 | Role | Use Case |
 |------|----------|
 | **Software engineers** | Understand the real-world context and motivation behind what you're building |
-| **Management consultants** | Capture workshop findings in structured, validated models |
+| **Management consultants** | Capture workshop findings in structured, validated models using industry-standard frameworks (McKinsey Three Horizons, BCG Growth-Share Matrix) |
 | **Business analysts** | Map how organizations actually operate |
-| **Strategy teams** | Build ROI-backed business cases for change |
+| **Strategy teams** | Build ROI-backed business cases for change with portfolio analysis and strategic planning tools |
 | **Operations leaders** | Identify bottlenecks and improvement opportunities |
+| **Service designers** | Map customer journeys with touchpoints, pain points, and moments of truth |
 | **Tool developers** | Embed UBML editing in web applications |
 
 Whether you're figuring out *what to build* or *why it matters*, UBML provides a shared language between business and technology.
@@ -50,7 +51,8 @@ Whether you're figuring out *what to build* or *why it matters*, UBML provides a
 | **Processes** | Workflows (L1–L4), steps, decisions, phases |
 | **Organization** | Roles, teams, systems, resource pools, skills |
 | **Information** | Entities, documents, locations, relationships |
-| **Strategy** | Value streams, capabilities, products, portfolios |
+| **Strategy** | Value streams, capabilities, products, portfolios with BCG matrix classification and Three Horizons planning |
+| **Customer Experience** | Customer journeys with touchpoints, pain points, emotional states, and moments of truth |
 | **Analysis** | KPIs, ROI models, simulation scenarios |
 | **Improvements** | Hypothesis trees to identify how to make more money |
 
@@ -269,6 +271,7 @@ UBML uses different file types for different aspects of your business model. All
 |----------|------------------|
 | **[Vision](./docs/VISION.md)** | Why UBML exists, what problems it solves |
 | **[Design Principles](./docs/PRINCIPLES.md)** | How the language is designed |
+| **[Consulting Frameworks](./docs/CONSULTING-FRAMEWORKS-RESEARCH.md)** | How UBML supports McKinsey, BCG, and Bain methodologies |
 | **[Example Workspace](./example)** | Real-world sample with all document types |
 | **CLI Help** | Run `ubml --help` for all commands |
 | **Schema Explorer** | Run `ubml schema` to browse interactively |

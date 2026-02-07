@@ -1188,3 +1188,294 @@ Quantitative measurements on Scenarios use the term `observations` (type `Observ
 
 - [PRINCIPLES.md](PRINCIPLES.md) — Binding design constraints
 - [VISION.md](VISION.md) — Product vision and positioning
+
+---
+
+## DD-009: Strategic Horizons Framework
+
+**Status**: Accepted
+
+### Context
+
+Management consultancies commonly use the "Three Horizons" framework (popularized by McKinsey and Baghai, Coley, White in "The Alchemy of Growth") for portfolio planning and investment allocation. The framework categorizes initiatives and offerings by strategic time horizon:
+
+- **Horizon 1 (H1)**: Core business - defend and extend current success (0-1 year focus)
+- **Horizon 2 (H2)**: Emerging opportunities - build emerging businesses (1-3 years)
+- **Horizon 3 (H3)**: Create viable options - seed future opportunities (3+ years)
+
+Organizations must balance investment across all three horizons. Too much H1 = sustainable but not growing. Too much H3 = burning cash on unproven bets.
+
+### Research
+
+**BCG Perspective**: "To grow, you need to attack different markets in different ways... H1 businesses provide the resources for H2 and H3 investments."
+
+**McKinsey Practice**: Widely used in strategy engagements for capability development, product portfolio balancing, and innovation pipeline management.
+
+**Consulting Workflow**: Strategy consultants routinely classify initiatives, capabilities, and products/services by horizon to:
+- Assess portfolio balance
+- Allocate investment budgets
+- Prioritize resource deployment
+- Manage innovation pipeline
+
+### Decision
+
+Add `strategicHorizon` enum property to Capability, Product, and Service types with values `h1`, `h2`, `h3`.
+
+```yaml
+strategicHorizon:
+  type: string
+  enum: [h1, h2, h3]
+```
+
+All instances optional (not required). Enables horizon-based classification without forcing it.
+
+### Alternatives Rejected
+
+**A) Horizon 1/2/3 as full values**
+- Rejected: Too verbose
+- `h1/h2/h3` is standard consultant shorthand
+
+**B) Separate Initiative or Project type**
+- Rejected: Too heavy for a classification dimension
+- Horizons apply to existing types (capabilities, products, services)
+
+**C) Time-based fields (0-1yr, 1-3yr, 3+yr)**
+- Rejected: Horizons are conceptual, not fixed time periods
+- Different industries have different time scales
+- Horizons are about strategic intent, not calendar math
+
+**D) Maturity-based instead**
+- Rejected: Maturity (how well we do it) ≠ Horizon (strategic focus)
+- Existing `maturity` field serves different purpose
+
+### Consequences
+
+**Enables**:
+- Strategy consultants can classify portfolio items using industry-standard framework
+- Horizon-based filtering and views ("show all H2 initiatives")
+- Portfolio balance analysis (% investment by horizon)
+- Aligns UBML with professional consulting practice
+
+**Constraints**:
+- Optional field; users not forced to classify by horizon
+- Simple enum; doesn't capture nuanced horizon transitions
+- No validation of horizon assignments (consultant judgment required)
+
+### Principles Applied
+
+| Principle | Application |
+|-----------|-------------|
+| **P5.2** Minimal Required Properties | Optional field, not required |
+| **P5.3** Enums Complete and Documented | Three values fully documented with examples |
+| **P6.1** Business Vocabulary First | "h1/h2/h3" is standard consultant terminology |
+| **P10.3** Avoid Standard-Specific Semantics | Strategic concept, not tied to BPMN/ArchiMate |
+
+---
+
+## DD-010: BCG Growth-Share Matrix Portfolio Classification
+
+**Status**: Accepted
+
+### Context
+
+The BCG Growth-Share Matrix (Boston Consulting Group, 1970) is one of the most foundational strategy frameworks in management consulting. It classifies business units, products, or services into four categories based on two dimensions:
+
+1. **Market Growth Rate**: Proxy for market attractiveness (high >10%, low <10%)
+2. **Relative Market Share**: Proxy for competitive strength (high >1.0x, low <1.0x vs largest competitor)
+
+This creates a 2x2 matrix:
+- **Stars** (high growth, high share): Invest heavily, future cash cows
+- **Cash Cows** (low growth, high share): Maintain, harvest cash to fund stars
+- **Question Marks** (high growth, low share): Selective investment or exit
+- **Dogs** (low growth, low share): Harvest or divest
+
+Every strategy consultant learns this framework. It's used in nearly every portfolio strategy engagement.
+
+### Research
+
+**BCG Foundation**: "The notion was simple: market share = cash generation; market growth = cash consumption. The matrix became the most widely used portfolio planning tool."
+
+**Consulting Practice**:
+- McKinsey uses variations (market attractiveness vs competitive strength)
+- Bain uses similar portfolio frameworks
+- BCG Matrix remains the standard baseline
+
+**Strategic Actions**:
+- Stars → Invest (build market leadership)
+- Cash Cows → Maintain (defend and harvest)
+- Question Marks → Selective invest or divest
+- Dogs → Harvest or divest (free resources)
+
+### Decision
+
+Add portfolio classification fields to Product and Service types:
+
+```yaml
+portfolioClassification:
+  type: string
+  enum: [star, cash-cow, question-mark, dog]
+
+marketGrowthRate:
+  type: string
+  enum: [high, low]
+
+relativeMarketShare:
+  type: string
+  enum: [high, low]
+
+strategicAction:
+  type: string
+  enum: [invest, maintain, harvest, divest]
+```
+
+All fields optional. Users can set classification directly OR derive from growth/share inputs.
+
+### Alternatives Rejected
+
+**A) Numeric growth rate and market share**
+- Rejected: Too detailed for strategic modeling
+- Consultants think in "high/low", not precise percentages
+- Threshold varies by industry (10% growth = high in mature industries, low in tech)
+
+**B) Different classification scheme (GE-McKinsey 9-box)**
+- Rejected: BCG 2x2 is the industry standard
+- GE 9-box is more complex, less widely used
+- Can add later if needed
+
+**C) Separate portfolio analysis document type**
+- Rejected: Over-engineered
+- Portfolio classification belongs on the product/service itself
+- Enables simple filtering and grouping
+
+**D) "Problem child" instead of "question mark"**
+- Rejected: "Question mark" is modern BCG terminology
+- "Problem child" is outdated (1970s term)
+- Retained as `valueMistake` for error handling
+
+### Consequences
+
+**Enables**:
+- Strategy consultants can classify products/services using BCG matrix
+- Portfolio-level views (bubble charts, quadrant distribution)
+- Investment prioritization based on classification
+- Strategic action planning (invest/maintain/harvest/divest)
+
+**Constraints**:
+- Simplified high/low classification (not continuous)
+- Consultant judgment required for threshold definitions
+- No automatic calculation or validation of classifications
+
+**Future Opportunities**:
+- Portfolio visualization tools (BCG matrix bubble chart)
+- Investment allocation optimization
+- Strategic scenario modeling
+
+### Principles Applied
+
+| Principle | Application |
+|-----------|-------------|
+| **P5.2** Minimal Required Properties | All fields optional |
+| **P5.3** Enums Complete and Documented | All values explained with examples |
+| **P6.1** Business Vocabulary First | Standard BCG terminology (star, cash-cow, etc.) |
+| **P7.1** Lossless Round-Trip Not Required | Strategic framework; no BPMN/ArchiMate equivalent |
+| **P10.3** Avoid Standard-Specific Semantics | Strategic layer beyond OMG standards scope |
+
+---
+
+## DD-011: Customer Journey Mapping in Value Streams
+
+**Status**: Accepted
+
+### Context
+
+Service design and customer experience (CX) consulting increasingly focus on the customer's journey - touchpoints, emotions, pain points, and moments of truth. This differs from operational process modeling (internal activities) by centering on customer perception and experience.
+
+**Current State**: Value streams model end-to-end customer value delivery at strategic level, but lack customer experience metadata.
+
+**Consulting Need**: CX consultants need to capture:
+- Where customers interact with the organization (touchpoints)
+- How customers feel at each stage (emotional state)
+- What frustrates customers (pain points)
+- Critical perception-shaping moments (moments of truth)
+- What value customers receive (outcomes)
+
+### Research
+
+**Service Design Practice**:
+- Customer journey maps are standard CX deliverables
+- Maps combine operational flow with emotional/experiential layer
+- Used to identify service improvement opportunities
+
+**Frameworks**:
+- Touchpoints (service interactions)
+- Emotional journey (anxiety, delight, frustration)
+- Moments of truth (critical make-or-break interactions)
+- Pain points (friction, obstacles, unmet needs)
+
+**Industry Standard**: Journey mapping is ubiquitous in consulting (McKinsey Design, IDEO, frog, etc.)
+
+### Decision
+
+Extend `ValueStream.stages` with optional customer journey properties:
+
+```yaml
+stages:
+  - name: "Stage Name"
+    customerTouchpoints: [...]  # Where/how customer interacts
+    customerEmotionalState: "..." # How customer feels
+    painPoints: [...]  # Customer frustrations
+    momentsOfTruth: [...]  # Critical perception moments
+    customerValue: "..."  # What customer gains
+```
+
+All properties optional. Free-text/arrays for flexibility across industries.
+
+### Alternatives Rejected
+
+**A) Separate journey document type**
+- Rejected: Would duplicate value stream structure
+- Journey IS the customer view of the value stream
+- Avoid parallel hierarchy (violates P1.1)
+
+**B) Link to external journey maps**
+- Rejected: Loses integration benefits
+- Journey metadata belongs WITH value stream stages
+
+**C) Structured emotion taxonomy**
+- Rejected: Too rigid
+- Customer emotions vary by industry/context
+- Free-text supports diverse use cases
+
+**D) Put journey data on Process instead**
+- Rejected: Processes are operational (internal view)
+- Value streams are strategic (customer view)
+- Natural alignment of concerns
+
+### Consequences
+
+**Enables**:
+- CX consultants model customer journeys within value streams
+- Service design insights captured alongside operational processes
+- Journey-focused views and pain point analysis
+- Bridges strategy (value streams) and operations (processes)
+
+**Constraints**:
+- Free-text fields require discipline (no standardized taxonomy)
+- No validation of completeness or consistency
+- Consultant judgment required for emotion classification
+
+**Future Opportunities**:
+- Journey visualization tools
+- Pain point prioritization frameworks
+- Emotion-driven process improvement recommendations
+
+### Principles Applied
+
+| Principle | Application |
+|-----------|-------------|
+| **P3.1** Nesting for Ownership | Journey metadata owned by value stream stage |
+| **P5.2** Minimal Required Properties | All fields optional |
+| **P6.1** Business Vocabulary First | CX/service design terminology (touchpoints, moments of truth) |
+| **P10.3** Avoid Standard-Specific Semantics | CX concepts beyond OMG standards |
+
+---

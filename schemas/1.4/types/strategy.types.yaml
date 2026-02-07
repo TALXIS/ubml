@@ -97,6 +97,95 @@ $defs:
               type: array
               items:
                 $ref: "../defs/refs.defs.yaml#/$defs/ProcessRef"
+            
+            # Customer journey metadata
+            customerTouchpoints:
+              description: |
+                Customer interaction points in this stage.
+                Where and how the customer experiences this part of the journey.
+                
+                EXAMPLES:
+                - "Website product page"
+                - "Sales representative call"
+                - "Email order confirmation"
+                - "Delivery notification SMS"
+                - "Customer support chat"
+                
+                Used for service design and customer experience improvement.
+              type: array
+              items:
+                type: string
+            
+            customerEmotionalState:
+              description: |
+                Customer's emotional state during this stage.
+                Helps identify moments of delight or frustration.
+                
+                EXAMPLES:
+                - curious (browsing, exploring)
+                - anxious (waiting, uncertain)
+                - frustrated (problem, delay)
+                - delighted (exceeded expectations)
+                - confused (unclear process)
+                - confident (trust established)
+                - relieved (issue resolved)
+                
+                Used to prioritize service improvements.
+              type: string
+              examples:
+                - curious
+                - anxious
+                - frustrated
+                - delighted
+                - confused
+                - confident
+                - relieved
+            
+            painPoints:
+              description: |
+                Customer pain points or frustrations in this stage.
+                Service design opportunities.
+                
+                EXAMPLES:
+                - "Unclear pricing on website"
+                - "Long wait time for sales callback"
+                - "Manual form filling required"
+                - "No delivery tracking available"
+                
+                Each pain point is an improvement opportunity.
+              type: array
+              items:
+                type: string
+            
+            momentsOfTruth:
+              description: |
+                Critical moments that shape customer perception.
+                Make-or-break touchpoints in this stage.
+                
+                EXAMPLES:
+                - "First pricing quote received"
+                - "Product arrives damaged or on time"
+                - "Support responds within 5 minutes or 5 hours"
+                - "Installation succeeds on first attempt"
+                
+                Moments of truth require special attention and excellence.
+              type: array
+              items:
+                type: string
+            
+            customerValue:
+              description: |
+                Value delivered to customer in this stage.
+                What the customer gains or accomplishes.
+                
+                EXAMPLES:
+                - "Customer understands product fit for their needs"
+                - "Customer receives accurate delivery estimate"
+                - "Customer's issue is resolved permanently"
+                - "Customer feels confident in their decision"
+                
+                Focus on customer outcomes, not internal activities.
+              type: string
       
       valueOutcome:
         description: |
@@ -246,6 +335,43 @@ $defs:
         items:
           type: string
       
+      strategicHorizon:
+        description: |
+          Strategic time horizon for this capability (BCG Three Horizons framework):
+          - h1: Horizon 1 - Core business to maintain and defend (0-1 year)
+          - h2: Horizon 2 - Emerging opportunities to invest and grow (1-3 years)
+          - h3: Horizon 3 - Future options to explore and experiment (3+ years)
+          
+          Used for portfolio balancing and investment allocation.
+          
+          EXAMPLES:
+          - h1: "Process customer orders" (core operational capability)
+          - h2: "Develop omnichannel customer experience" (growth initiative)
+          - h3: "Explore AI-powered personalization" (future option)
+        type: string
+        enum: [h1, h2, h3]
+        x-ubml:
+          propertyNames: ["strategicHorizon", "horizon"]
+          valueMistakes:
+            horizon1:
+              value: "horizon1"
+              hint: "Use 'h1' for Horizon 1 (core business)."
+            horizon2:
+              value: "horizon2"
+              hint: "Use 'h2' for Horizon 2 (emerging opportunities)."
+            horizon3:
+              value: "horizon3"
+              hint: "Use 'h3' for Horizon 3 (future options)."
+            core:
+              value: "core"
+              hint: "Use 'h1' for core business capabilities."
+            future:
+              value: "future"
+              hint: "Use 'h3' for future/experimental capabilities."
+            emerging:
+              value: "emerging"
+              hint: "Use 'h2' for emerging opportunity capabilities."
+      
       owner:
         description: "Capability owner."
         $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
@@ -352,6 +478,94 @@ $defs:
         items:
           $ref: "../defs/refs.defs.yaml#/$defs/ProductRef"
       
+      strategicHorizon:
+        description: |
+          Strategic time horizon for this product offering.
+          See Capability.strategicHorizon for framework details.
+        type: string
+        enum: [h1, h2, h3]
+      
+      portfolioClassification:
+        description: |
+          BCG Growth-Share Matrix classification for portfolio strategy.
+          
+          Based on market growth rate (high/low) and relative market share (high/low):
+          - star: High growth, high share - Invest heavily to maintain leadership
+          - cash-cow: Low growth, high share - Maintain position, harvest cash flow
+          - question-mark: High growth, low share - Selective investment or exit
+          - dog: Low growth, low share - Harvest or divest
+          
+          EXAMPLES:
+          - star: New cloud platform in growing market with 40% share
+          - cash-cow: Mature enterprise software with 60% share, stable market
+          - question-mark: IoT sensors in booming market but only 8% share
+          - dog: Legacy on-premise tool in declining market with 12% share
+        type: string
+        enum: [star, cash-cow, question-mark, dog]
+        x-ubml:
+          propertyNames: ["portfolioClassification", "bcgClassification"]
+          valueMistakes:
+            "star-product":
+              value: "star-product"
+              hint: "Use 'star' for high-growth, high-share products."
+            "cash cow":
+              value: "cash cow"
+              hint: "Use 'cash-cow' (hyphenated) for low-growth, high-share products."
+            question:
+              value: "question"
+              hint: "Use 'question-mark' for high-growth, low-share products."
+            "problem-child":
+              value: "problem-child"
+              hint: "Use 'question-mark' - this is the modern BCG term for this quadrant."
+            "problem child":
+              value: "problem child"
+              hint: "Use 'question-mark' - this is the modern BCG term for this quadrant."
+      
+      marketGrowthRate:
+        description: |
+          Market growth rate classification for BCG matrix positioning.
+          Typically >10% annual growth is 'high', <10% is 'low', but varies by industry.
+        type: string
+        enum: [high, low]
+      
+      relativeMarketShare:
+        description: |
+          Relative market share (vs. largest competitor) for BCG matrix positioning.
+          >1.0 is 'high' (market leader), <1.0 is 'low' (follower).
+        type: string
+        enum: [high, low]
+      
+      strategicAction:
+        description: |
+          Recommended strategic action based on portfolio position.
+          - invest: Grow aggressively (typical for stars, selective question-marks)
+          - maintain: Defend position (typical for cash-cows)
+          - harvest: Maximize short-term cash flow (aging cash-cows, dogs)
+          - divest: Exit the business (dogs with no turnaround potential)
+          
+          DECISION GUIDE:
+          - Stars → invest (build future cash cows)
+          - Cash cows → maintain (fund stars and question-marks)
+          - Question marks → invest (if winnable) or divest (if not)
+          - Dogs → harvest or divest (free up resources)
+        type: string
+        enum: [invest, maintain, harvest, divest]
+        x-ubml:
+          propertyNames: ["strategicAction", "action"]
+          valueMistakes:
+            grow:
+              value: "grow"
+              hint: "Use 'invest' for growth strategy."
+            hold:
+              value: "hold"
+              hint: "Use 'maintain' to defend current position."
+            exit:
+              value: "exit"
+              hint: "Use 'divest' for exit strategy."
+            keep:
+              value: "keep"
+              hint: "Use 'maintain' to keep current position."
+      
       owner:
         description: "Product owner/manager."
         $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
@@ -448,6 +662,68 @@ $defs:
         type: array
         items:
           $ref: "../defs/refs.defs.yaml#/$defs/ServiceRef"
+      
+      strategicHorizon:
+        description: |
+          Strategic time horizon for this service offering.
+          See Capability.strategicHorizon for framework details.
+        type: string
+        enum: [h1, h2, h3]
+      
+      portfolioClassification:
+        description: |
+          BCG Growth-Share Matrix classification for portfolio strategy.
+          See Product.portfolioClassification for framework details.
+        type: string
+        enum: [star, cash-cow, question-mark, dog]
+        x-ubml:
+          propertyNames: ["portfolioClassification", "bcgClassification"]
+          valueMistakes:
+            "star-product":
+              value: "star-product"
+              hint: "Use 'star' for high-growth, high-share services."
+            "cash cow":
+              value: "cash cow"
+              hint: "Use 'cash-cow' (hyphenated) for low-growth, high-share services."
+            question:
+              value: "question"
+              hint: "Use 'question-mark' for high-growth, low-share services."
+            "problem-child":
+              value: "problem-child"
+              hint: "Use 'question-mark' - this is the modern BCG term for this quadrant."
+      
+      marketGrowthRate:
+        description: |
+          Market growth rate classification for BCG matrix positioning.
+          See Product.marketGrowthRate for details.
+        type: string
+        enum: [high, low]
+      
+      relativeMarketShare:
+        description: |
+          Relative market share (vs. largest competitor) for BCG matrix positioning.
+          See Product.relativeMarketShare for details.
+        type: string
+        enum: [high, low]
+      
+      strategicAction:
+        description: |
+          Recommended strategic action based on portfolio position.
+          See Product.strategicAction for framework details.
+        type: string
+        enum: [invest, maintain, harvest, divest]
+        x-ubml:
+          propertyNames: ["strategicAction", "action"]
+          valueMistakes:
+            grow:
+              value: "grow"
+              hint: "Use 'invest' for growth strategy."
+            hold:
+              value: "hold"
+              hint: "Use 'maintain' to defend current position."
+            exit:
+              value: "exit"
+              hint: "Use 'divest' for exit strategy."
       
       owner:
         description: "Service owner/manager."
