@@ -1,0 +1,14 @@
+ubml: "1.4"
+name: "CFO Interview — Q1 Budget Discussion"
+
+sources:
+  SR00001:
+    name: "Interview with CFO"
+    type: interview
+    date: "2026-01-15"
+    participants:
+      - AC00001
+      - "External consultant: Marie"
+    description: "90-minute discussion covering budget constraints, Q1 priorities, and team restructuring"
+    tags: [budget, Q1-planning, restructuring]
+    file: "./2026-01-cfo-interview.transcript.md"

@@ -1,0 +1,203 @@
+# ============================================================================
+# UBML Link Types Schema
+# ============================================================================
+# Unified link type for routing, scheduling, and dependencies.
+#
+# ============================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://ubml.talxis.com/schemas/1.4/types/link.types.yaml"
+title: "UBML Link Types"
+description: |
+  Links represent relationships between steps. In UBML, links unify three 
+  concerns that are often separated in other process modeling notations:
+  
+  1. ROUTING - Control flow (sequence, conditions, probability)
+  2. SCHEDULING - Timing relationships (before, after, start-to-start)
+  3. DATA FLOW - Information passing between steps
+  
+  WHY UNIFIED LINKS:
+  Most notations force separate edge types for sequence flows, data flows,
+  and dependencies. UBML unifies these because in practice, most edges
+  carry multiple semantic layers simultaneously.
+
+$defs:
+
+  # ==========================================================================
+  # SCHEDULING PROPERTIES
+  # ==========================================================================
+
+  SchedulingProperties:
+    description: |
+      Timing relationship properties for scheduling constraints.
+      
+      DEPENDENCY TYPES (MSProject-compatible):
+      ┌────────────────────────┬───────────────────────────────────────┐
+      │ Type                   │ Meaning                               │
+      ├────────────────────────┼───────────────────────────────────────┤
+      │ finish-to-start (FS)   │ B starts after A finishes (default)   │
+      │ start-to-start (SS)    │ B starts when A starts                │
+      │ finish-to-finish (FF)  │ B finishes when A finishes            │
+      │ start-to-finish (SF)   │ B finishes when A starts              │
+      └────────────────────────┴───────────────────────────────────────┘
+      
+      LAG - adds delay between linked steps
+      PRIORITY - affects scheduling order when resources are constrained
+    type: object
+    additionalProperties: false
+    properties:
+      type:
+        description: |
+          Scheduling dependency type.
+          Default is finish-to-start (FS) if not specified.
+        type: string
+        enum: [finish-to-start, start-to-start, finish-to-finish, start-to-finish]
+        default: finish-to-start
+      
+      lag:
+        description: |
+          Time delay between linked steps.
+          Positive = delay, Negative = overlap.
+          
+          Examples:
+            "1d" - 1 day delay
+            "-2h" - 2 hour overlap
+            "30min" - 30 minute delay
+        $ref: "../defs/primitives.defs.yaml#/$defs/Duration"
+      
+      priority:
+        description: |
+          Scheduling priority for resource-constrained scenarios.
+          Higher priority links are scheduled first.
+        $ref: "../defs/shared.defs.yaml#/$defs/Priority"
+
+  # ==========================================================================
+  # LINK DEFINITION
+  # ==========================================================================
+
+  Link:
+    description: |
+      Unified edge carrying routing, scheduling, and data flow.
+      
+      ROUTING PROPERTIES:
+      - condition: Guard expression (only follow if true)
+      - probability: Branch probability for simulation
+      - isDefault: Fallback route when no conditions match
+      
+      SCHEDULING PROPERTIES:
+      - schedule.type: Dependency type (FS, SS, FF, SF)
+      - schedule.lag: Time delay/overlap
+      - schedule.priority: Scheduling priority
+      
+      DATA FLOW:
+      - dataBindings: Map of data passed between steps
+      
+      EXAMPLES:
+      
+      Simple sequence (A → B):
+        - from: ST00001
+          to: ST00002
+      
+      Conditional branch:
+        - from: ST00001
+          to: ST00002
+          condition: "amount > 10000"
+        - from: ST00001
+          to: ST00003
+          isDefault: true
+      
+      Probabilistic branch (for simulation):
+        - from: ST00001
+          to: ST00002
+          probability: 0.7
+        - from: ST00001
+          to: ST00003
+          probability: 0.3
+      
+      Scheduling dependency with lag:
+        - from: ST00001
+          to: ST00002
+          schedule:
+            type: finish-to-start
+            lag: "2d"
+      
+      Start-to-start with data binding:
+        - from: ST00001
+          to: ST00002
+          schedule:
+            type: start-to-start
+          dataBindings:
+            targetField: sourceField
+    type: object
+    additionalProperties: false
+    required: [from, to]
+    properties:
+      from:
+        description: "Source step ID."
+        $ref: "../defs/refs.defs.yaml#/$defs/StepRef"
+      
+      to:
+        description: "Target step ID."
+        $ref: "../defs/refs.defs.yaml#/$defs/StepRef"
+      
+      condition:
+        description: |
+          Guard expression. If present, link is only followed when true.
+          
+          Examples:
+            condition: "amount > 10000"
+            condition: "status == 'approved'"
+            condition: requiresManagerApproval
+        $ref: "../defs/primitives.defs.yaml#/$defs/Expression"
+      
+      probability:
+        description: |
+          Branch probability for simulation.
+          All outgoing probabilities from a step should sum to 1.0.
+          
+          Note: Probabilities are for SIMULATION ONLY and do not affect
+          actual process execution, which uses conditions.
+        type: number
+        minimum: 0
+        maximum: 1
+      
+      isDefault:
+        description: |
+          Marks this as the default/fallback route.
+          Followed when no other conditional links from the same step match.
+          
+          Only ONE link from a step should have isDefault: true.
+        type: boolean
+      
+      schedule:
+        description: "Scheduling properties for project planning."
+        $ref: "#/$defs/SchedulingProperties"
+      
+      dataBindings:
+        description: |
+          Data passed from source to target step.
+          Keys are target step fields, values are source step fields.
+          
+          Example:
+            dataBindings:
+              customerName: approvedName
+              orderId: generatedOrderId
+        type: object
+        additionalProperties:
+          type: string
+      
+      label:
+        description: |
+          Optional label for the link, displayed in diagrams.
+          Used when condition text is too verbose for edge labels.
+        type: string
+      
+      tags:
+        description: "Tags for filtering and views."
+        type: array
+        items:
+          type: string
+      
+      custom:
+        description: "User-defined custom fields."
+        $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

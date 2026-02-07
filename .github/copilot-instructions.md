@@ -2,14 +2,7 @@
 
 ## What This Is
 
-UBML (Unified Business Modeling Language) is a YAML-based notation for modeling business processes, organizations, and strategy. It's designed for business analysts and consultants, not software engineers - readability and consultant vocabulary matter more than technical precision.
-
-**This repo contains:**
-- **DSL schema** (`schemas/`) - JSON schemas defining the UBML language
-- **SDK** (`src/`) - TypeScript library for parsing, validating, and serializing UBML
-- **CLI tools** (`src/cli/`) - Command-line interface for working with UBML files
-
-## How It Works
+UBML is a YAML-based DSL for modeling business processes, organizations, and strategy. Designed for business analysts, not engineers - readability and consultant vocabulary matter most.
 
 **Source of truth flow:**
 1. **Schemas** (`schemas/`) - Primary source of truth for the DSL structure
@@ -18,20 +11,34 @@ UBML (Unified Business Modeling Language) is a YAML-based notation for modeling 
 4. **SDK** (`src/`) - Built using generated types for parsing/validation
 5. **CLI** (`src/cli/`) - Built on top of SDK, intended as the primary user interface
 
-**Users should interact via CLI**, not by hand-editing YAML files (though it's supported).
+## When Schemas Change
+
+After modifying `schemas/`:
+1. Document rationale in `/docs/DESIGN-DECISIONS.md`
+2. Run `npm run generate` to regenerate TypeScript types
+3. Update SDK (`src/`) if semantics changed
+4. Update CLI (`src/cli/`) if new elements/features added
+5. Add/update tests
+
+Note: Some duplication exists - check for hardcoded element types, validation logic, or CLI prompts.
+
+## Updating UBML Version
+
+1. Update `package.json` version (e.g., `1.3.0` → `1.4.0`)
+2. Run: `npm run update-schema-versions` (renames schema folder, updates all version strings)
+3. Run: `npm run generate` (regenerates TypeScript types)
+4. Run: `npm run verify-versions` (verifies consistency)
 
 ## Critical Guidance
 
-**Before changing language design or schemas:** Read `/docs/PRINCIPLES.md` - it contains binding design constraints. Violating these principles is a design flaw that must be fixed.
+**Read `/docs/PRINCIPLES.md` before changing language design or schemas** - contains binding design constraints.
 
-**The `/docs/` directory steers everything:**
-- `VISION.md` - Why UBML exists and what it solves
-- `WORKSPACE-SEMANTICS.md` - Semantic structure of a workspace and how concepts relate
-- `PRINCIPLES.md` - Non-negotiable design rules
-- `DESIGN-DECISIONS.md` - Rationale for major choices
+**Key docs:**
+- `VISION.md` - Why UBML exists
+- `WORKSPACE-SEMANTICS.md` - How concepts relate
+- `PRINCIPLES.md` - Non-negotiable rules
+- `DESIGN-DECISIONS.md` - Rationale for major choices (add new decisions here)
 - `OPEN-TOPICS.md` - Unresolved questions
-
-When making schema changes, add decisions to `DESIGN-DECISIONS.md`. When uncertain, check `OPEN-TOPICS.md`.
 
 ## Architecture Notes
 

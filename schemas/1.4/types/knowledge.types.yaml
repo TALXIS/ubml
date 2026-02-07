@@ -1,0 +1,312 @@
+# ============================================================================
+# UBML Knowledge Types Schema
+# ============================================================================
+# Defines Sources and Insights for the knowledge capture layer.
+#
+# Sources catalog where information comes from (interviews, meetings, etc.)
+# Insights capture atomic derived knowledge extracted from sources.
+# Together they form the "Knowledge Layer" (Layer 2 in workspace anatomy).
+# ============================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://ubml.talxis.com/schemas/1.4/types/knowledge.types.yaml"
+title: "UBML Knowledge Types"
+description: |
+  Knowledge layer types: Sources and Insights.
+  
+  Sources catalog where information comes from.
+  Insights are atomic derived knowledge with baked-in context.
+  Model elements link back via derivedFrom for full traceability.
+
+$defs:
+
+  # ==========================================================================
+  # SOURCE
+  # ==========================================================================
+
+  Source:
+    description: |
+      Catalog entry for a knowledge source.
+      
+      Sources answer "where did this information come from?" They are
+      metadata records pointing to interviews, documents, meetings,
+      surveys, and other information origins. The actual content lives
+      in companion files or external URLs.
+      
+      SOURCE TYPES:
+      - interview: One-on-one or group interview
+      - meeting: Scheduled meeting or call
+      - workshop: Facilitated working session
+      - document: Written material (SOP, contract, regulation)
+      - email: Email thread or message
+      - survey: Survey or questionnaire results
+      - observation: Direct observation of work being done
+      - system-export: Data exported from an IT system
+      - research: External research, benchmarks, industry data
+      
+      MINIMAL EXAMPLE:
+        SR00001:
+          name: "Interview with CFO"
+      
+      FULL EXAMPLE:
+        SR00001:
+          name: "Interview with CFO"
+          type: interview
+          date: "2026-01-15"
+          participants: [AC00010, "Jan Novák (external)"]
+          description: "90-minute deep dive on budget constraints"
+          tags: [budget, constraints, Q1-planning]
+          file: "./transcripts/2026-01-15-cfo-interview.md"
+          url: "https://sharepoint.com/recordings/cfo-interview.mp4"
+    type: object
+    additionalProperties: false
+    required: [name]
+    properties:
+      name:
+        description: "Human-readable name for this source."
+        type: string
+      
+      type:
+        description: "Kind of information source."
+        type: string
+        enum: [interview, meeting, workshop, document, email, survey, observation, system-export, research]
+        x-ubml:
+          propertyNames: ["type"]
+          valueMistakes:
+            call:
+              value: "call"
+              hint: "Use 'meeting' for scheduled calls."
+            transcript:
+              value: "transcript"
+              hint: "Use 'interview' for interview transcripts, or 'meeting' for meeting transcripts."
+            file:
+              value: "file"
+              hint: "Use 'document' for written materials."
+            report:
+              value: "report"
+              hint: "Use 'document' for reports, or 'system-export' for generated reports."
+            data:
+              value: "data"
+              hint: "Use 'system-export' for data exports."
+      
+      date:
+        description: "Date the source was created or the event occurred (ISO 8601 date)."
+        type: string
+        format: date
+      
+      participants:
+        description: |
+          Who participated in or authored this source.
+          Can reference actors by ID or use plain text for external participants.
+        type: array
+        items:
+          oneOf:
+            - $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
+            - type: string
+      
+      description:
+        description: "Summary of what this source contains or covers."
+        type: string
+      
+      tags:
+        description: "Topic tags for organizing and searching sources."
+        type: array
+        items:
+          type: string
+      
+      file:
+        description: |
+          Relative path to a companion file (transcript, notes, export).
+          Path is relative to the source file's directory.
+        type: string
+      
+      url:
+        description: |
+          External URL where the source content lives.
+          For recordings, PDFs, or documents in SharePoint/cloud storage.
+        type: string
+        format: uri
+      
+      notes:
+        description: "Additional notes about this source."
+        type: string
+      
+      custom:
+        description: "User-defined custom fields."
+        $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"
+
+  # ==========================================================================
+  # INSIGHT
+  # ==========================================================================
+
+  Insight:
+    description: |
+      Atomic piece of derived knowledge with baked-in context.
+      
+      Insights are the building blocks of organizational understanding.
+      Each insight is a single, atomic statement extracted from a source
+      or observed directly. Insights carry enough context to be understood
+      in isolation, years after capture.
+      
+      INSIGHT KINDS:
+      - pain: A problem, frustration, or inefficiency
+      - opportunity: A potential improvement or advantage
+      - process-fact: An observation about how work currently happens
+      - stakeholder: Information about a person, role, or team
+      - decision: A decision that was made and its rationale
+      - risk: A risk or vulnerability identified
+      - assumption: Something assumed to be true but not verified
+      - constraint: A limitation or boundary condition
+      
+      STATUS LIFECYCLE:
+      - proposed: Captured but not yet reviewed/validated
+      - validated: Confirmed as accurate by review or evidence
+      - disputed: Challenged or contradicted by other information
+      - retired: No longer relevant (superseded or context changed)
+      
+      MINIMAL EXAMPLE (capture in seconds):
+        IN00001:
+          text: "CFO mentioned budget freeze until Q3"
+      
+      FULL EXAMPLE:
+        IN00001:
+          text: "Warehouse staff spend 2 hours daily on manual data entry"
+          kind: pain
+          status: validated
+          source: SR00001
+          attribution: "Karel Dvořák, Warehouse Manager"
+          date: "2026-01-15"
+          confidence: 0.85
+          about: [AC00010, EN00005]
+          context: |
+            Mentioned during discussion about daily routines.
+            Karel demonstrated the three-system workflow on his screen.
+          tags: [data-entry, manual-work]
+          related: [IN00002, IN00005]
+    type: object
+    additionalProperties: false
+    required: [text]
+    properties:
+      text:
+        description: |
+          The insight statement. Should be atomic — one fact, one observation,
+          one claim per insight. Write as a complete sentence.
+        type: string
+      
+      kind:
+        description: "Classification of what kind of knowledge this is."
+        type: string
+        enum: [pain, opportunity, process-fact, stakeholder, decision, risk, assumption, constraint]
+        x-ubml:
+          propertyNames: ["kind"]
+          valueMistakes:
+            problem:
+              value: "problem"
+              hint: "Use 'pain' for problems, frustrations, and inefficiencies."
+            issue:
+              value: "issue"
+              hint: "Use 'pain' for issues and problems, or 'risk' for potential issues."
+            finding:
+              value: "finding"
+              hint: "Use 'process-fact' for factual findings, or 'pain'/'opportunity' for evaluative ones."
+            observation:
+              value: "observation"
+              hint: "Use 'process-fact' for process observations, or 'stakeholder' for people observations."
+            fact:
+              value: "fact"
+              hint: "Use 'process-fact' for factual observations about work."
+      
+      status:
+        description: |
+          Validation status of this insight.
+          Insights start as 'proposed' and move through review.
+        type: string
+        enum: [proposed, validated, disputed, retired]
+        default: proposed
+        x-ubml:
+          propertyNames: ["status"]
+          valueMistakes:
+            confirmed:
+              value: "confirmed"
+              hint: "Use 'validated' for confirmed insights."
+            rejected:
+              value: "rejected"
+              hint: "Use 'disputed' for challenged insights, or 'retired' for no longer relevant ones."
+            archived:
+              value: "archived"
+              hint: "Use 'retired' for insights that are no longer relevant."
+            active:
+              value: "active"
+              hint: "Use 'validated' for active, confirmed insights."
+      
+      source:
+        description: "Reference to the source this insight was extracted from."
+        $ref: "../defs/refs.defs.yaml#/$defs/SourceRef"
+      
+      attribution:
+        description: |
+          Who said or observed this. Plain text — can be a name, role, or
+          description like "multiple workshop participants".
+        type: string
+      
+      date:
+        description: "When this insight was captured (ISO 8601 date)."
+        type: string
+        format: date
+      
+      confidence:
+        description: |
+          Confidence level in this insight (0-1).
+          1.0 = directly observed and verified
+          0.8 = stated by credible source
+          0.5 = secondhand or uncertain
+          0.3 = speculation or rough estimate
+        type: number
+        minimum: 0
+        maximum: 1
+      
+      about:
+        description: |
+          What or who this insight is about.
+          References to actors, entities, or processes.
+        type: array
+        items:
+          oneOf:
+            - $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
+            - $ref: "../defs/refs.defs.yaml#/$defs/EntityRef"
+            - $ref: "../defs/refs.defs.yaml#/$defs/ProcessRef"
+      
+      context:
+        description: |
+          Human-readable context for future readers.
+          Explain the circumstances: what prompted this, what was happening,
+          any relevant body language or tone. This field helps someone
+          understand the insight 3 years from now without chasing sources.
+        type: string
+      
+      tags:
+        description: "Topic tags for organizing and searching insights."
+        type: array
+        items:
+          type: string
+      
+      related:
+        description: |
+          References to related insights (supporting, contradicting, or contextual).
+        type: array
+        items:
+          $ref: "../defs/refs.defs.yaml#/$defs/InsightRef"
+      
+      supersedes:
+        description: |
+          If this insight replaces an older one, reference the old insight here.
+          The superseded insight should have status: retired.
+        $ref: "../defs/refs.defs.yaml#/$defs/InsightRef"
+      
+      notes:
+        description: "Additional notes or commentary."
+        type: string
+      
+      custom:
+        description: "User-defined custom fields."
+        $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

@@ -1,0 +1,288 @@
+# ============================================================================
+# UBML Process Types Schema
+# ============================================================================
+# Defines processes, phases, and cross-process triggers.
+#
+# ============================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://ubml.talxis.com/schemas/1.4/types/process.types.yaml"
+title: "UBML Process Types"
+description: |
+  Processes are the core workflows containing steps, links, and control flow.
+  This schema defines Process, Phase, and ProcessTrigger types.
+
+$defs:
+
+  # ==========================================================================
+  # PHASE DEFINITION
+  # ==========================================================================
+
+  Phase:
+    description: |
+      A non-executable grouping of steps for organizational purposes.
+      
+      WHY PHASES EXIST:
+      Phases provide an OVERLAY on the process graph without changing
+      execution semantics. They answer questions like:
+      - "Which lifecycle stage is this step part of?" (kind: lifecycle)
+      - "Which delivery phase/release includes this step?" (kind: delivery)
+      
+      PHASES vs BLOCKS - CRITICAL DISTINCTION:
+      ┌─────────────┬─────────────────────────┬─────────────────────────┐
+      │             │ PHASES (PH###)          │ BLOCKS (BK###)          │
+      ├─────────────┼─────────────────────────┼─────────────────────────┤
+      │ Purpose     │ Organizational view     │ Execution semantics     │
+      │ Operators   │ lifecycle, delivery     │ par, alt, loop, opt     │
+      │ Affects     │ Nothing (metadata only) │ Routing & scheduling    │
+      │ Question    │ "What stage is this?"   │ "How does this run?"    │
+      │ Simulation  │ No effect               │ Changes behavior        │
+      └─────────────┴─────────────────────────┴─────────────────────────┘
+      
+      INDUSTRY EXAMPLES:
+      - Construction: Design Phase, Build Phase, Handover Phase
+      - Manufacturing: Planning Phase, Production Phase, QA Phase
+      - Engineering: Discovery Phase, Design Phase, Delivery Phase
+      - Services: Intake Phase, Fulfillment Phase, Closure Phase
+    type: object
+    additionalProperties: false
+    required: [name, kind]
+    anyOf:
+      - required: [startMilestone, endMilestone]
+      - required: [includeSteps]
+    properties:
+      name:
+        description: |
+          Human-readable phase name displayed in diagrams and reports.
+          
+          Examples:
+            - "Requirements Gathering"
+            - "MVP Scope"
+            - "Phase 2 Delivery"
+        type: string
+      
+      kind:
+        description: |
+          Phase classification:
+          
+          - lifecycle: Stage in the process lifecycle.
+            Typically sequential, non-overlapping stages like SDLC phases.
+            Rendered as horizontal bands or swimlane backgrounds.
+            Examples: "Initiation", "Planning", "Execution", "Closure"
+          
+          - delivery: Delivery phase, release, or iteration.
+            May overlap; often tied to roadmaps.
+            Rendered with distinct colors or collapsible groups.
+            Examples: "MVP", "Release 1.0", "Sprint 3", "Future Backlog"
+        type: string
+        enum: [lifecycle, delivery]
+        x-ubml:
+          propertyNames: ["kind"]
+          valueMistakes:
+            stage:
+              value: "stage"
+              hint: "Use 'lifecycle' for process stages. 'stage' is not a valid phase kind."
+            release:
+              value: "release"
+              hint: "Use 'delivery' for releases and iterations."
+            sprint:
+              value: "sprint"
+              hint: "Use 'delivery' for sprints and iterations."
+            phase:
+              value: "phase"
+              hint: "Phase kind must be 'lifecycle' or 'delivery', not 'phase' itself."
+            milestone:
+              value: "milestone"
+              hint: "Phases group steps; milestones are step kinds. Use 'lifecycle' or 'delivery'."
+      
+      description:
+        description: |
+          Detailed description of the phase's purpose, scope, or goals.
+        type: string
+      
+      entryCriteria:
+        description: |
+          Conditions that must be met before work in this phase can begin.
+          These are documentation/governance criteria, NOT executable guards.
+          
+          Example: "Requirements document approved by stakeholders"
+        type: string
+      
+      exitCriteria:
+        description: |
+          Conditions that must be met before this phase is considered complete.
+          Used for quality gates and governance checkpoints.
+          
+          Example: "All test cases passed with >95% coverage"
+        type: string
+      
+      owner:
+        description: |
+          Actor responsible for this phase's completion.
+          Typically a role or team, not an individual.
+        $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
+      
+      startMilestone:
+        description: |
+          Step ID marking the beginning of this phase.
+          MUST reference a step with kind: milestone.
+        $ref: "../defs/refs.defs.yaml#/$defs/StepRef"
+      
+      endMilestone:
+        description: |
+          Step ID marking the end of this phase.
+          MUST reference a step with kind: milestone.
+        $ref: "../defs/refs.defs.yaml#/$defs/StepRef"
+      
+      includeSteps:
+        description: |
+          Explicit list of step IDs included in this phase.
+          Use when milestone boundaries don't cleanly divide stages.
+          
+          Note: Steps can only belong to ONE phase of each kind.
+        type: array
+        items:
+          $ref: "../defs/refs.defs.yaml#/$defs/StepRef"
+      
+      tags:
+        description: "Tags for filtering and views."
+        type: array
+        items:
+          type: string
+      
+      custom:
+        description: "User-defined custom fields."
+        $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"
+
+  # ==========================================================================
+  # PROCESS DEFINITION
+  # ==========================================================================
+
+  Process:
+    description: |
+      The core process model.
+      
+      Supports:
+      - Multi-level hierarchy (L1 strategic to L4 detailed)
+      - Cross-process invocation via Step.calls
+      - Unified links for routing and scheduling
+      - Blocks for control flow grouping (par, alt, loop) - EXECUTION semantics
+      - Phases for lifecycle stages and delivery phases - ORGANIZATIONAL overlay
+      
+      PROCESS LEVELS:
+      - L1: Strategic (value chain level)
+      - L2: Operational (major processes)
+      - L3: Procedural (detailed processes)
+      - L4: Work instructions (task-level detail)
+    type: object
+    additionalProperties: false
+    required: [name, steps]
+    properties:
+      name:
+        description: |
+          Short label for diagrams.
+          
+          Examples:
+            - "Order Fulfillment"
+            - "Customer Onboarding"
+            - "Easement Acquisition"
+        type: string
+      
+      description:
+        description: "Longer description for documentation."
+        type: string
+      
+      level:
+        description: |
+          Process hierarchy level:
+          1 = L1 strategic (value chain)
+          2 = L2 operational (major processes)
+          3 = L3 procedural (detailed processes)
+          4 = L4 work instructions
+          5-6 = reserved for future use
+        type: integer
+        minimum: 1
+        maximum: 6
+      
+      parent:
+        description: "Parent process ID for hierarchy."
+        $ref: "../defs/refs.defs.yaml#/$defs/ProcessRef"
+      
+      startsWith:
+        description: "Step IDs that are entry points to this process."
+        type: array
+        items:
+          $ref: "../defs/refs.defs.yaml#/$defs/StepRef"
+      
+      endsWith:
+        description: "Step IDs that are exit points from this process."
+        type: array
+        items:
+          $ref: "../defs/refs.defs.yaml#/$defs/StepRef"
+      
+      steps:
+        description: |
+          Steps in this process.
+          Keyed by step ID (ST### pattern).
+        type: object
+        additionalProperties: false
+        patternProperties:
+          "^ST\\d{5,}$":
+            $ref: "step.types.yaml#/$defs/Step"
+      
+      links:
+        description: |
+          Relationships between steps.
+          Each link can carry both routing and scheduling properties.
+        type: array
+        items:
+          $ref: "link.types.yaml#/$defs/Link"
+      
+      blocks:
+        description: |
+          Control flow blocks with EXECUTION semantics.
+          Keyed by block ID (BK### pattern).
+          For organizational grouping, use 'phases' instead.
+        type: object
+        additionalProperties: false
+        patternProperties:
+          "^BK\\d{5,}$":
+            $ref: "block.types.yaml#/$defs/Block"
+      
+      phases:
+        description: |
+          Non-executable organizational groupings.
+          Keyed by phase ID (PH### pattern).
+        type: object
+        additionalProperties: false
+        patternProperties:
+          "^PH\\d{5,}$":
+            $ref: "#/$defs/Phase"
+      
+      subprocesses:
+        description: |
+          Child processes (for L1-L4 hierarchy).
+          Keyed by process ID (PR### pattern).
+        type: object
+        additionalProperties: false
+        patternProperties:
+          "^PR\\d{5,}$":
+            $ref: "#/$defs/Process"
+      
+      derivedFrom:
+        description: |
+          Insights that support or justify the existence of this process.
+          Links this process back to the knowledge that informed it.
+        type: array
+        items:
+          $ref: "../defs/refs.defs.yaml#/$defs/InsightRef"
+      
+      tags:
+        description: "Tags for filtering and views."
+        type: array
+        items:
+          type: string
+      
+      custom:
+        description: "User-defined custom fields."
+        $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

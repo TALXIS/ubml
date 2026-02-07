@@ -128,6 +128,8 @@ function getDefaultName(type: DocumentType, dir: string): string {
     views: 'views',
     links: 'links',
     glossary: 'glossary',
+    sources: 'sources',
+    insights: 'insights',
   };
 
   return defaults[type] || type;
@@ -235,18 +237,10 @@ Examples:
   ubml add actors sales-team --dir ./sales
 
 Document Types:
-  workspace    Root workspace configuration
-  process      Business process definitions
-  actors       Roles, teams, and systems
-  entities     Business entities and documents
-  hypotheses   Problem framing with SCQH
-  scenarios    Simulation scenarios
-  strategy     Value streams and capabilities
-  metrics      KPIs and ROI analysis
-  mining       Process mining configuration
-  views        Custom visualizations
-  links        Cross-process links
-  glossary     Business terminology
+${DOCUMENT_TYPES.map(type => {
+  const info = getDocumentTypeInfo(type);
+  return `  ${type.padEnd(12)} ${info?.shortDescription ?? ''}`;
+}).join('\n')}
 `)
     .action((
       type: string | undefined,

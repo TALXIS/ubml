@@ -356,6 +356,8 @@ export const DOCUMENT_MULTIPLICITY: Record<DocumentType, 'singleton' | 'catalog'
   actors: 'catalog',        // Shared definitions, can split for large orgs
   entities: 'catalog',      // Shared definitions, can split by domain
   metrics: 'catalog',       // Shared definitions, can split by initiative
+  sources: 'multiple',      // One per source or grouped by date/domain
+  insights: 'catalog',      // Shared knowledge, can split by domain
   process: 'multiple',      // One per business process
   scenarios: 'multiple',    // Grouped by process or initiative
   hypotheses: 'multiple',   // One per problem/initiative

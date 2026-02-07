@@ -1,0 +1,104 @@
+# ============================================================================
+# UBML Insights Document Schema
+# ============================================================================
+# Schema for .insights.ubml.yaml files - atomic derived knowledge.
+#
+# FILE PATTERN: *.insights.ubml.yaml
+# ============================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://ubml.talxis.com/schemas/1.4/documents/insights.schema.yaml"
+title: "Insights"
+description: |
+  Insight documents capture atomic derived knowledge with baked-in context.
+  
+  WHAT IS AN INSIGHT?
+  An insight is a single, atomic statement extracted from a source
+  or observed directly. Insights carry enough context to be understood
+  in isolation, years after capture.
+  
+  INSIGHT KINDS:
+  - pain: A problem, frustration, or inefficiency
+  - opportunity: A potential improvement or advantage
+  - process-fact: An observation about how work currently happens
+  - stakeholder: Information about a person, role, or team
+  - decision: A decision that was made and its rationale
+  - risk: A risk or vulnerability identified
+  - assumption: Something assumed to be true but not verified
+  - constraint: A limitation or boundary condition
+  
+  FILE NAMING: *.insights.ubml.yaml
+  Examples:
+    - insights.ubml.yaml
+    - order-mgmt.insights.ubml.yaml
+    - customer-feedback.insights.ubml.yaml
+
+# CLI metadata - structured data for tooling
+x-ubml-cli:
+  category: knowledge
+  categoryDisplayName: "Knowledge"
+  workflowOrder: 16
+  shortDescription: "Atomic derived knowledge — pains, opportunities, process facts, risks."
+  defaultFilename: "insights"
+  detectBy:
+    - insights
+  gettingStarted:
+    - "Capture atomic facts and observations as insights with minimal structure."
+    - "Only the 'text' field is required — enrich later with kind, source, attribution."
+    - "Link insights to model elements via derivedFrom for traceability."
+  exampleFilename: "insights.ubml.yaml"
+
+type: object
+additionalProperties: false
+required: [ubml]
+
+properties:
+  ubml:
+    description: |
+      UBML version identifier.
+      Must be "1.4" for this schema version.
+    type: string
+    const: "1.4"
+  
+  name:
+    description: |
+      Optional document name.
+      If not provided, the filename is used.
+    type: string
+  
+  description:
+    description: |
+      Document description.
+      Explain what insights are captured in this file.
+    type: string
+  
+  insights:
+    description: |
+      Insight entries, keyed by insight ID.
+      
+      Insight IDs follow the IN##### pattern (e.g., IN00001, IN00002).
+      
+      Example:
+        insights:
+          IN00001:
+            text: "CFO mentioned budget freeze until Q3"
+          IN00002:
+            text: "Warehouse staff spend 2 hours daily on manual data entry"
+            kind: pain
+            source: SO00001
+            confidence: 0.85
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^IN\\d{5,}$":
+        $ref: "../types/knowledge.types.yaml#/$defs/Insight"
+  
+  tags:
+    description: "Tags for filtering and organization."
+    type: array
+    items:
+      type: string
+  
+  custom:
+    description: "User-defined custom fields."
+    $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

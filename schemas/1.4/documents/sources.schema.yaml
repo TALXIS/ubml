@@ -1,0 +1,104 @@
+# ============================================================================
+# UBML Sources Document Schema
+# ============================================================================
+# Schema for .sources.ubml.yaml files - knowledge source catalog entries.
+#
+# FILE PATTERN: *.sources.ubml.yaml
+# ============================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://ubml.talxis.com/schemas/1.4/documents/sources.schema.yaml"
+title: "Sources"
+description: |
+  Source documents catalog where information comes from.
+  
+  WHAT IS A SOURCE?
+  A source is a metadata record pointing to an interview, document,
+  meeting, survey, or other information origin. The actual content
+  lives in companion files or external URLs.
+  
+  SOURCE TYPES:
+  - interview: One-on-one or group interview
+  - meeting: Scheduled meeting or call
+  - workshop: Facilitated working session
+  - document: Written material (SOP, contract, regulation)
+  - email: Email thread or message
+  - survey: Survey or questionnaire results
+  - observation: Direct observation of work being done
+  - system-export: Data exported from an IT system
+  - research: External research, benchmarks, industry data
+  
+  FILE NAMING: *.sources.ubml.yaml
+  Examples:
+    - sources.ubml.yaml
+    - 2026-01-cfo-interview.sources.ubml.yaml
+    - workshop-kickoff.sources.ubml.yaml
+
+# CLI metadata - structured data for tooling
+x-ubml-cli:
+  category: knowledge
+  categoryDisplayName: "Knowledge"
+  workflowOrder: 15
+  shortDescription: "Catalog of knowledge sources — interviews, meetings, documents, surveys."
+  defaultFilename: "sources"
+  detectBy:
+    - sources
+  gettingStarted:
+    - "Record where information comes from: interviews, meetings, documents, research."
+    - "Each source is metadata — actual content lives in companion files or external URLs."
+    - "Link insights to sources for full traceability."
+  exampleFilename: "sources.ubml.yaml"
+
+type: object
+additionalProperties: false
+required: [ubml]
+
+properties:
+  ubml:
+    description: |
+      UBML version identifier.
+      Must be "1.4" for this schema version.
+    type: string
+    const: "1.4"
+  
+  name:
+    description: |
+      Optional document name.
+      If not provided, the filename is used.
+    type: string
+  
+  description:
+    description: |
+      Document description.
+      Explain what sources are cataloged in this file.
+    type: string
+  
+  sources:
+    description: |
+      Source catalog entries, keyed by source ID.
+      
+      Source IDs follow the SR##### pattern (e.g., SR00001, SR00002).
+      
+      Example:
+        sources:
+          SR00001:
+            name: "Interview with CFO"
+            type: interview
+            date: "2026-01-15"
+            participants: [AC00010]
+            file: "./transcripts/2026-01-15-cfo-interview.md"
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^SR\\d{5,}$":
+        $ref: "../types/knowledge.types.yaml#/$defs/Source"
+  
+  tags:
+    description: "Tags for filtering and organization."
+    type: array
+    items:
+      type: string
+  
+  custom:
+    description: "User-defined custom fields."
+    $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

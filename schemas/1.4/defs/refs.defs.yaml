@@ -1,0 +1,570 @@
+# ============================================================================
+# UBML Reference Type Definitions
+# ============================================================================
+# Contains all ID reference types used for linking between model elements.
+# Each reference uses a typed ID pattern (prefix + digits) for type safety.
+# ============================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://ubml.talxis.com/schemas/1.4/defs/refs.defs.yaml"
+title: "UBML Reference Types"
+description: |
+  Reference types for linking between UBML model elements with type safety.
+  Each reference uses a typed ID pattern (prefix + digits) for clarity.
+
+$defs:
+
+  ActorRef:
+    description: |
+      Reference to an actor (AC### pattern).
+      
+      Actors represent WHO does work in your processes:
+      - People, roles, teams, organizations
+      - Systems and external parties
+      
+      Examples: AC00001, AC00042, AC0000100
+    type: string
+    pattern: "^AC\\d{5,}$"
+    examples:
+      - "AC00001"
+      - "AC00010"
+      - "AC0000100"
+    x-ubml:
+      prefix: "AC"
+      humanName: "Actor ID"
+      shortDescription: "Actors (people, teams, systems)"
+      errorHint: "AC + 5+ digits (e.g., AC00001, AC00010)"
+      category: actors-resources
+      categoryDisplayName: "Actors & Resources"
+
+  StepRef:
+    description: |
+      Reference to a step (ST### pattern).
+      
+      Steps are the individual activities within a process.
+      
+      Examples: ST00001, ST00015, ST0000200
+    type: string
+    pattern: "^ST\\d{5,}$"
+    examples:
+      - "ST00001"
+      - "ST00010"
+      - "ST0000100"
+    x-ubml:
+      prefix: "ST"
+      humanName: "Step ID"
+      shortDescription: "Steps in processes"
+      errorHint: "ST + 5+ digits (e.g., ST00001, ST00010)"
+      category: process-elements
+      categoryDisplayName: "Process Elements"
+
+  ProcessRef:
+    description: |
+      Reference to a process (PR### pattern).
+      
+      Processes are workflows containing steps, links, and control flow.
+      
+      Examples: PR00001, PR00010, PR0000100
+    type: string
+    pattern: "^PR\\d{5,}$"
+    examples:
+      - "PR00001"
+      - "PR00010"
+      - "PR0000100"
+    x-ubml:
+      prefix: "PR"
+      humanName: "Process ID"
+      shortDescription: "Processes"
+      errorHint: "PR + 5+ digits (e.g., PR00001, PR00010)"
+      category: process-elements
+      categoryDisplayName: "Process Elements"
+
+  EntityRef:
+    description: |
+      Reference to an entity (EN### pattern).
+      
+      Entities are core business objects like Order, Customer, Contract.
+      
+      Examples: EN00001, EN015, EN0000100
+    type: string
+    pattern: "^EN\\d{5,}$"
+    examples:
+      - "EN00001"
+      - "EN00010"
+      - "EN0000100"
+    x-ubml:
+      prefix: "EN"
+      humanName: "Entity ID"
+      shortDescription: "Entities (data objects)"
+      errorHint: "EN + 5+ digits (e.g., EN00001, EN00010)"
+      category: information-model
+      categoryDisplayName: "Information Model"
+
+  DocumentRef:
+    description: |
+      Reference to a document (DC### pattern).
+      
+      Documents are representations of entities:
+      - Forms, contracts, reports, invoices
+      - Files, templates, signed documents
+      
+      Examples: DC001, DC010, DC100
+    type: string
+    pattern: "^DC\\d{5,}$"
+    x-ubml:
+      prefix: "DC"
+      humanName: "Document ID"
+      shortDescription: "Documents"
+      errorHint: "DC + 5+ digits (e.g., DC00001, DC00010)"
+      category: information-model
+      categoryDisplayName: "Information Model"
+
+  SkillRef:
+    description: |
+      Reference to a skill (SK### pattern).
+      
+      Skills define what people can do:
+      - Certifications (HGV license, crane operator)
+      - Competencies (negotiation, technical review)
+      
+      Examples: SK00001, SK010, SK100
+    type: string
+    pattern: "^SK\\d{5,}$"
+    x-ubml:
+      prefix: "SK"
+      humanName: "Skill ID"
+      shortDescription: "Skills"
+      errorHint: "SK + 5+ digits (e.g., SK00001, SK00010)"
+      category: actors-resources
+      categoryDisplayName: "Actors & Resources"
+
+  ServiceRef:
+    description: |
+      Reference to a service (SV### pattern).
+      
+      Services are offerings in the service catalog.
+      
+      Examples: SV001, SV010, SV100
+    type: string
+    pattern: "^SV\\d{5,}$"
+    x-ubml:
+      prefix: "SV"
+      humanName: "Service ID"
+      shortDescription: "Services"
+      errorHint: "SV + 5+ digits (e.g., SV00001, SV00010)"
+      category: strategy
+      categoryDisplayName: "Strategy"
+
+  ScenarioRef:
+    description: |
+      Reference to a scenario (SC### pattern).
+      
+      Scenarios define simulation configurations for what-if analysis.
+      
+      Examples: SC00001, SC010, SC100
+    type: string
+    pattern: "^SC\\d{5,}$"
+    x-ubml:
+      prefix: "SC"
+      humanName: "Scenario ID"
+      shortDescription: "Scenarios"
+      errorHint: "SC + 5+ digits (e.g., SC00001, SC00010)"
+      category: analysis
+      categoryDisplayName: "Analysis"
+
+  HypothesisRef:
+    description: |
+      Reference to a hypothesis node (HY### pattern).
+      
+      Hypotheses are nodes in the SCQH hypothesis tree.
+      
+      Examples: HY00001, HY010, HY100
+    type: string
+    pattern: "^HY\\d{5,}$"
+    x-ubml:
+      prefix: "HY"
+      humanName: "Hypothesis ID"
+      shortDescription: "Hypotheses"
+      errorHint: "HY + 5+ digits (e.g., HY00001, HY00010)"
+      category: analysis
+      categoryDisplayName: "Analysis"
+
+  SourceRef:
+    description: |
+      Reference to a knowledge source (SR##### pattern).
+      
+      Sources catalog where information comes from:
+      - Interviews, meetings, workshops
+      - Documents, emails, surveys
+      - System exports, research
+      
+      Examples: SR00001, SR00042
+    type: string
+    pattern: "^SR\\d{5,}$"
+    examples:
+      - "SR00001"
+      - "SR00010"
+      - "SR00100"
+    x-ubml:
+      prefix: "SR"
+      humanName: "Source ID"
+      shortDescription: "Knowledge sources"
+      errorHint: "SR + 5+ digits (e.g., SR00001, SR00010)"
+      category: knowledge
+      categoryDisplayName: "Knowledge"
+
+  InsightRef:
+    description: |
+      Reference to an insight (IN##### pattern).
+      
+      Insights are atomic pieces of derived knowledge:
+      - Pain points, opportunities, process facts
+      - Stakeholder observations, decisions, risks
+      
+      Examples: IN00001, IN00042
+    type: string
+    pattern: "^IN\\d{5,}$"
+    examples:
+      - "IN00001"
+      - "IN00010"
+      - "IN00100"
+    x-ubml:
+      prefix: "IN"
+      humanName: "Insight ID"
+      shortDescription: "Insights"
+      errorHint: "IN + 5+ digits (e.g., IN00001, IN00010)"
+      category: knowledge
+      categoryDisplayName: "Knowledge"
+
+  KpiRef:
+    description: |
+      Reference to a KPI (KP### pattern).
+      
+      KPIs are key performance indicators with targets.
+      
+      Examples: KP00001, KP010, KP100
+    type: string
+    pattern: "^KP\\d{5,}$"
+    x-ubml:
+      prefix: "KP"
+      humanName: "KPI ID"
+      shortDescription: "KPIs"
+      errorHint: "KP + 5+ digits (e.g., KP00001, KP00010)"
+      category: analysis
+      categoryDisplayName: "Analysis"
+
+  TermRef:
+    description: |
+      Reference to a glossary term (TM### pattern).
+      
+      Terms are business vocabulary entries in the glossary.
+      They define domain-specific terminology consistently across the workspace.
+      
+      Examples: TM00001, TM00010, TM00100
+    type: string
+    pattern: "^TM\\d{5,}$"
+    examples:
+      - "TM00001"
+      - "TM00010"
+      - "TM00100"
+    x-ubml:
+      prefix: "TM"
+      humanName: "Term ID"
+      shortDescription: "Glossary terms"
+      errorHint: "TM + 5+ digits (e.g., TM00001, TM00010)"
+      category: advanced
+      categoryDisplayName: "Advanced"
+
+  CapabilityRef:
+    description: |
+      Reference to a capability (CP### pattern).
+      
+      Capabilities describe what the organization can do.
+      
+      Examples: CP00001, CP010, CP100
+    type: string
+    pattern: "^CP\\d{5,}$"
+    x-ubml:
+      prefix: "CP"
+      humanName: "Capability ID"
+      shortDescription: "Capabilities"
+      errorHint: "CP + 5+ digits (e.g., CP00001, CP00010)"
+      category: strategy
+      categoryDisplayName: "Strategy"
+
+  ValueStreamRef:
+    description: |
+      Reference to a value stream (VS### pattern).
+      
+      Value streams show end-to-end value flows across processes.
+      
+      Examples: VS00001, VS010, VS100
+    type: string
+    pattern: "^VS\\d{5,}$"
+    x-ubml:
+      prefix: "VS"
+      humanName: "Value Stream ID"
+      shortDescription: "Value Streams"
+      errorHint: "VS + 5+ digits (e.g., VS00001, VS00010)"
+      category: strategy
+      categoryDisplayName: "Strategy"
+
+  ProductRef:
+    description: |
+      Reference to a product (PD### pattern).
+      
+      Products are bundled offerings to customers.
+      
+      Examples: PD001, PD010, PD100
+    type: string
+    pattern: "^PD\\d{5,}$"
+    x-ubml:
+      prefix: "PD"
+      humanName: "Product ID"
+      shortDescription: "Products"
+      errorHint: "PD + 5+ digits (e.g., PD00001, PD00010)"
+      category: strategy
+      categoryDisplayName: "Strategy"
+
+  PortfolioRef:
+    description: |
+      Reference to a portfolio (PF### pattern).
+      
+      Portfolios group related products, services, or process types.
+      They enable executive-level views and organizational structuring:
+      - Product portfolios: "Consumer Products", "Enterprise Solutions"
+      - Service portfolios: "Professional Services", "Support Services"
+      - Project portfolios: "Infrastructure Projects", "Digital Transformation"
+      
+      Portfolios can be hierarchical (parent portfolios contain sub-portfolios).
+      
+      Examples: PF001, PF010, PF100
+    type: string
+    pattern: "^PF\\d{5,}$"
+    x-ubml:
+      prefix: "PF"
+      humanName: "Portfolio ID"
+      shortDescription: "Portfolios"
+      errorHint: "PF + 5+ digits (e.g., PF00001, PF00010)"
+      category: strategy
+      categoryDisplayName: "Strategy"
+
+  EquipmentRef:
+    description: |
+      Reference to equipment (EQ### pattern).
+      
+      Equipment represents physical assets used to perform work:
+      - Vehicles: trucks, forklifts, cranes
+      - Machines: production lines, CNC machines, 3D printers
+      - Tools: specialized equipment, testing devices
+      - Devices: scanners, tablets, measurement instruments
+      
+      Equipment is separate from actors because:
+      1. Equipment cannot be accountable (RACI only has people/roles)
+      2. Equipment requires operators with specific skills
+      3. Equipment has physical location constraints
+      4. Equipment has capacity/throughput characteristics
+      
+      Examples: EQ00001, EQ010, EQ100
+    type: string
+    pattern: "^EQ\\d{5,}$"
+    x-ubml:
+      prefix: "EQ"
+      humanName: "Equipment ID"
+      shortDescription: "Equipment"
+      errorHint: "EQ + 5+ digits (e.g., EQ00001, EQ00010)"
+      category: actors-resources
+      categoryDisplayName: "Actors & Resources"
+
+  LocationRef:
+    description: |
+      Reference to a location (LC### pattern).
+      
+      Locations answer WHERE work happens or equipment is stationed:
+      - Sites: construction sites, customer premises
+      - Facilities: factories, warehouses, offices
+      - Regions: geographic areas for service coverage
+      - Zones: areas within a facility (assembly line, loading dock)
+      
+      Locations are separate from actors because:
+      1. A location is not a participant - it's a place
+      2. Multiple actors can work at the same location
+      3. Equipment is stationed at locations
+      4. Some steps are location-specific (on-site vs remote)
+      
+      Examples: LC001, LC010, LC100
+    type: string
+    pattern: "^LC\\d{5,}$"
+    x-ubml:
+      prefix: "LC"
+      humanName: "Location ID"
+      shortDescription: "Locations"
+      errorHint: "LC + 5+ digits (e.g., LC00001, LC00010)"
+      category: information-model
+      categoryDisplayName: "Information Model"
+
+  BlockRef:
+    description: |
+      Reference to a control flow block (BK### pattern).
+      
+      Blocks define EXECUTION semantics - how steps run together:
+      - par: parallel execution
+      - alt: alternative paths (branching)
+      - loop: repeated execution
+      - opt: optional execution
+      
+      Examples: BK001, BK010, BK100
+    type: string
+    pattern: "^BK\\d{5,}$"
+    x-ubml:
+      prefix: "BK"
+      humanName: "Block ID"
+      shortDescription: "Blocks"
+      errorHint: "BK + 5+ digits (e.g., BK00001, BK00010)"
+      category: process-elements
+      categoryDisplayName: "Process Elements"
+
+  PhaseRef:
+    description: |
+      Reference to a process phase (PH### pattern).
+      
+      Phases are ORGANIZATIONAL overlays on the process graph:
+      - lifecycle: project stages like Design → Build → Test
+      - delivery: release scopes like MVP, Phase 1, Future
+      
+      Phases do NOT affect execution - they're purely for visualization
+      and stakeholder communication. Use blocks for execution semantics.
+      
+      Examples: PH001, PH010, PH100
+    type: string
+    pattern: "^PH\\d{5,}$"
+    x-ubml:
+      prefix: "PH"
+      humanName: "Phase ID"
+      shortDescription: "Phases"
+      errorHint: "PH + 5+ digits (e.g., PH00001, PH00010)"
+      category: process-elements
+      categoryDisplayName: "Process Elements"
+
+  PersonaRef:
+    description: |
+      Reference to a persona (PS### pattern).
+      
+      Personas are stakeholder archetypes with goals and pain points.
+      
+      Examples: PS001, PS010, PS100
+    type: string
+    pattern: "^PS\\d{5,}$"
+    x-ubml:
+      prefix: "PS"
+      humanName: "Persona ID"
+      shortDescription: "Personas"
+      errorHint: "PS + 5+ digits (e.g., PS00001, PS00010)"
+      category: actors-resources
+      categoryDisplayName: "Actors & Resources"
+
+  ResourcePoolRef:
+    description: |
+      Reference to a resource pool (RP### pattern).
+      
+      Resource pools group interchangeable resources for simulation.
+      
+      Examples: RP00001, RP010, RP100
+    type: string
+    pattern: "^RP\\d{5,}$"
+    x-ubml:
+      prefix: "RP"
+      humanName: "Resource Pool ID"
+      shortDescription: "Resource Pools"
+      errorHint: "RP + 5+ digits (e.g., RP00001, RP00010)"
+      category: actors-resources
+      categoryDisplayName: "Actors & Resources"
+
+  ViewRef:
+    description: |
+      Reference to a view (VW### pattern).
+      
+      Views are saved diagram configurations.
+      
+      Examples: VW00001, VW010, VW100
+    type: string
+    pattern: "^VW\\d{5,}$"
+    x-ubml:
+      prefix: "VW"
+      humanName: "View ID"
+      shortDescription: "Views"
+      errorHint: "VW + 5+ digits (e.g., VW00001, VW00010)"
+      category: other
+      categoryDisplayName: "Other"
+
+  # ==========================================================================
+  # DATA OBJECT REFERENCES
+  # ==========================================================================
+  # References to entities or documents with optional state information.
+  # Used for step inputs and outputs.
+  # ==========================================================================
+
+  DataObjectInput:
+    description: |
+      Reference to an entity or document as step input.
+      
+      Inputs are read-only and don't change document state.
+      Use 'inState' to require the document be in a specific lifecycle state.
+      
+      Examples:
+        # Simple reference
+        - ref: DC001
+        
+        # With required state
+        - ref: DC002
+          inState: approved
+    type: object
+    additionalProperties: false
+    required: [ref]
+    properties:
+      ref:
+        description: "Entity or document ID."
+        oneOf:
+          - $ref: "#/$defs/EntityRef"
+          - $ref: "#/$defs/DocumentRef"
+      inState:
+        description: |
+          Required document state (precondition).
+          Must match a state from the document's lifecycle array.
+          Optional - omit if any state is acceptable.
+        type: string
+
+  DataObjectOutput:
+    description: |
+      Reference to an entity or document as step output.
+      
+      Outputs can change document state. Lifecycle progression:
+      - First output of a document → created in first lifecycle state
+      - Subsequent outputs → document advances to next lifecycle state
+      - Use explicit toState for non-linear flows (rejection, rework)
+      
+      Examples:
+        # Simple reference (auto-advance state)
+        - ref: DC001
+        
+        # With explicit target state (for rejection/rework)
+        - ref: DC002
+          toState: draft
+    type: object
+    additionalProperties: false
+    required: [ref]
+    properties:
+      ref:
+        description: "Entity or document ID."
+        oneOf:
+          - $ref: "#/$defs/EntityRef"
+          - $ref: "#/$defs/DocumentRef"
+      toState:
+        description: |
+          Target document state after this step completes.
+          Must match a state from the document's lifecycle array.
+          
+          Use only for non-linear flows (rejection, rework, cancellation).
+          For normal forward progression, omit this - the tool infers
+          the next state from the document's lifecycle order.
+        type: string

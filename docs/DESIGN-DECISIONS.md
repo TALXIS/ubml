@@ -42,7 +42,7 @@ Each decision follows this structure:
 
 ## DD-001: Cross-Process Invocation
 
-**Status**: Accepted (v1.1)
+**Status**: Accepted
 
 ### Context
 
@@ -154,10 +154,7 @@ steps:
    - Validate `calls[].process` resolves to valid ProcessRef
    - Check for cycles in call chains (optional)
 
-3. **Migration required**:
-   - v1.0 → v1.1 migration must convert old syntax to new
-
-4. **Projection mapping**:
+3. **Projection mapping**:
    - `mode: sync` → BPMN Call Activity
    - `mode: async` + `on: complete` → BPMN Intermediate Signal Throw Event
    - `mode: async` + `on: error` → BPMN Intermediate Error Throw Event
@@ -177,7 +174,7 @@ steps:
 
 ## DD-002: Links for Intra-Process Flow Only
 
-**Status**: Accepted (v1.1)
+**Status**: Accepted
 
 ### Context
 
@@ -222,7 +219,7 @@ links:
 
 ## DD-003: Step Grouping and Nesting
 
-**Status**: Accepted (v1.1)
+**Status**: Accepted
 
 ### Context
 
@@ -500,7 +497,7 @@ Additional behaviors (approval, review, notification) are modeled as **propertie
 
 ## DD-004: Why No Shorthand Syntaxes
 
-**Status**: Accepted (v1.0)
+**Status**: Accepted
 
 ### Context
 
@@ -531,7 +528,6 @@ The benefits don't justify the costs.
 
 - Schema allows exactly one structure per concept
 - Tooling rejects alternative syntaxes
-- Migration converts any legacy shorthands to canonical form
 
 ### Principles Applied
 
@@ -544,7 +540,7 @@ The benefits don't justify the costs.
 
 ## DD-005: Process Isolation and Cross-Process Coordination
 
-**Status**: Accepted (v1.1)
+**Status**: Accepted
 
 ### Context
 
@@ -627,7 +623,7 @@ Cross-process coordination happens through **events**, not direct task links. UB
 
 ## DD-006: Template-Instance Separation
 
-**Status**: Accepted (v1.1)
+**Status**: Accepted
 
 ### Context
 
@@ -705,7 +701,7 @@ Clean separation follows **P10.4**: *"Separation of Modeling and Operational Con
 
 ## DD-007: Scenarios for Business Situation Modeling
 
-**Status**: Accepted (v1.1)
+**Status**: Accepted
 
 ### Context
 
@@ -1001,6 +997,180 @@ scenarios:
 | **P7.2** Import Should Enrich | Mining data enriches via evidence, not by changing process |
 | **P3.2** References for Cross-Cutting | Scenarios reference processes, don't contain them |
 | **P3.5** Coherent Model Boundaries | Scenarios + Hypotheses enable focused ROI analysis |
+
+---
+
+## DD-008: Knowledge Architecture — Sources and Insights
+
+**Status**: Accepted (v1.3)
+
+### Context
+
+Consulting engagements generate vast amounts of unstructured knowledge: interview transcripts, meeting notes, documents, emails, surveys, corridor conversations, research findings. This knowledge feeds into the UBML model but has no formal place in the language.
+
+Without a knowledge layer:
+- Model elements appear without justification ("why does this step exist?")
+- Knowledge lives in consultants' heads, email threads, and shared drives
+- When consultants rotate off a project, knowledge is lost
+- After 2-3 years, nobody remembers why the model looks the way it does
+
+UBML workspaces are intended as long-lived digital twins of organizations (5+ years). They need a systematic way to catalog information sources and the insights derived from them.
+
+### Research
+
+Management consulting firms universally use layered knowledge capture:
+
+| Pattern | Flow |
+|---------|------|
+| McKinsey | Interview notes → Key findings → Implications → Recommendations |
+| BCG | Data room → Fact pack → Insight cards → Hypothesis tree |
+| Bain | Source interviews → Issue trees → Validated/invalidated branches |
+
+**Common pattern**: Raw sources → Atomic insights → Structured analysis. Always traceable.
+
+UBML's existing typed reference system (ID prefixes + cross-references) already forms a lightweight knowledge graph. The knowledge layer extends it with two new node types rather than introducing separate infrastructure.
+
+### Decision
+
+#### Three-Layer Truth Architecture
+
+UBML adopts a three-layer model for organizational knowledge:
+
+| Layer | Purpose | ID Pattern |
+|-------|---------|------------|
+| **Sources** | Catalog of where information comes from | `SR#####` |
+| **Insights** | Atomic derived knowledge with human-readable context | `IN#####` |
+| **Model** | Interpreted structures (processes, actors, entities…) | existing IDs |
+
+Each layer references the one below. Model elements reference insights via `derivedFrom`. Insights reference sources. This enables traceability from any model element back to its origin.
+
+#### Source (SR#####)
+
+A catalog entry for where information came from. Metadata only — actual content lives in companion files or external URLs (per P12.2).
+
+```yaml
+sources:
+  SR00001:
+    name: "Interview with Warehouse Manager"
+    type: interview
+    date: "2026-01-15"
+    participants: [AC00010, "Jan Novák (external)"]
+    description: "90-minute deep dive on order processing pain points"
+    tags: [order-processing, warehouse]
+    file: "./transcripts/2026-01-15-warehouse-manager.md"
+```
+
+**Required properties**: `name` only. Everything else optional (P5.2).
+
+**Source types**: `interview`, `meeting`, `workshop`, `document`, `email`, `survey`, `observation`, `system-export`, `research`
+
+#### Insight (IN#####)
+
+An atomic piece of derived knowledge. Carries enough context to be understood in isolation, years after capture (P12.5).
+
+```yaml
+insights:
+  IN00001:
+    text: "Warehouse staff spend 2 hours daily on manual data entry across SAP, Excel, and the legacy portal"
+    kind: pain
+    status: validated
+    source: SR00001
+    attribution: "Karel Dvořák, Warehouse Manager"
+    date: "2026-01-15"
+    confidence: 0.85
+    about: [AC00010, EN00005]
+    context: |
+      Mentioned during discussion about daily routines. Karel demonstrated
+      the three-system workflow on his screen. Visibly frustrated.
+    tags: [data-entry, manual-work]
+    related: [IN00002, IN00005]
+    supersedes: IN00042
+```
+
+**Required properties**: `text` only. A consultant in a rush can write:
+
+```yaml
+  IN00099:
+    text: "CFO mentioned budget freeze until Q3"
+```
+
+**Insight kinds**: `pain`, `opportunity`, `process-fact`, `stakeholder`, `decision`, `risk`, `assumption`, `constraint`
+
+**Status lifecycle**: `proposed` → `validated` | `disputed` | `retired`
+
+#### Linking to Model (derivedFrom)
+
+Model elements gain an optional `derivedFrom` property (on Step, Actor, Entity, Process, HypothesisNode, KPI):
+
+```yaml
+steps:
+  ST00015:
+    name: "Enter Order Data into SAP"
+    kind: action
+    derivedFrom: [IN00001, IN00003]
+```
+
+### Why No "Evidence" Middle Layer
+
+The original plan proposed: Source → Evidence → Claim, where Evidence was a precise pointer (line number, timestamp) into a source document.
+
+| Problem | Impact |
+|---------|--------|
+| **Brittle references** | Editing a transcript shifts all line numbers |
+| **High authoring friction** | Extra record for every insight, little value to readers |
+| **Maintenance burden** | Over 5 years, hundreds of pointers would go stale |
+
+Instead, each Insight carries a human-readable `context` field. Context survives reformatting, editing, and the passage of time. Precise pointers do not.
+
+### Terminology: "Evidence" in UBML
+
+The word "evidence" appears in UBML with clear, non-overlapping meanings:
+
+| Location | Meaning |
+|----------|---------|
+| `HypothesisNode.type: evidence` | Enum value — a hypothesis node backed by evidence |
+| `HypothesisNode.evidence` | Free-text string — human-readable evidence description |
+
+Quantitative measurements on Scenarios use the term `observations` (type `Observation`). The knowledge layer uses `SourceRef` (`SR#####`) and `InsightRef` (`IN#####`) for structured traceability.
+
+### Terminology: "Insight" over "Claim"
+
+| Term | Pros | Cons |
+|------|------|------|
+| **Insight** ✓ | Natural consultant vocabulary, used in deliverables | Slightly implies positive discovery |
+| Claim | Precise in knowledge management | Adversarial/legal tone |
+| Finding | Natural in formal reports | Too formal for capture mode |
+
+**Decision**: **Insight** (`IN#####`) — matches how consultants talk and works in both quick capture and formal reports.
+
+### Alternatives Rejected
+
+| Alternative | Why Rejected |
+|-------------|--------------|
+| Source → Evidence → Claim (three-element chain) | Brittle references, high friction, maintenance burden (see above) |
+| Single layer (no Sources) | No traceability, can't audit where knowledge came from |
+| Free-text markdown notes | Not structured enough for cross-referencing or AI assistance |
+| Computed index as source of truth | Violates P1.3 (No Computed Aggregations) |
+| Strict required fields on insights | Violates P5.2 and P12.1 |
+
+### Consequences
+
+1. **New types**: `Source`, `Insight`, `SourceRef` (`SR#####`), `InsightRef` (`IN#####`)
+2. **New document schemas**: `*.sources.ubml.yaml`, `*.insights.ubml.yaml`
+3. **Modified types**: `derivedFrom` property added to core model types
+4. **Scenario property**: `observations` (type `Observation`) for quantitative measurements
+5. **New file patterns**: `*.sources.ubml.yaml`, `*.insights.ubml.yaml`
+7. **Deferred**: LLM extraction, indexing/caching — see OPEN-TOPICS.md
+
+### Principles Applied
+
+| Principle | How Applied |
+|-----------|-------------|
+| **P1.1** Single Source of Truth | Each insight exists once; model elements reference, not duplicate |
+| **P5.2** Required Properties Minimal | Only `text` required on Insight; only `name` required on Source |
+| **P6.1** Business Vocabulary First | "Insight" not "Claim"; "Source" not "Provenance" |
+| **P9.1** No Alternative Representations | One way to capture knowledge |
+| **P12** Knowledge Capture | Minimal friction, catalog sources, append-friendly, layered truth, context over precision |
 
 ---
 

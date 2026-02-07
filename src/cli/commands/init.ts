@@ -70,7 +70,7 @@ function generateVscodeExtensions(): { recommendations: string[] } {
 /**
  * Document template type.
  */
-type TemplateType = 'workspace' | 'process' | 'actors';
+type TemplateType = 'workspace' | 'process' | 'actors' | 'insights';
 
 /**
  * Template factory for creating UBML document templates.
@@ -141,6 +141,20 @@ function createDocumentTemplate(type: TemplateType, name?: string): unknown {
             type: 'role',
             kind: 'human',
             description: 'Primary business user role - replace with actual roles',
+          },
+        },
+      };
+    }
+
+    case 'insights': {
+      const inId = formatId('IN', ID_CONFIG.initOffset);
+      return {
+        ...base,
+        insights: {
+          [inId]: {
+            text: 'Sample insight - replace with your observations',
+            kind: 'process-fact',
+            status: 'proposed',
           },
         },
       };
@@ -238,6 +252,11 @@ function createWorkspaceFiles(
     const actorsFile = join(workspaceDir, 'actors.ubml.yaml');
     writeFileSync(actorsFile, serialize(createDocumentTemplate('actors')));
     createdFiles.push(actorsFile);
+
+    // Create sample insights file
+    const insightsFile = join(workspaceDir, 'insights.ubml.yaml');
+    writeFileSync(insightsFile, serialize(createDocumentTemplate('insights')));
+    createdFiles.push(insightsFile);
   }
 
   // Create VS Code settings directory
@@ -386,6 +405,7 @@ What gets created:
   ${highlight('<name>.workspace.ubml.yaml')}  Workspace configuration
   ${highlight('process.ubml.yaml')}           Sample process (unless --minimal)
   ${highlight('actors.ubml.yaml')}            Sample actors (unless --minimal)
+  ${highlight('insights.ubml.yaml')}          Sample insights (unless --minimal)
   ${highlight('.vscode/settings.json')}       VS Code YAML schema settings
   ${highlight('.vscode/extensions.json')}     Recommended extensions
 `)

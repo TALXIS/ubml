@@ -1,0 +1,139 @@
+# ============================================================================
+# UBML Metrics Document Schema
+# ============================================================================
+# Schema for .metrics.ubml.yaml files - KPIs and ROI analysis definitions.
+#
+# FILE PATTERN: *.metrics.ubml.yaml
+# ============================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://ubml.talxis.com/schemas/1.4/documents/metrics.schema.yaml"
+title: "Metrics"
+description: |
+  Metrics documents define Key Performance Indicators (KPIs) and 
+  Return on Investment (ROI) analyses.
+  
+  WHAT ARE METRICS?
+  Metrics are quantifiable measures used to evaluate performance:
+  - KPIs: Ongoing performance measures with targets
+  - ROI: Investment analysis comparing costs to benefits
+  
+  WHY DEFINE METRICS?
+  Metrics enable:
+  - Performance monitoring
+  - Objective setting and tracking
+  - Business case justification
+  - Continuous improvement
+  
+  FILE NAMING: *.metrics.ubml.yaml
+  Examples:
+    - process-kpis.metrics.ubml.yaml
+    - automation-roi.metrics.ubml.yaml
+    - performance-targets.metrics.ubml.yaml
+
+# CLI metadata - structured data for tooling
+x-ubml-cli:
+  category: analysis
+  categoryDisplayName: "Analysis & Planning"
+  workflowOrder: 5
+  shortDescription: "Define KPIs and ROI analyses for performance measurement."
+  defaultFilename: "metrics"
+  detectBy:
+    - kpis
+    - metrics
+    - roiAnalyses
+  gettingStarted:
+    - "Define KPIs for your key processes"
+    - "Set baseline and target values"
+    - "Define thresholds for performance levels"
+    - "Add ROI analysis for improvement initiatives"
+  exampleFilename: "process-kpis.metrics.ubml.yaml"
+
+type: object
+additionalProperties: false
+required: [ubml]
+
+properties:
+  ubml:
+    description: |
+      UBML version identifier.
+      Must be "1.4" for this schema version.
+    type: string
+    const: "1.4"
+  
+  name:
+    description: |
+      Optional document name.
+      If not provided, the filename is used.
+    type: string
+  
+  description:
+    description: |
+      Document description.
+      Explain what metrics are defined in this file.
+    type: string
+  
+  kpis:
+    description: |
+      KPI definitions, keyed by KPI ID.
+      
+      KPI IDs follow the KP### pattern (e.g., KP00001, KP00002).
+      
+      Example:
+        kpis:
+          KP00001:
+            name: "Order Cycle Time"
+            description: "Time from order to delivery"
+            type: process
+            unit: hours
+            baseline: 120
+            target: 48
+            thresholds:
+              - level: red
+                value: 120
+                operator: gte
+              - level: green
+                value: 48
+                operator: lte
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^KP\\d{5,}$":
+        $ref: "../types/metrics.types.yaml#/$defs/KPI"
+  
+  roiAnalyses:
+    description: |
+      ROI analysis definitions, keyed by ROI ID.
+      
+      ROI IDs follow the ROI### pattern (e.g., ROI001, ROI002).
+      
+      Example:
+        roiAnalyses:
+          ROI001:
+            name: "Process Automation Business Case"
+            analysisPeriod: 36
+            discountRate: 0.08
+            costs:
+              - name: "Software License"
+                amount: 50000
+                timing: one-time
+            benefits:
+              - name: "Labor Savings"
+                amount: 40000
+                timing: recurring
+                frequency: annually
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^ROI\\d{5,}$":
+        $ref: "../types/metrics.types.yaml#/$defs/ROI"
+  
+  tags:
+    description: "Tags for filtering and organization."
+    type: array
+    items:
+      type: string
+  
+  custom:
+    description: "User-defined custom fields."
+    $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

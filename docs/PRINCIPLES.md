@@ -284,7 +284,7 @@ References must point to the correct element type. An actor reference must point
 
 #### P8.3: Hierarchy Consistency
 
-If a schema allows both parent and children (during migration), the validator must ensure they are consistent. Contradictions are errors.
+If a schema allows both parent and children, the validator must ensure they are consistent. Contradictions are errors.
 
 #### P8.4: Global ID Uniqueness
 
@@ -362,34 +362,67 @@ Before adding any new enum value to a primitive type, document its projection to
 
 ## Evolution Principles
 
-### P11: Language Clarity Over Compatibility
+### P11: Language Clarity and Precision
 
-**UBML prioritizes a pristine, correct DSL over backward compatibility.**
+**UBML prioritizes a pristine, correct DSL.**
 
-#### P11.1: No Legacy Debt
+#### P11.1: Fix Design Flaws Immediately
 
-The language must not carry design mistakes forward to avoid breaking changes. When a flaw is discovered, fix it.
+The language must not carry design mistakes forward. When a flaw is discovered, fix it.
 
-**Rationale:** UBML is maturing. Accumulating legacy cruft now will permanently compromise the notation's clarity. Users can tolerate migrations; they cannot tolerate a confusing, inconsistent language.
+**Rationale:** Accumulating compromises will permanently damage the notation's clarity. A confusing, inconsistent language is worse than any short-term inconvenience.
 
-#### P11.2: Versioned Breaking Changes
+#### P11.2: Versioned Schema
 
-When a breaking change is necessary:
+All UBML documents declare their schema version. Tooling must refuse to process documents with an unrecognized version.
 
-1. **Increment the version** — the version field in documents must change
-2. **CLI detects mismatch** — tooling must refuse to process mismatched versions
-3. **Interactive migration** — CLI provides an upgrade wizard that prompts for any information that cannot be automatically inferred
-4. **No silent degradation** — old files must not parse with new tooling without explicit migration
+**Rationale:** Explicit versions prevent silent corruption and ensure tooling and documents stay in sync.
 
-**Rationale:** Explicit versions prevent silent corruption. Migration tooling reduces friction. Users control when they upgrade.
+#### P11.3: Future Schema Evolution
 
-#### P11.3: Migration Tooling Required
-
-Breaking changes require CLI migration support:
+When future schema versions introduce incompatible changes:
 
 - Automated migration command with interactive prompts for ambiguous changes
 - Dry-run mode to preview changes without applying
 - Batch mode for CI that fails if human input would be required
 - Clear diff output showing what changed and why
 
-**Rationale:** Breaking changes are acceptable only if migration is automated. Never force manual file editing across a workspace.
+**Rationale:** Schema evolution must be automated. Never force manual file editing across a workspace.
+
+---
+
+### P12: Knowledge Capture
+
+**The workspace must serve as a living knowledge base with minimal friction for adding information.**
+
+UBML workspaces are long-lived (5+ years) digital twins of organizations. They must continuously absorb new information from interviews, workshops, documents, observations, research, surveys, and corridor conversations. The language must make it trivially easy to catalog information and extract structured insights.
+
+#### P12.1: Minimal Capture Friction
+
+Users must be able to record knowledge with as little structure as they have at the moment of capture. A consultant who hears a key fact in a meeting should be able to add it to the workspace in seconds, not minutes. Structure guides, never blocks.
+
+**Rationale:** If the barrier to recording information is higher than writing it on a napkin, consultants will use the napkin. The tool must be faster than alternatives for capturing knowledge.
+
+#### P12.2: Catalog, Not Container
+
+The workspace catalogs where information lives, not the information itself. Large artifacts (recordings, PDFs, transcripts) live externally; the workspace stores just enough metadata to find them later.
+
+**Rationale:** Git repos should stay small. Knowledge sources are diverse and large. The workspace needs to know what exists and where to find it, not store everything.
+
+#### P12.3: Append-Friendly Knowledge
+
+Knowledge accumulates over time. Changed understanding supersedes previous knowledge with explicit references to what it replaces. The full history of organizational understanding is preserved, never deleted.
+
+**Rationale:** Long-lived workspaces will accumulate thousands of knowledge entries. The structure must handle growth gracefully. Deleting knowledge destroys audit trails and breaks traceability.
+
+#### P12.4: Layered Truth
+
+The workspace separates raw information, derived knowledge, and interpreted models into distinct layers. Each layer references the one below for traceability, enabling auditing of why the model looks the way it does.
+
+**Rationale:** Separating raw information from interpretation prevents mixing opinion with observation. Traceability enables stakeholders to challenge conclusions by following the chain back to original sources.
+
+#### P12.5: Context Over Precision
+
+Derived knowledge carries human-readable context (who, when, about what, how confident) rather than precise mechanical pointers (line numbers, timestamps). Context survives editing, reformatting, and the passage of time. Precise pointers do not.
+
+**Rationale:** A consultant reading a knowledge entry 3 years after it was captured needs to understand its provenance at a glance, not chase brittle references in a document that may have been reformatted.

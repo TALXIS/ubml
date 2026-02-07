@@ -1,0 +1,99 @@
+# ============================================================================
+# UBML Links Document Schema
+# ============================================================================
+# Schema for .links.ubml.yaml files - cross-process link definitions.
+#
+# FILE PATTERN: *.links.ubml.yaml
+# ============================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://ubml.talxis.com/schemas/1.4/documents/links.schema.yaml"
+title: "Links"
+description: |
+  Link documents define relationships between steps across processes.
+  
+  WHEN TO USE LINK DOCUMENTS?
+  Links within a single process are defined in the process document.
+  Use a separate links document when:
+  - Connecting steps across different process files
+  - Managing complex cross-process dependencies
+  - Keeping interface definitions separate from processes
+  
+  LINK TYPES:
+  - Routing: Control flow connections
+  - Scheduling: Timing dependencies
+  - Data flow: Information passing
+  
+  FILE NAMING: *.links.ubml.yaml
+  Examples:
+    - cross-process-links.links.ubml.yaml
+    - order-to-fulfillment.links.ubml.yaml
+    - integration-links.links.ubml.yaml
+
+# CLI metadata - structured data for tooling
+x-ubml-cli:
+  category: advanced
+  categoryDisplayName: "Advanced"
+  workflowOrder: 11
+  shortDescription: "Define relationships between steps across processes."
+  defaultFilename: "cross-process"
+  detectBy:
+    - links
+  gettingStarted:
+    - "Identify cross-process connections"
+    - "Define links with source and target steps"
+    - "Add conditions or scheduling as needed"
+    - "Document data bindings if applicable"
+  exampleFilename: "cross-process.links.ubml.yaml"
+
+type: object
+additionalProperties: false
+required: [ubml]
+
+properties:
+  ubml:
+    description: |
+      UBML version identifier.
+      Must be "1.4" for this schema version.
+    type: string
+    const: "1.4"
+  
+  name:
+    description: |
+      Optional document name.
+      If not provided, the filename is used.
+    type: string
+  
+  description:
+    description: |
+      Document description.
+      Explain what links are defined in this file.
+    type: string
+  
+  links:
+    description: |
+      Cross-process link definitions.
+      
+      Example:
+        links:
+          - from: ST015
+            to: ST101
+            condition: "order.approved"
+            schedule:
+              type: finish-to-start
+              lag: "1h"
+            dataBindings:
+              orderId: approvedOrderId
+    type: array
+    items:
+      $ref: "../types/link.types.yaml#/$defs/Link"
+  
+  tags:
+    description: "Tags for filtering and organization."
+    type: array
+    items:
+      type: string
+  
+  custom:
+    description: "User-defined custom fields."
+    $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

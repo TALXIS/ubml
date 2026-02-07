@@ -1,0 +1,40 @@
+ubml: "1.4"
+name: "Example Insights"
+
+insights:
+  IN00001:
+    text: "Warehouse staff spend 2 hours daily on manual data entry across SAP, Excel, and the legacy portal"
+    kind: pain
+    status: validated
+    source: SR00001
+    attribution: "Karel Dvořák, Warehouse Manager"
+    date: "2026-01-15"
+    confidence: 0.85
+    about:
+      - AC00001
+    context: |
+      Mentioned during discussion about daily routines. Karel demonstrated
+      the three-system workflow on his screen — switching between SAP transaction
+      VA01, an Excel tracking sheet, and the legacy web portal. Visibly frustrated.
+      Two colleagues nodded in agreement.
+    tags: [data-entry, manual-work, pain-point]
+    related: [IN00002]
+
+  IN00002:
+    text: "The legacy portal crashes approximately twice per week, causing data loss"
+    kind: pain
+    status: proposed
+    source: SR00001
+    attribution: "Karel Dvořák"
+    date: "2026-01-15"
+    confidence: 0.7
+    context: |
+      Anecdotal — Karel mentioned it but didn't have specific dates.
+      Worth validating with IT logs.
+    tags: [system-reliability, data-loss]
+    related: [IN00001]
+
+  IN00003:
+    text: "CFO mentioned budget freeze until Q3"
+    kind: constraint
+    status: proposed

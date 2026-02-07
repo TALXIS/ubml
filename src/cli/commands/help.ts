@@ -69,6 +69,8 @@ const TOPICS: Record<string, () => void> = {
   strategy: () => showDocumentHelp('strategy'),
   glossary: () => showDocumentHelp('glossary'),
   links: () => showDocumentHelp('links'),
+  sources: () => showDocumentHelp('sources'),
+  insights: () => showDocumentHelp('insights'),
   
   // Control flow concepts - use schema introspection
   blocks: () => showConceptHelp('Block'),
