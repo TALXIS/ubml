@@ -43,11 +43,9 @@ Things that affect language design but are primarily tooling concerns:
 - BPMN export fidelity — what's acceptable loss?
 - Process mining import — what observation types do we need?
 - **Semantic hints in validation** — Currently, hints like "goals belong in strategy, not process" are hardcoded in `validation-errors.ts`. These encode semantic relationships between document types (process vs. strategy vs. hypotheses) that should ideally come from schema metadata (e.g., `x-ubml` annotations). This would make semantic guidance maintainable alongside schema evolution and allow schema authors to define cross-document guidance without modifying TypeScript code.
-- **Duration natural language normalization** — CLI should accept `90 days` and normalize to `90d`. Schema stays strict for interchange. Aligns with "Forgiveness over Strictness" principle. Needs `ubml fix` command to auto-correct.
-- **Template quality gaps** — Templates for `links`, `hypotheses`, `glossary` are minimal or empty. Every template should include complete, commented examples with real-world scenarios. Glossary template uses numeric IDs inconsistent with other elements.
-- **Missing CLI help topics** — `blocks`, `phases`, `links` have no help topics despite being valid schema concepts. `ubml help blocks` returns "Unknown topic."
-- **Single-file validation silently skips cross-references** — `ubml validate single-file.yaml` passes even when referencing undefined actors. Should warn that cross-references are not checked.
-- **Schema browser / property search** — `ubml schema <type> --properties` returns empty for some types (hypotheses). `ubml schema --find "owner"` would help users discover where properties live across types.
+- **Duration natural language normalization** — CLI should accept `90 days` and normalize to `90d`. Schema stays strict for interchange. Aligns with "Forgiveness over Strictness" principle. Needs `ubml fix` command to auto-correct. Tracked in `plan/CLI-UX-IMPROVEMENTS.md` P1.3.
+- **Template quality gaps** — Templates for `links`, `hypotheses`, `glossary` are minimal or empty. Every template should include complete, commented examples with real-world scenarios. Glossary template uses numeric IDs inconsistent with other elements. Tracked in `plan/CLI-UX-IMPROVEMENTS.md` P2.1.
+- **Schema browser / property search** — `ubml schema <type> --properties` returns empty for some types (hypotheses). `ubml schema --find "owner"` would help users discover where properties live across types. Tracked in `plan/CLI-UX-IMPROVEMENTS.md` P3.
 
 ---
 

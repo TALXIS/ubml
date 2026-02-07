@@ -253,7 +253,7 @@ Split into:
 - `extract-content.ts` — Content detection config
 - `extract-metadata.ts` — Re-exports + remaining
 
-**Defer reason:** Low priority, functional as-is, 100% test coverage maintained.
+**Status:** ✅ Completed (all three tasks implemented)
 
 ---
 
@@ -401,9 +401,6 @@ Based on evaluation findings, these areas still need attention:
 - Glossary category IDs inconsistent (numeric vs TM### pattern)
 - Examples command doesn't exist (`ubml examples <type>`)
 
-### Code Quality
-- Phase 6 file splitting mentioned in test-results has been completed (all three tasks done)
-
 ### CLI Convenience
 - No quick capture: `ubml add insight "..."`, `ubml add source ...`
 - No search/discovery: `ubml find`, `ubml list`, `ubml trace`
@@ -423,8 +420,5 @@ Based on evaluation findings, these areas still need attention:
 See `plan/CLI-UX-IMPROVEMENTS.md` for detailed implementation proposals.
 
 ### Note on Completed Work
-- File splitting refactoring (Phase 6) has been completed - see `test-results/cetin-test-result/REFACTORING-PLAN.md` for details
+- File splitting refactoring (Phase 6) has been completed - see `sandbox/cetin-ftth-eval/` for details
 
----
-
-*This document synthesizes findings from deleted temp/ evaluation files. Preserves context, bug reports, priority analysis, and design decisions for future reference.*

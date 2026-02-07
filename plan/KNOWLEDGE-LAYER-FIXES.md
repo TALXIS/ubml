@@ -1,9 +1,9 @@
 # Knowledge Layer — Design Fixes
 
 > **Basis**: Test results from `temp/knowledge-layer-test/`, principles in `docs/PRINCIPLES.md`
-> **Schema version**: 1.3
+> **Schema version**: 1.4
 > **Date**: 2026-02-07
-> **Status**: Proposed
+> **Status**: Proposed (none implemented yet)
 > 
 > **Context**: See `plan/EVALUATION-FINDINGS.md` for test methodology, bug reports, and full analysis.
 
@@ -77,7 +77,7 @@ sources: [SR00001]
 - Generated types: regenerate
 - Semantic validator: `source` → `sources` in reference field extraction
 - CLI templates: update insight template
-- Existing examples: `example/insights.ubml.yaml`, `example_cetin/` files
+- Existing examples: `example/insights.ubml.yaml`, `sandbox/cetin-ftth/` files
 - Test workspace: `temp/knowledge-layer-test/`
 - Plans/docs: update `SOURCES-AND-DERIVED-KNOWLEDGE-PLAN.md`, `KNOWLEDGE-LAYER-IMPLEMENTATION.md`
 
@@ -404,11 +404,11 @@ Deferred for discussion. If renamed, this is a breaking change that needs migrat
 
 For each schema change:
 
-- [ ] Update `schemas/1.3/types/knowledge.types.yaml`
-- [ ] Update `schemas/1.3/types/hypothesis.types.yaml` (if F7)
+- [ ] Update `schemas/1.4/types/knowledge.types.yaml`
+- [ ] Update `schemas/1.4/types/hypothesis.types.yaml` (if F7)
 - [ ] Run `npm run generate` → regenerate types, data, constants
 - [ ] Update `src/semantic-validator.ts` if reference fields change
-- [ ] Update example files: `example/insights.ubml.yaml`, `example_cetin/`
+- [ ] Update example files: `example/insights.ubml.yaml`, `sandbox/cetin-ftth/`
 - [ ] Update test workspace: `temp/knowledge-layer-test/`
 - [ ] Run `npm test` — all tests pass
 - [ ] Run `npm run build && ./dist/cli.js validate example/` — examples validate

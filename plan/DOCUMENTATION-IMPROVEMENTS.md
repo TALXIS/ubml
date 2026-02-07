@@ -670,8 +670,8 @@ Open files in order:
 
 ## More Examples
 
-- **[CETIN FTTH](../example_cetin/)** — Real-world telecom scenario (complex)
-- **[Samples](../samples/)** — Mermaid diagrams (pre-UBML modeling notes)
+- **[CETIN FTTH](../sandbox/cetin-ftth/)** — Real-world telecom scenario (complex)
+- **[Samples](../sandbox/samples/)** — Mermaid diagrams (pre-UBML modeling notes)
 
 ---
 

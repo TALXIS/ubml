@@ -33,6 +33,15 @@ Extend existing `misplacementHints` functionality:
 
 Explain when and how to use `custom:` fields.
 
+### 1.3 Duration Natural Language Normalization
+
+Users write `duration: 90 days` but schema requires `90d`. CLI should accept natural language and normalize:
+- `90 days` → `90d`
+- `2 hours` → `2h`
+- `3 months` → `3mo`
+
+Implement as part of a `ubml fix` command or as auto-correction during `ubml add`. Schema stays strict for interchange.
+
 ---
 
 ## Priority 2: Templates & Examples
@@ -118,6 +127,77 @@ ubml report coverage    # % of elements with derivedFrom links
 ubml report orphans     # Unused insights, unreferenced actors
 ```
 
+### 5.4 Insight Review Workflow
+
+```bash
+ubml insights review    # Interactive status management for insights
+```
+
+Walk through insights by status (proposed → validated/disputed/retired). Useful after a batch of meeting captures to triage and confirm findings.
+
+### 5.5 Insight Deduplication Warning
+
+During `ubml validate` or `ubml add insight`, warn when a new insight's `text` is 85%+ similar to an existing insight. Prevents duplicate capture across meetings.
+
+```
+⚠ IN00007 text is 92% similar to IN00003 — possible duplicate?
+  IN00003: "Preparation phase takes 450 days on average"
+  IN00007: "The preparation phase averages 450 days"
+```
+
+---
+
+## Priority 6: Larger Features (Future)
+
+These are significant features requested during evaluation. Not prioritized for immediate work but worth tracking.
+
+### 6.1 Visual Export / Projections
+
+Users consistently requested diagram generation. Design docs exist in `docs/projections/` (Mermaid, BPMN, PlantUML, ArchiMate, etc.) but no implementation.
+
+Minimal viable version:
+```bash
+ubml export --format=mermaid process.ubml.yaml   # Process flow diagram
+ubml export --format=mermaid actors.ubml.yaml     # Org chart
+```
+
+Mermaid is the lowest-effort target (text-based, widely supported). BPMN export has higher fidelity requirements — see `docs/projections/BPMN.md`.
+
+### 6.2 `ubml rename` — Safe ID Refactoring
+
+Rename an element ID across all files in the workspace:
+```bash
+ubml rename AC00001 AC10001   # Updates all references
+```
+
+Needs: workspace scanning, reference field awareness, atomic multi-file update.
+
+### 6.3 `ubml doctor` — Workspace Health Check
+
+Combined diagnostics beyond validation:
+- Schema version consistency
+- Orphaned elements (defined but unreferenced)
+- Missing recommended files (glossary, strategy)
+- ID pattern consistency
+- Coverage stats (% elements with derivedFrom, % steps with RACI)
+
+### 6.4 `ubml lint` — Style Suggestions
+
+Non-blocking suggestions for model quality:
+- Naming conventions (capabilities should start with verb)
+- Missing descriptions on key elements
+- Unused custom fields that have native equivalents
+- ID gaps (AC00001, AC00003 — missing AC00002)
+
+### 6.5 AI-Assisted Extraction
+
+Automated extraction from source documents (meeting transcripts, interviews):
+```bash
+ubml analyze meetings/*.md --suggest
+```
+
+Scan documents for actors, systems, metrics, processes. Preview candidates, confirm before adding. Depends on LLM provider abstraction. Deferred until manual workflow is proven — tracked in `docs/OPEN-TOPICS.md`.
+
 ---
 
 ## Not Doing (Principle Violations)
@@ -127,8 +207,8 @@ These were proposed in testing but correctly rejected:
 - **Step.participants shorthand** — Violates P9.1, P9.2, DD-004. RACI is the one way to express responsibility. CLI should guide to RACI, not provide shortcuts.
 - **Entity.properties alias** — Violates P9.1. Use `attributes` (typed) or `custom:` (freeform).
 - **Process.goal property** — Rejected per semantic separation. Goals belong in strategy/hypotheses/metrics. CLI provides hint when users try this.
-- **Duration schema relaxation** — Schema stays strict (`90d`). CLI handles normalization from `90 days` → `90d`.
+- **Duration schema relaxation** — Schema stays strict (`90d`). CLI handles normalization (see 1.3).
 
 ---
 
-*Prioritize P1-P2 for next development cycle. P3-P5 as time permits.*
+*Prioritize P1-P2 for next development cycle. P3-P5 as time permits. P6 is future work.*

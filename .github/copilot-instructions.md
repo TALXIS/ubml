@@ -25,11 +25,9 @@ Note: Some duplication exists - check for hardcoded element types, validation lo
 ## Updating UBML Version
 
 1. Update `package.json` version (e.g., `1.3.0` → `1.4.0`)
-2. Run: `npm run update-schema-versions` (renames schema folder, updates all version strings)
-3. Run: `npm run generate` (regenerates TypeScript types)
-4. Run: `npm run verify-versions` (verifies consistency)
+2. Run: `npm run update-schema-versions && npm run generate && npm run verify-versions`
 
-## Critical Guidance
+## Guidance
 
 **Read `/docs/PRINCIPLES.md` before changing language design or schemas** - contains binding design constraints.
 
@@ -46,3 +44,9 @@ Note: Some duplication exists - check for hardcoded element types, validation lo
 - Core (`src/`) - Browser-safe, zero Node dependencies
 - Node-specific (`src/node/`) - File system operations only
 - Generated (`src/generated/`) - **Never edit directly**, run `npm run generate`
+
+## Testing & Experiments
+
+**`sandbox/`** (gitignored) - Local testing data for CLI experiments
+
+**Run local CLI:** `npx tsx bin/ubml.ts <command>` (e.g., `npx tsx bin/ubml.ts validate sandbox/`)

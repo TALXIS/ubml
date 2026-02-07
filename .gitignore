@@ -54,8 +54,7 @@ src/constants.ts
 # Allow bin folder for CLI scripts (override global gitignore)
 !bin/
 
-# Local samples (not part of the package)
-samples/
-example_cetin/
+# Local sandbox — testing data, experiments, CLI examples (not part of the package)
+sandbox/
+
 temp
-test-results/
