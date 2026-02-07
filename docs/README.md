@@ -9,8 +9,10 @@ These documents define the **notation and abstractions** of the Unified Business
 | Document | Purpose |
 |----------|--------|
 | [VISION.md](VISION.md) | Why UBML exists, what problem it solves, who it serves |
+| [WORKSPACE-SEMANTICS.md](WORKSPACE-SEMANTICS.md) | Semantic structure of a workspace — what it contains and how parts relate |
 | [PRINCIPLES.md](PRINCIPLES.md) | Binding constraints that govern language design decisions |
 | [DESIGN-DECISIONS.md](DESIGN-DECISIONS.md) | Specific choices made, alternatives rejected, and why |
+| [projections/](projections/README.md) | How UBML maps to BPMN, ArchiMate, UML, Mermaid, PlantUML, and other standards — and what each standard captures that UBML cannot |
 | [OPEN-TOPICS.md](OPEN-TOPICS.md) | Unresolved questions and areas needing design work |
 
 **Audience**: Maintainers and contributors evolving the language.
