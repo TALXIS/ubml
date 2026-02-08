@@ -34,7 +34,9 @@ ubml export --format=mermaid actors.ubml.yaml     # Org chart / actor relationsh
 
 Formal BPMN 2.0 XML generation for enterprise interchange.
 
-**Prerequisites**: Resolve Plan 00 D4 (process/workflow boundary) if not already decided.
+**Prerequisites**:
+- Resolve Plan 00 D4 (process/workflow boundary) if not already decided.
+- **Formalize expression language grammar (ts-subset-v1)**. BPMN gateway conditions require parseable expressions. The existing TypeScript-subset `Expression` type must have a formal grammar (allowed ESTree node types, type environment contract, built-in function signatures) before condition serialization can work. Set BPMN `expressionLanguage` to `urn:ubml:ts-subset-v1`. See Plan 18 (Expression Language decision).
 
 **Scope**:
 - Steps → BPMN Tasks

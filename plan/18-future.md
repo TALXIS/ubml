@@ -28,9 +28,15 @@ Track deferred design decisions, larger features, and infrastructure changes tha
 
 ### Expression Language
 
-**Question**: Define a grammar for guards, conditions, and formulas? Or keep as free-text?
+**Decision**: Formalize the existing TypeScript-subset as `ts-subset-v1`. Keep JS-family syntax (`&&`, `||`, `!`, `===`) rather than switching to FEEL or Power Fx.
 
-**When to decide**: Before BPMN export (Plan 16 Phase 2) — BPMN requires parseable expressions.
+**Rationale**: The planned React GUI expression builder eliminates the readability concern (consultants use a visual builder, not raw syntax). The JS/TS ecosystem provides production-ready parsing (acorn), AST manipulation (babel/recast), and editor integration (Monaco with free autocomplete, type checking via `.d.ts`). FEEL has no mature JS parser; Power Fx has no JS/TS runtime at all (C#/.NET only, JS port requested since 2022 with no ETA). For BPMN export, set `expressionLanguage="urn:ubml:ts-subset-v1"` — BPMN 2.0 explicitly supports custom expression languages.
+
+**Remaining work** (prerequisite for Plan 16 Phase 2):
+- Define allowed ESTree node types (BinaryExpression, LogicalExpression, MemberExpression, ConditionalExpression, CallExpression for builtins, Literal, Identifier)
+- Define type environment contract (how entity attributes and work attributes surface as typed identifiers)
+- Formalize built-in function signatures as a `.d.ts`
+- Build or adopt a subset validator (parse with acorn + reject disallowed AST nodes)
 
 ### Entity Relationships Quality
 
