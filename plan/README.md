@@ -51,10 +51,16 @@
 
 | # | File | Scope | Effort | Depends on |
 |---|------|-------|--------|------------|
-| 15 | [VS Code Integration](15-vscode-integration.md) | YAML schema association, init scaffolding, stretch: extension | Medium | 01–04 |
+| 15 | [VS Code Integration](15-vscode-integration.md) | YAML schema association, init scaffolding | Medium | 01–04 |
 | 16 | [Visual Export](16-visual-export.md) | Mermaid → BPMN → PlantUML/ArchiMate |Large | 01–04, 10 |
 | 17 | [CI/CD & Release](17-ci-release.md) | GitHub Actions, release workflow, version strategy | Small–Med | 05, 10 |
 | 18 | [Future](18-future.md) | Deferred decisions, AI extraction, playground, deduplication, indexing, insight splitting | Exploratory | — |
+
+### Milestone 5: Progressive Refinement (make it smart)
+
+| # | File | Scope | Effort | Depends on |
+|---|------|-------|--------|------------|
+| 19 | [Refinement Questions](19-refinement-questions.md) | Schema-declared questions, refinement engine, CLI `ubml refine`, ESLint rule, computed maturity | Large | 04, 06, 08, 15 |
 
 ---
 
@@ -80,7 +86,8 @@
 05 + 10 ── 17 CI/Release                                              
                                                                       
 18 Future (independent, exploratory)                                  
-```
+
+04 + 06 + 08 + 15 ── 19 Refinement Questions
 
 ---
 

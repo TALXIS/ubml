@@ -59,25 +59,12 @@ Extend `src/semantic-validator.ts` to catch structural errors that currently pas
 
 ---
 
-## E. Validation Strictness Levels (if D5 decided)
-
-If Plan 00 D5 resolves to support validation levels, implement the framework here:
-
-- `draft`: Suppress warnings, only schema errors
-- `standard`: Warnings + errors (default)
-- `strict`: All checks including style suggestions
-
-**Implementation**: Check document-level `validation` property, allow CLI `--level` override.
-
----
-
 ## Checklist
 
 - [ ] Implement cycle detection for parent chains
 - [ ] Implement type-correct reference validation
 - [ ] Implement same-process scope for phase/block step refs
 - [ ] Implement orphaned step warning
-- [ ] (If D5 resolved) Implement validation strictness framework
 - [ ] Unit tests for each new validation rule
 - [ ] Run full test suite + validate example workspace
 
@@ -87,4 +74,4 @@ If Plan 00 D5 resolves to support validation levels, implement the framework her
 
 - Tackle A and B first — highest value, most likely to catch real errors.
 - C and D can be follow-ups if the session runs long.
-- Each check should be independently toggleable for future strictness levels.
+- Each check should be independently toggleable.

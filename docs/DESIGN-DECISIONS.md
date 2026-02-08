@@ -1287,3 +1287,66 @@ When a referenced element doesn't exist yet, create it first. External people (c
 | **P1.5** Typed References for Modeled Concepts | If the concept is modeled, use the model |
 | **P9.1** No Alternative Representations | One way to reference a concept |
 | **P12.6** Single Provenance Path | No side channels that bypass the formal chain |
+
+---
+
+## DD-011: Progressive Refinement Strategy
+
+**Status**: Accepted
+
+### Context
+
+Consultants capture knowledge from meetings, interviews, and ad-hoc conversations. Initial capture is messy — names, pains, fragments of process descriptions, contradictory accounts from different stakeholders. The workspace must accept this rough input and guide progressive structuring.
+
+The end goal is effective handover: stakeholders and developers should understand how the business makes money and where optimization opportunities exist. UBML is not designing software — it's describing how an organization operates so that others can act on that understanding.
+
+Without a refinement strategy, two failure modes emerge:
+1. **Too strict** — consultants abandon the tool because it blocks rough capture
+2. **Too loose** — models stay permanently incomplete because nothing guides them toward completeness
+
+### Research
+
+We evaluated three approaches to progressive formalization:
+
+| Approach | How It Works | Weakness |
+|----------|-------------|----------|
+| Validation mode levels (draft/standard/strict) | Suppress errors based on declared mode | Hides problems; users never leave draft mode; violates P4.4 if defaulted |
+| Schema-level maturity property | Store maturity state on elements | Violates P1.3 (computable from present/absent optional properties) |
+| Schema-declared refinement questions | Schema metadata defines what's missing as human-friendly questions | Requires tooling to surface questions; questions must be well-authored |
+
+### Decision
+
+**Progressive refinement through schema-declared questions, NOT through validation mode relaxation.**
+
+1. **Schema is always strictly validated** — structural correctness is non-negotiable. A model with only required fields is valid; optional fields being absent is not an error.
+2. **The schema declares refinement questions on each type** — human-friendly questions about missing optional information (e.g., "Who is responsible for this step?", "What triggers this process?"). These are metadata for tooling, not validation rules.
+3. **Questions are tiered by impact** — core modeling questions first, analytical depth second, traceability third. Tooling surfaces questions progressively to avoid overwhelming users.
+4. **Model completeness is always derived**, never stored — tooling computes maturity from what's present in the workspace (P1.3).
+5. **Conflicting information coexists** in the model via the knowledge layer (Sources and Insights with status tracking). Tooling facilitates hypothesis-driven resolution rather than forcing immediate consistency.
+6. **The primary input pattern is unstructured content** — consultants drop meeting transcripts, names, pain points, and anecdotes into the workspace. Tooling creates structure, deduplicates, and progressively composes a model.
+
+### Alternatives Rejected
+
+| Alternative | Why Rejected |
+|-------------|-------------|
+| Validation strictness levels (draft/standard/strict) | Hides errors instead of guiding improvement. Users never graduate from draft mode. Violates P4.4 if a default is set. |
+| Schema-level maturity property on elements | Violates P1.3 — maturity is computable from what's present in the model. Stored maturity goes stale. |
+| Relaxed required fields as "draft mode" | Masks incomplete models instead of guiding completion. Required fields (P5.2) are already minimal. |
+| Hardcoded refinement logic in code | Doesn't evolve with schema changes. Guidance about model elements should live with the schema, not in application code. |
+
+### Consequences
+
+1. **Schema carries refinement metadata** alongside structural definitions — what's missing and why it matters
+2. **Existing valid models remain valid** — refinement questions surface for missing optional information, not for structural errors
+3. **Tooling can derive model completeness** at any granularity (element, type, workspace) without stored state
+4. **Validation output is actionable** — phrased as questions ("Who owns this process?") rather than error codes
+
+### Principles Applied
+
+| Principle | How Applied |
+|-----------|-------------|
+| **P1.3** No Computed Aggregations | Completeness derived, never stored |
+| **P4.3** Schema Always Fully Validated | No draft mode; schema is always strict |
+| **P5.2** Required Properties Minimal | Required fields already minimal; refinement questions handle the rest |
+| **P12.1** Minimal Capture Friction | Rough capture is valid; questions guide, never block |
+| **P12.7** Progressive Refinement Through Questions | Core mechanism for progressive formalization |

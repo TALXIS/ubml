@@ -61,20 +61,15 @@ Resolve only the design questions that block schema work (Plans 01–04). Make a
 
 ---
 
-## D5: Validation strictness levels
+## D5: Remove `kind` from Actor
 
-**Question**: How should progressive validation work?
+**Question**: Actor has both `type` (person/role/team/system/organization/external/customer) and `kind` (human/org/system). Do we need both?
 
-**Context**: P4.3 says documents should declare expected validation strictness. Currently validation is binary (pass/fail). Users need progressive formalization.
+**Context**: `kind` is fully derivable from `type` — the mapping is deterministic (`system→system`, `person/role/team→human`, `organization/external/customer→org`). No projection mapping references `kind`; every BPMN, ArchiMate, UML, and Mermaid mapping uses `type` as the semantic discriminator. Having both violates P1.3 (derivable data) and P5.2 (unnecessary required field).
 
-**Options**:
-- A) Document-level `validation: draft | standard | strict`
-- B) CLI flag: `ubml validate --level=draft`
-- C) Both — document declares default, CLI overrides
+**Recommendation**: **Remove `kind` from Actor schema.** Tooling derives the behavioral category from `type` when needed.
 
-**Recommendation**: **Option C.** Document-level property sets the default (progressive modeling). CLI flag overrides for CI/CD or batch checking. Default when omitted: `standard`.
-
-**Blocks**: Plan 04 (semantic validation)
+**Blocks**: Plan 01 or Plan 03 (schema change)
 
 ---
 

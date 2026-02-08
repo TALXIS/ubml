@@ -55,7 +55,7 @@ Error-driven guide — user sees an error, finds the fix:
 - "Invalid duration format" → UBML duration syntax reference
 - "Files not found by validator" → file naming pattern requirements
 - "Command not found: ubml" → installation options
-- VS Code schema not working → extension, file extension, reload
+- VS Code schema not working → check file extension (.ubml.yaml), reload window, verify Red Hat YAML extension installed
 
 ---
 

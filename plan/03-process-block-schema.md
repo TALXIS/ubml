@@ -54,6 +54,14 @@ anyOf:
 
 ---
 
+## E. Make `steps` Optional on Process
+
+**Rationale**: Process currently requires non-empty `steps`. This blocks L1/L2 process placeholders — consultants identify process names and ownership before decomposing steps. All projections handle empty processes gracefully (BPMN collapsed subprocess, ArchiMate named element, Mermaid node).
+
+**Fix**: Remove `steps` from Process `required`. A process with just `name` is valid. Processes without steps surface as high-priority refinement candidates (Plan 19).
+
+---
+
 ## Checklist
 
 - [ ] Add `owner: ActorRef` to Process schema
@@ -63,5 +71,6 @@ anyOf:
 - [ ] Run `npm run generate`
 - [ ] Update example workspace with Process.owner usage
 - [ ] Update example workspace with `seq` block pattern
+- [ ] Make `steps` optional on Process (remove from `required`)
 - [ ] Run `npm test` + validate examples
 - [ ] Document decisions in `docs/DESIGN-DECISIONS.md`

@@ -182,11 +182,11 @@ Default values must not change based on where an element appears. An omitted pro
 
 **Rationale:** Consistency. No hidden rules to learn. Context should never change meaning.
 
-#### P4.3: Validation Modes Explicit
+#### P4.3: Schema Always Fully Validated
 
-Documents should be able to declare their expected validation strictness. This allows progressive formalization from rough drafts to validated models.
+The schema is always strictly validated — there are no modes that suppress errors. A model with only required fields is structurally correct. Progressive formalization comes from guided refinement of optional properties, not from relaxing what the schema enforces.
 
-**Rationale:** Supports workshop capture (loose) through to production models (strict).
+**Rationale:** Validation modes hide problems instead of guiding improvement. A model missing optional fields is valid but incomplete — tooling should tell the user what to add next, not pretend errors don't exist.
 
 #### P4.4: No Hidden Defaults
 
@@ -407,7 +407,7 @@ UBML workspaces are long-lived (5+ years) digital twins of organizations. They m
 
 Users must be able to record knowledge with as little structure as they have at the moment of capture. A consultant who hears a key fact in a meeting should be able to add it to the workspace in seconds, not minutes. Structure guides, never blocks.
 
-**Rationale:** If the barrier to recording information is higher than writing it on a napkin, consultants will use the napkin. The tool must be faster than alternatives for capturing knowledge.
+**Rationale:** If the barrier to recording information is higher than writing it on a napkin, consultants will use the napkin. The tool must be faster than alternatives for capturing knowledge. Tooling should guide users from minimal capture toward complete models — but the guidance comes after capture, never during it.
 
 #### P12.2: Catalog, Not Container
 
@@ -438,3 +438,13 @@ Derived knowledge carries human-readable context (who, when, about what, how con
 All knowledge provenance must flow through the formal chain: Source → Insight → Model. Schema types must not provide alternative provenance mechanisms (free-text citation fields, inline source references, shortcut attribution) that bypass this chain.
 
 **Rationale:** Parallel provenance paths fragment knowledge management. Free-text citations can't be traced, validated, or queried. If the formal chain has too much friction, fix the chain (P12.1) — don't add a side channel.
+
+#### P12.7: Progressive Refinement Through Questions
+
+Schema consistency is never relaxed to lower the capture barrier. Instead, missing optional information is surfaced as human-friendly questions that guide the user toward a more complete model. Tooling presents questions progressively — prioritized by impact — not all at once.
+
+The primary input pattern is unstructured content (meeting transcripts, interview notes, anecdotes) that tooling structures into the model. Conflicting information from different sources is expected and tracked through the knowledge layer, not rejected.
+
+Model completeness is always derived from what's present in the workspace, never stored as a property (P1.3). The workspace grows from rough fragments to a complete model through guided refinement, not through mode switches.
+
+**Rationale:** Consultants work with messy, contradictory, incomplete information. A tool that rejects this reality will not be used. Questions drive improvement better than errors — they tell users what to do, not just what's wrong.

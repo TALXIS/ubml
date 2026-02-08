@@ -2,13 +2,13 @@
 
 > **Status**: Proposed
 > **Depends on**: 01–04 (schema stable), 05 (validation working correctly)
-> **Effort**: Medium (one session for basics, ongoing for advanced)
+> **Effort**: Medium (one session)
 
 ---
 
 ## Goal
 
-Meet users where they work. VS Code is the primary editing environment — provide schema validation, auto-completion, and reference navigation without requiring the CLI.
+Meet users where they work. VS Code is the primary editing environment — provide schema validation and auto-completion without requiring the CLI.
 
 ---
 
@@ -23,20 +23,7 @@ Ship `.vscode/settings.json` or workspace-level config that associates `*.ubml.y
 
 ---
 
-## B. UBML VS Code Extension (stretch)
-
-If YAML extension integration isn't sufficient, build a lightweight VS Code extension:
-
-- Go-to-definition for references (click `AC00001` → jump to actor definition)
-- Hover info for IDs (show element name and type)
-- Validation-on-save using the SDK
-- Reference count decorations (e.g., "3 references" on actor)
-
-**Architecture**: Use `src/` SDK (browser-safe) directly in the extension. The core is already designed for this split.
-
----
-
-## C. `.vscode/settings.json` Template in `ubml init`
+## B. `.vscode/settings.json` Template in `ubml init`
 
 Ensure `ubml init` scaffolds editor config:
 
@@ -60,5 +47,4 @@ Schemas are hosted via GitHub Pages at ubml.talxis.com. No npm package required 
 - [ ] Add `.vscode/settings.json` generation to `ubml init`
 - [ ] Test YAML schema auto-completion with Red Hat YAML extension
 - [ ] Verify inline validation matches CLI validation
-- [ ] (Stretch) Prototype VS Code extension with go-to-definition
 - [ ] Document VS Code setup in quickstart guide (Plan 12)
