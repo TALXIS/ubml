@@ -116,8 +116,15 @@ For detailed persona definitions and the collaboration model, see [CONSUMERS.md]
 UBML exists to support a clear workflow:
 
 ```
-Observe → Model → Simulate → Propose → Execute → Measure → Refine
+  ┌─────────────────────────────────────────────────────────────┐
+  │                                                             │
+  ▼                                                             │
+Observe → Model → Analyze → Plan → Execute → Absorb ───────────┘
 ```
+
+This is a **continuous cycle**, not a one-shot delivery. After execution, the organization has changed. The model absorbs those changes — yesterday's target becomes today's baseline — and the cycle runs again. New issues surface, new hypotheses form, new plans take shape.
+
+A UBML workspace is designed to survive this cycle for years. It's a living organizational model, not a project artifact that rots after handover.
 
 ### Capture the Real Way Value Is Delivered
 
@@ -134,7 +141,13 @@ Interviews and workshops generate rich insights that typically live in scattered
 ### Support Reasoning About Change
 
 Models aren't just documentation. They should support reasoning about what happens when you change things—how long will it take, what resources are needed, where are the constraints?
+This means modeling both **how things work today** (as-is) and **how they should work after improvement** (to-be). The gap between as-is and to-be is where analysis happens: issue decomposition, hypothesis-driven investigation, scenario simulation, and business case development.
 
+### Turn Analysis Into Action
+
+Analysis without a plan is a shelf document. When hypotheses are validated and improvements are prioritized by impact and effort, the model should capture **what to do, in what order, and why** — the planning layer that turns conclusions into a sequenced roadmap.
+
+This is where the cycle closes: the plan drives execution, execution changes the organization, and the model absorbs the new reality.
 ### Build ROI-Backed Business Cases
 
 Every proposed change should connect to measurable outcomes. UBML models provide the foundation for KPIs and performance metrics that matter.
@@ -270,6 +283,8 @@ UBML succeeds when:
 - Business cases are grounded in models that show *why* the proposed change will deliver value
 - AI tools can read UBML and understand enough about a business to be genuinely helpful
 - Analysts spend their time understanding the business, not fighting their tools
+- A workspace created in Year 1 is still actively used in Year 5 — evolving through multiple improvement cycles, each building on the last
+- Every change to a process can be traced back through the initiative that delivered it, the hypothesis that proposed it, and the evidence that justified it
 
 ---
 
@@ -298,8 +313,9 @@ UBML is built on beliefs we intend to validate:
 UBML is intentionally focused. To stay effective, we're explicit about what lies outside its scope:
 
 - **Describing, not executing.** UBML captures how work happens; it doesn't automate or orchestrate that work.
-- **Business layer only.** We model processes, actors, and value—not application portfolios, infrastructure, or technical architecture.
-- **Understanding, not tracking.** We capture current state and proposed improvements—not implementation progress or project status.
+- **Business layer only.** We model processes, actors, and value — not application portfolios, infrastructure, or technical architecture.
+- **Planning, not tracking.** We capture what should change, in what order, and why — not implementation progress, sprint status, or project burndown. The plan is a consulting deliverable; execution tracking belongs in project management tools.
+- **Understanding over time.** The workspace captures current state, proposed improvements, and the rationale connecting them — across multiple improvement cycles. But it records *conclusions*, not *activity*.
 - **Honest about data.** Simulation and ROI estimates require calibration from real operations. UBML provides structure for this analysis, but accuracy depends on the data you bring.
 
 These boundaries prevent scope creep and keep the notation learnable.

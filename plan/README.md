@@ -61,6 +61,7 @@
 | # | File | Scope | Effort | Depends on |
 |---|------|-------|--------|------------|
 | 19 | [Refinement Questions](19-refinement-questions.md) | Schema-declared questions, refinement engine, CLI `ubml refine`, ESLint rule, computed maturity | Large | 04, 06, 08, 15 |
+| 20 | [Analysis Feedback Loops](20-analysis-feedback-loops.md) | Cross-element references, consulting framework gaps, cyclic analysis workflow support | Large | 19, 04, 00 |
 
 ---
 
@@ -87,7 +88,7 @@
                                                                       
 18 Future (independent, exploratory)                                  
 
-04 + 06 + 08 + 15 ── 19 Refinement Questions
+04 + 06 + 08 + 15 ── 19 Refinement Questions ── 20 Analysis Feedback Loops
 
 ---
 

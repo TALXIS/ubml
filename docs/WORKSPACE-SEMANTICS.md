@@ -120,6 +120,10 @@ Mining configurations bridge observed reality with the model. They map event log
 
 Hypotheses drive investigation. Scenarios quantify impact. KPIs measure outcomes. Mining grounds everything in data. Together, they form a cycle: **hypothesize → simulate → measure → refine**.
 
+Critically, downstream analysis informs upstream decisions. The impact of an issue can't be sized until a process is modeled, hypotheses are formed, KPIs are defined, and scenarios are simulated. Business cases flow back to prioritize the original issue tree. This feedback loop — from analysis conclusions back to problem prioritization — is what makes the analytical layer genuinely useful rather than a documentation exercise.
+
+Analysis also bridges to planning: once issues are prioritized and hypotheses validated, the model should capture what to change, in what order, and why — turning analytical conclusions into a sequenced plan of action.
+
 ---
 
 ## Layer 5: Strategy
@@ -158,12 +162,43 @@ Every element in a UBML workspace has a typed ID (prefix + number). References u
 
 ## Workspace as a Living System
 
-A UBML workspace is not a static document. It evolves over months and years as the organization changes:
+A UBML workspace is not a static document. It's designed to survive and stay useful across multiple improvement cycles spanning years.
 
-- **Knowledge accumulates** — new sources are cataloged, new insights extracted
-- **The model refines** — rough drafts become validated process maps
-- **Hypotheses resolve** — some are validated, others invalidated, new ones emerge
-- **Metrics track** — baselines shift, targets update, new KPIs are added
+### The Continuous Cycle
+
+Organizational improvement is cyclic:
+
+```
+  ┌────────────────────────────────────────────┐
+  │                                            │
+  ▼                                            │
+Capture as-is → Analyze → Plan → Execute → Absorb
+```
+
+Each cycle:
+1. **Capture** — Model the current state (or update it after the last cycle's changes)
+2. **Analyze** — Decompose issues, form hypotheses, simulate scenarios, build business cases
+3. **Plan** — Prioritize improvements, sequence initiatives, define the target operating model
+4. **Execute** — Implement changes (outside UBML — this is project management territory)
+5. **Absorb** — The target state becomes the new current state. KPI targets become baselines. Capability target maturity becomes actual maturity. Hypothesis trees close. The model is ready for the next cycle.
+
+The workspace accumulates value across these cycles. Year 3's issue tree references Year 1's insights. Every process change traces back through the initiative that delivered it, the hypothesis that proposed it, and the evidence that justified it.
+
+### What Evolves Over Time
+
+- **Knowledge accumulates** — new sources are cataloged, new insights extracted; old insights remain for provenance
+- **The model refines** — rough drafts become validated process maps; target states absorb into new baselines
+- **Hypotheses resolve** — some are validated, others invalidated, new ones emerge from changed conditions
+- **Metrics shift** — baselines update after each improvement cycle, targets move, new KPIs are added
 - **Strategy adapts** — capabilities mature, value streams evolve, portfolios rebalance
+
+### What Prevents Rot
+
+Most organizational models die within months. UBML resists this by:
+
+- **Making the model a working tool** — analysts use it daily for analysis and planning, not just as a deliverable
+- **Keeping provenance alive** — every element traces back to evidence, so the model stays defensible as people change
+- **Supporting progressive refinement** — the model doesn't demand completeness; it guides what to enrich next
+- **Using git for history** — the full evolution of organizational understanding is version-controlled and auditable
 
 Git provides the version history. The workspace structure provides the semantic organization. Together, they create an auditable record of how organizational understanding developed over time.
