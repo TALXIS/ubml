@@ -1,7 +1,7 @@
-# 09 — Refactoring & Health Tools
+# 10 — Refactoring & Health Tools
 
 > **Status**: Proposed
-> **Depends on**: 03 (semantic validation), 04 (validation bugs fixed)
+> **Depends on**: 04 (semantic validation), 05 (validation bugs fixed)
 > **Effort**: Large (split into sub-items, implement incrementally)
 > **References**: [Evaluation Findings](_reference/EVALUATION-FINDINGS.md)
 
@@ -43,7 +43,7 @@ Combined health check beyond validation:
 - Schema version consistency across files
 - Orphaned elements (defined but never referenced)
 - Missing recommended files (glossary for complex workspaces)
-- ID pattern consistency (gaps, mixed patterns)
+- ID pattern consistency (mixed prefix patterns within same type)
 - Coverage stats (% elements with derivedFrom, % steps with RACI)
 
 ---
@@ -55,7 +55,6 @@ Non-blocking suggestions for model quality:
 - Naming conventions (capabilities should start with verb)
 - Missing descriptions on key elements
 - Unused custom fields that have native equivalents
-- ID gaps (AC00001, AC00003 — missing AC00002)
 
 ---
 

@@ -1,4 +1,4 @@
-# 02 — Process & Block Schema Changes
+# 03 — Process & Block Schema Changes
 
 > **Status**: Proposed
 > **Depends on**: 00 (D1: Process.owner, D3: seq operator)
@@ -50,7 +50,7 @@ anyOf:
 
 **Decision**: KPI references Step/Process (one-way). Step does NOT have a `kpis` array. This preserves P1.1 (No Dual Hierarchy).
 
-**Action**: Add inline comment in schema. Ensure CLI `ubml show` and `ubml trace` provide reverse lookup. Document in help topics (Plan 05).
+**Action**: Add inline comment in schema. Ensure CLI `ubml show` and `ubml trace` provide reverse lookup. Document in help topics (Plan 06).
 
 ---
 

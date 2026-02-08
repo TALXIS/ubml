@@ -1,7 +1,7 @@
-# 16 — CI/CD & Release Process
+# 17 — CI/CD & Release Process
 
 > **Status**: Proposed
-> **Depends on**: 04 (validation working), 09 (migration tooling exists)
+> **Depends on**: 05 (validation working), 10 (migration tooling exists)
 > **Effort**: Small–Medium
 > **Note**: Can be implemented incrementally alongside other work
 
@@ -48,7 +48,7 @@ Document how schema evolution works:
 
 - Schema versions track the UBML DSL, not the npm package
 - Breaking changes → new schema version (1.4 → 1.5)
-- `ubml migrate` (Plan 09 D) handles transitions
+- `ubml migrate` (Plan 10 D) handles transitions
 - Old schema versions are NOT maintained — this is pre-1.0 software
 
 ---

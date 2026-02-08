@@ -4,12 +4,15 @@
 
 UBML is a YAML-based DSL for modeling business processes, organizations, and strategy. Designed for business analysts, not engineers - readability and consultant vocabulary matter most.
 
+**Status:** Early development. Schemas and CLI are evolving rapidly. Do not try to keep backwards compatibility yet; focus on iterating quickly and not polluting the codebase with temporary compatibility layers. The product has not been released to the public yet, so breaking changes are welcome as we refine the design.
+
 **Source of truth flow:**
 1. **Schemas** (`schemas/`) - Primary source of truth for the DSL structure
 2. **Docs** (`/docs/`) - Design principles, strategy, and decision rationale
 3. **Build** (`npm run generate`) - Generates TypeScript types from schemas
 4. **SDK** (`src/`) - Built using generated types for parsing/validation
 5. **CLI** (`src/cli/`) - Built on top of SDK, intended as the primary user interface
+6. **Roadmap** (`plan/`) - Proposed and in-progress work, with detailed plans
 
 ## When Schemas Change
 
@@ -36,7 +39,7 @@ Note: Some duplication exists - check for hardcoded element types, validation lo
 - `WORKSPACE-SEMANTICS.md` - How concepts relate
 - `PRINCIPLES.md` - Non-negotiable rules
 - `DESIGN-DECISIONS.md` - Rationale for major choices (add new decisions here)
-- `plan/00-design-decisions.md` - Open design questions and unresolved topics
+- `plan/` - Open design questions and unresolved topics
 
 ## Architecture Notes
 

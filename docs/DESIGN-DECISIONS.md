@@ -1160,7 +1160,7 @@ Quantitative measurements on Scenarios use the term `observations` (type `Observ
 3. **Modified types**: `derivedFrom` property added to core model types
 4. **Scenario property**: `observations` (type `Observation`) for quantitative measurements
 5. **New file patterns**: `*.sources.ubml.yaml`, `*.insights.ubml.yaml`
-7. **Deferred**: LLM extraction, indexing/caching — see `plan/00-design-decisions.md` (deferred items) and `plan/10-future-considerations.md`
+7. **Deferred**: LLM extraction, indexing/caching — see `plan/00-design-decisions.md` (deferred items) and `plan/18-future.md`
 
 ### Principles Applied
 
@@ -1188,3 +1188,102 @@ Quantitative measurements on Scenarios use the term `observations` (type `Observ
 
 - [PRINCIPLES.md](PRINCIPLES.md) — Binding design constraints
 - [VISION.md](VISION.md) — Product vision and positioning
+
+---
+
+## DD-009: CLI Accepts Only Canonical Format
+
+**Status**: Accepted
+
+### Context
+
+Users sometimes expect forgiving input: "90 days" instead of "90d", "2 hours" instead of "2h". This creates tension between usability (accept what users type) and P9.1 (No Alternative Representations).
+
+### Decision
+
+**CLI tooling must accept only the canonical format defined in the schema.**
+
+When a user provides an invalid format, the CLI must reject it with a clear error message showing the correct format:
+
+```
+Invalid duration '90 days'. Use: 90d, 2h, 30min, 1wk, 3mo
+Run 'ubml help durations' for format details.
+```
+
+The CLI must not silently normalize alternative inputs ("90 days" → "90d").
+
+### Rationale
+
+| Approach | Pros | Cons |
+|----------|------|------|
+| **Strict (chosen)** | Users learn canonical format; no hidden conversions; tooling stays simple | Requires users to learn format |
+| Lenient normalization | Feels forgiving | Creates two valid input surfaces; obscures canonical format; adds parser complexity; invites scope creep ("support more natural language!") |
+
+**P9.1 applies at all input surfaces.** Accepting alternative forms at the CLI contradicts the principle just as much as accepting them in YAML files.
+
+The vision's "forgiving during capture, rigorous when needed" refers to **schema validation strictness** (draft/standard/strict modes), not format leniency. Users can start with incomplete models (missing optional properties), but the properties they do provide must use canonical syntax.
+
+### Alternatives Rejected
+
+| Alternative | Why Rejected |
+|-------------|--------------|
+| Accept natural language, normalize before writing | Creates complexity creep. Where does it stop? "one and a half days"? "about 2 hours"? |
+| Accept both, warn on non-canonical | Still two valid forms. Warning fatigue leads to ignoring warnings. |
+| Strict in files, lenient in CLI | Inconsistent. Users copy-paste from CLI to files and get validation errors. |
+
+### Consequences
+
+1. **Error messages must be excellent** — users will hit format errors frequently at first. Messages must show examples and link to help.
+2. **Help topics required** — `ubml help durations`, `ubml help references`, etc.
+3. **Documentation must be clear** — format specs easily discoverable.
+
+### Principles Applied
+
+| Principle | How Applied |
+|-----------|-------------|
+| **P9.1** No Alternative Representations | One format, everywhere — schema, CLI, docs |
+
+---
+
+## DD-010: Typed References Only — No String Alternatives
+
+**Status**: Accepted
+
+### Context
+
+When properties refer to concepts that have their own element types in the workspace (actors, processes, sources, insights, entities), there are two possible approaches:
+
+1. Use the typed reference (`ActorRef`, `ProcessRef`, `SourceRef`, etc.)
+2. Accept a plain string, either exclusively or as a union (`oneOf: [Ref, string]`)
+
+Strings can't be traced, validated, queried, or deduplicated. They create parallel identity systems where the same real-world thing exists as both a typed element and an unlinked text fragment.
+
+### Decision
+
+**Every property that refers to a modeled concept must use the corresponding typed reference. No string alternatives.**
+
+This applies uniformly to all element types — actors, sources, insights, processes, entities, and any future types.
+
+Examples:
+- `Source.participants`: `ActorRef[]` — even for external people
+- `Insight.attribution`: `ActorRef` — who said/wrote this
+- `Process.owner`: `ActorRef` — accountable person
+- `Step.responsible`: `ActorRef[]` — RACI responsible
+
+When a referenced element doesn't exist yet, create it first. External people (clients, vendors, interviewees) use `Actor` with `type: external`. The CLI makes this fast (`ubml add actor`).
+
+### Alternatives Rejected
+
+| Alternative | Why Rejected |
+|-------------|--------------|
+| `Ref \| string` unions for progressive refinement | Two identity systems. Strings become permanent. Violates P1.5. |
+| String-only properties for simplicity | No linkage to model. Can't trace, query, or validate. |
+| Mix of ref-only and string-only by property | Inconsistent. Users must remember which properties allow strings. |
+
+### Principles Applied
+
+| Principle | How Applied |
+|-----------|-------------|
+| **P1.5** Typed References for Modeled Concepts | If the concept is modeled, use the model |
+| **P9.1** No Alternative Representations | One way to reference a concept |
+| **P12.6** Single Provenance Path | No side channels that bypass the formal chain |

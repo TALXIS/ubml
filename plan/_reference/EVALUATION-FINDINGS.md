@@ -6,7 +6,7 @@
 > **Status**: Historical reference - preserves context from evaluation sessions
 > 
 > **Note**: This document captures what was discovered during testing. For actionable plans based on these findings, see:
-> - [03-cli-error-messages.md](../03-cli-error-messages.md), [04-templates-examples.md](../04-templates-examples.md), [05-schema-discovery-validation.md](../05-schema-discovery-validation.md) — CLI/UX work
+> - [06-cli-error-messages.md](../06-cli-error-messages.md), [07-templates-examples.md](../07-templates-examples.md), [08-schema-discovery.md](../08-schema-discovery.md) — CLI/UX work
 > - [01-knowledge-layer-schema.md](../01-knowledge-layer-schema.md) — Schema fixes
 
 ---
@@ -417,7 +417,7 @@ Based on evaluation findings, these areas still need attention:
 - Reference hints showing defined actors
 - `participants`/`actors` misplacement hint
 
-See plans [03](../03-cli-error-messages.md), [04](../04-templates-examples.md), [05](../05-schema-discovery-validation.md), and [09](../09-cli-convenience-tooling.md) for detailed implementation proposals.
+See plans [06](../06-cli-error-messages.md), [07](../07-templates-examples.md), [08](../08-schema-discovery.md), and [09](../09-quick-capture-search.md) for detailed implementation proposals.
 
 ### Note on Completed Work
 - File splitting refactoring (Phase 6) has been completed - see `sandbox/cetin-ftth-eval/` for details

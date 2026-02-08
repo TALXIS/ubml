@@ -1,7 +1,7 @@
-# 06 — Templates & Examples
+# 07 — Templates & Examples
 
 > **Status**: Proposed
-> **Depends on**: 01, 02 (schema changes affect template content)
+> **Depends on**: 01, 03 (schema changes affect template content)
 > **Effort**: Medium (one session)
 > **References**: [Evaluation Findings](_reference/EVALUATION-FINDINGS.md) §Template Quality Issues
 

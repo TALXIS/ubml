@@ -1,7 +1,7 @@
-# 07 — Schema Discovery & Introspection
+# 08 — Schema Discovery & Introspection
 
 > **Status**: Proposed
-> **Depends on**: 01, 02 (schema should be finalized before improving discovery tools)
+> **Depends on**: 01, 03 (schema should be finalized before improving discovery tools)
 > **Effort**: Medium (one session)
 > **References**: [Evaluation Findings](_reference/EVALUATION-FINDINGS.md) §Bug 4
 
@@ -9,7 +9,7 @@
 
 ## Goal
 
-Improve how users discover available properties and explore the schema from the CLI. Complement error messages (Plan 05) with proactive exploration tools.
+Improve how users discover available properties and explore the schema from the CLI. Complement error messages (Plan 06) with proactive exploration tools.
 
 ---
 

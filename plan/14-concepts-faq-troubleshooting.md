@@ -1,7 +1,7 @@
-# 13 — Concepts, FAQ & Troubleshooting
+# 14 — Concepts, FAQ & Troubleshooting
 
 > **Status**: Proposed
-> **Depends on**: 10 (docs structure), 12 (element catalog provides specifics; concepts provide the big picture)
+> **Depends on**: 11 (docs structure), 13 (element catalog provides specifics; concepts provide the big picture)
 > **Effort**: Large (one to two sessions)
 
 ---
@@ -14,7 +14,7 @@ Write three documents that support independent learning after the quickstart: ho
 
 ## A. Concepts Guide (`docs/guide/CONCEPTS.md`)
 
-Explain how UBML works at the conceptual level. Not a reference — a mental model.
+User-facing adaptation of `docs/design/WORKSPACE-SEMANTICS.md`. Same conceptual layers and relationships, rewritten with examples and plain language for analysts — not schema-level precision for maintainers. WORKSPACE-SEMANTICS.md remains the authoritative design reference; CONCEPTS.md teaches.
 
 **Topics**:
 1. **Workspaces** — What they are, file structure, why split files

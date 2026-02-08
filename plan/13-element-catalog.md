@@ -1,7 +1,7 @@
-# 12 — Element Catalog
+# 13 — Element Catalog
 
 > **Status**: Proposed
-> **Depends on**: 10 (docs structure), 11 (quickstart provides the learning path)
+> **Depends on**: 11 (docs structure), 12 (quickstart provides the learning path)
 > **Effort**: Medium (one session)
 
 ---

@@ -96,6 +96,12 @@ The schema must not include version history, change tracking, or diff capabiliti
 
 **Rationale:** Git provides proven version control, branching, and diffing. UBML files are plain text designed for git. Don't reinvent what git does well. Process variants use file-based organization (current/proposed folders), not schema properties.
 
+#### P1.5: Typed References for Modeled Concepts
+
+When a property refers to a concept that has its own element type in the workspace, it must use the typed reference for that element type. String alternatives must not be provided.
+
+**Rationale:** A string and a typed reference to the same real-world thing create parallel identity systems. Strings cannot be traced, validated, deduplicated, or queried. If the workspace models a concept, every reference to that concept must go through the model.
+
 ---
 
 ### P2: Consistent Structural Patterns
@@ -426,3 +432,9 @@ The workspace separates raw information, derived knowledge, and interpreted mode
 Derived knowledge carries human-readable context (who, when, about what, how confident) rather than precise mechanical pointers (line numbers, timestamps). Context survives editing, reformatting, and the passage of time. Precise pointers do not.
 
 **Rationale:** A consultant reading a knowledge entry 3 years after it was captured needs to understand its provenance at a glance, not chase brittle references in a document that may have been reformatted.
+
+#### P12.6: Single Provenance Path
+
+All knowledge provenance must flow through the formal chain: Source → Insight → Model. Schema types must not provide alternative provenance mechanisms (free-text citation fields, inline source references, shortcut attribution) that bypass this chain.
+
+**Rationale:** Parallel provenance paths fragment knowledge management. Free-text citations can't be traced, validated, or queried. If the formal chain has too much friction, fix the chain (P12.1) — don't add a side channel.

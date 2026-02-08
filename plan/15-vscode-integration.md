@@ -1,7 +1,7 @@
-# 14 — VS Code & Editor Integration
+# 15 — VS Code & Editor Integration
 
 > **Status**: Proposed
-> **Depends on**: 01–03 (schema stable), 04 (validation working correctly)
+> **Depends on**: 01–04 (schema stable), 05 (validation working correctly)
 > **Effort**: Medium (one session for basics, ongoing for advanced)
 
 ---
@@ -43,13 +43,15 @@ Ensure `ubml init` scaffolds editor config:
 ```json
 {
   "yaml.schemas": {
-    "./node_modules/ubml/schemas/1.5/ubml.schema.yaml": "*.ubml.yaml"
+    "https://ubml.talxis.com/schemas/1.5/ubml.schema.yaml": "*.ubml.yaml"
   },
   "files.associations": {
     "*.ubml.yaml": "yaml"
   }
 }
 ```
+
+Schemas are hosted via GitHub Pages at ubml.talxis.com. No npm package required for editor integration.
 
 ---
 
@@ -59,4 +61,4 @@ Ensure `ubml init` scaffolds editor config:
 - [ ] Test YAML schema auto-completion with Red Hat YAML extension
 - [ ] Verify inline validation matches CLI validation
 - [ ] (Stretch) Prototype VS Code extension with go-to-definition
-- [ ] Document VS Code setup in quickstart guide (Plan 11)
+- [ ] Document VS Code setup in quickstart guide (Plan 12)

@@ -1,7 +1,7 @@
-# 11 — Quickstart Tutorial & CLI Reference
+# 12 — Quickstart Tutorial & CLI Reference
 
 > **Status**: Proposed
-> **Depends on**: 10 (docs structure must exist)
+> **Depends on**: 11 (docs structure must exist)
 > **Effort**: Medium (one session)
 
 ---
@@ -58,7 +58,7 @@ Searchable reference for every CLI command.
 | `ubml nextid` | Generate next ID |
 | `ubml syncids` | Synchronize IDs |
 | `ubml enums` | List enum values |
-| `ubml examples` | Show examples (Plan 06) |
+| `ubml examples` | Show examples (Plan 07) |
 
 **Source**: Extract from Commander.js definitions in `src/cli/commands/`, expand with examples.
 

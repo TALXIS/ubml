@@ -38,11 +38,11 @@ Fix five design flaws in the knowledge layer (Source → Insight → Model) disc
 
 ---
 
-## F4: Widen `attribution` to accept `ActorRef | string`
+## F4: Change `attribution` to `ActorRef`
 
 **Problem**: Attribution is a plain string — same person exists as `AC00001` in actors and `"Jan Tilsch, CEO"` in attribution with no linkage.
 
-**Fix**: Change to `oneOf: [ActorRef, string]`. Matches `participants` pattern.
+**Fix**: Change type to `ActorRef`. All people referenced in the workspace must exist as actors. External participants use actor `type: external`. No `string` alternative (P1.5, DD-010).
 
 ---
 
@@ -51,6 +51,22 @@ Fix five design flaws in the knowledge layer (Source → Insight → Model) disc
 **Problem**: Three free-text fields (`text`, `context`, `notes`) with unclear boundary. Violates P9.1 (No Alternative Representations).
 
 **Fix**: Remove `notes`. Users use `context` for supplementary information.
+
+---
+
+## F6: Remove `source` from HypothesisNode
+
+**Problem**: Free-text `source` on HypothesisNode is a parallel knowledge provenance mechanism that bypasses the formal Source → Insight → Model chain. Violates P1 (Single Source of Truth), P9.1 (No Alternative Representations), and P12.6 (Single Provenance Path). With `text` as the only required Insight field, there's negligible friction in creating an insight and linking via `derivedFrom`.
+
+**Fix**: Remove `source` property from HypothesisNode. Users link to insights via `derivedFrom: [IN#####]`.
+
+---
+
+## F7: Change `participants` on Source to `ActorRef[]`
+
+**Problem**: `participants` on Source accepts `oneOf: [ActorRef, string]`, creating two ways to reference people. Violates P1.5 (Typed References for Modeled Concepts). External participants should be modeled as actors with `type: external`.
+
+**Fix**: Change `participants` items type to `ActorRef` only. Remove the `string` alternative (DD-010).
 
 ---
 
@@ -72,9 +88,9 @@ Fix five design flaws in the knowledge layer (Source → Insight → Model) disc
 - **Why not all ref types in `about`?** Only high-frequency types: Steps and Capabilities. Expand if real usage shows demand.
 - **Why keep `notes` on Source?** Source has `description` (content) + `notes` (meta-commentary) — the distinction is clearer there. The overlap is specific to Insight.
 - **No insight `name` field** — Insights ARE their text. Listing/search tooling truncates `text` for display.
+- **Why not `ActorRef | string` for attribution/participants?** P1.5 — if the concept is modeled, use the model. String alternatives create parallel identity systems (DD-010).
 
 ### Considered But Not Changed
 
-- **`participants` inconsistency across sources** — `oneOf: [ActorRef, string]` intentionally allows both for progressive refinement (P12.1). Capture names first, upgrade to refs when actors are modeled.
 - **`related` limited to InsightRef only** — Reverse path exists (`HypothesisNode.derivedFrom`). Adding all ref types would create a kitchen-sink field. Expand if real usage shows demand.
-- **`format: date` not enforced at runtime** — Ajv configuration issue (`validateFormats: true`), not a schema design issue. Tracked in [Plan 04 D](04-validation-bugs.md).
+- **`format: date` not enforced at runtime** — Ajv configuration issue (`validateFormats: true`), not a schema design issue. Tracked in [Plan 05 D](05-validation-bugs.md).

@@ -1,7 +1,7 @@
-# 15 — Visual Export & Projections
+# 16 — Visual Export & Projections
 
 > **Status**: Proposed (exploratory)
-> **Depends on**: 01–03 (schema stable), 09 (workspace tooling)
+> **Depends on**: 01–04 (schema stable), 10 (workspace tooling)
 > **Effort**: Large (multiple sessions)
 > **References**: `docs/projections/` (Mermaid, BPMN, PlantUML, ArchiMate)
 

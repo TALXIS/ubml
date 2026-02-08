@@ -1,7 +1,7 @@
-# 10 — Docs Structure & Landing Page
+# 11 — Docs Structure & Landing Page
 
 > **Status**: Proposed
-> **Depends on**: 05–07 (document stable CLI behavior, not in-flux features)
+> **Depends on**: 06–08 (document stable CLI behavior, not in-flux features)
 > **Effort**: Small (one session)
 
 ---
@@ -22,12 +22,12 @@ docs/
 ├── index.md                    # Landing page (NEW)
 ├── VISION.md                   # Stays here (for everyone)
 ├── guide/                      # USER-FACING (NEW)
-│   ├── QUICKSTART.md           # → Plan 11
-│   ├── CLI-REFERENCE.md        # → Plan 11
-│   ├── ELEMENTS.md             # → Plan 12
-│   ├── CONCEPTS.md             # → Plan 13
-│   ├── FAQ.md                  # → Plan 13
-│   └── TROUBLESHOOTING.md      # → Plan 13
+│   ├── QUICKSTART.md           # → Plan 12
+│   ├── CLI-REFERENCE.md        # → Plan 12
+│   ├── ELEMENTS.md             # → Plan 13
+│   ├── CONCEPTS.md             # → Plan 14
+│   ├── FAQ.md                  # → Plan 14
+│   └── TROUBLESHOOTING.md      # → Plan 14
 ├── projections/                # Keep as-is
 ├── design/                     # MAINTAINER-FACING (MOVED)
 │   ├── README.md               # "Audience: Contributors"

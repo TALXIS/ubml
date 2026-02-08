@@ -1,7 +1,7 @@
-# 05 — CLI Error Messages & Guidance
+# 06 — CLI Error Messages & Guidance
 
 > **Status**: Proposed
-> **Depends on**: 01, 02 (schema should be stable before improving messages about it)
+> **Depends on**: 01, 03 (schema should be stable before improving messages about it)
 > **Effort**: Medium (one session)
 > **References**: [Evaluation Findings](_reference/EVALUATION-FINDINGS.md)
 
@@ -80,7 +80,7 @@ Could be part of a future `ubml fix` command or auto-correction during `ubml add
 
 ---
 
-## G. Semantic Hints Architecture (design aspiration)
+## F. Semantic Hints Architecture (design aspiration)
 
 Currently, hints like "goals belong in strategy, not process" are hardcoded in `validation-errors.ts`. These encode semantic relationships between document types (process vs. strategy vs. hypotheses) that should ideally come from schema metadata (e.g., `x-ubml` annotations). This would make semantic guidance maintainable alongside schema evolution and allow schema authors to define cross-document guidance without modifying TypeScript code.
 
@@ -88,7 +88,7 @@ Not blocking implementation of hardcoded hints (A–D), but keep this in mind as
 
 ---
 
-## H. Knowledge Layer Tooling Coverage
+## G. Knowledge Layer Tooling Coverage
 
 Verify that ESLint rules, CLI help text, and validation hints correctly reference `observations`, `SourceRef`, `InsightRef`, and other knowledge layer names introduced in DD-008. May have gaps introduced during implementation.
 
@@ -105,6 +105,6 @@ Verify that ESLint rules, CLI help text, and validation hints correctly referenc
 - [ ] Implement `ubml help links`
 - [ ] Implement `ubml help raci`
 - [ ] Implement `ubml help custom`
-- [ ] (Stretch) Implement duration normalization for CLI input
+- [ ] Implement `ubml help durations`
 - [ ] Audit ESLint rules, CLI help, and validation hints for knowledge layer coverage (DD-008)
 - [ ] Tests for new hint messages

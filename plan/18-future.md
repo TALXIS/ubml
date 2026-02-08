@@ -1,4 +1,4 @@
-# 17 — Future Considerations
+# 18 — Future Considerations
 
 > **Status**: Proposed (exploratory — no immediate action)
 > **Depends on**: Most earlier plans
@@ -14,49 +14,49 @@ Track deferred design decisions, larger features, and infrastructure changes tha
 
 ## Deferred Design Decisions
 
-### ArchiMate Projection Mapping (was D5)
+### ArchiMate Projection Mapping
 
 **Question**: How do actor types and RACI map to ArchiMate Actor vs Role?
 
-**When to decide**: Before implementing ArchiMate export (Plan 15 Phase 3).
+**When to decide**: Before implementing ArchiMate export (Plan 16 Phase 3).
 
-### Metrics & Measurement Model (was D6)
+### Metrics & Measurement Model
 
 **Question**: Is the metrics model sufficient? How do KPI actuals, process mining observations, and scenario evidence relate?
 
 **When to decide**: When real usage data on KPI tracking accumulates.
 
-### Expression Language (was D7)
+### Expression Language
 
 **Question**: Define a grammar for guards, conditions, and formulas? Or keep as free-text?
 
-**When to decide**: Before BPMN export (Plan 15 Phase 2) — BPMN requires parseable expressions.
+**When to decide**: Before BPMN export (Plan 16 Phase 2) — BPMN requires parseable expressions.
 
-### Entity Relationships Quality (was D9)
+### Entity Relationships Quality
 
 **Question**: Is the relationship model (cardinality, association types) expressive enough for real data modeling?
 
 **When to decide**: After hands-on testing with real entity modeling scenarios.
 
-### Hypothesis Decomposition Quality (was D10)
+### Hypothesis Decomposition Quality
 
 **Question**: Are `and`/`or`/`mece` operators and the `type` enum sufficient for real consulting use?
 
 **When to decide**: After validation against real hypothesis-driven scenarios.
 
-### Workspace Organization Conventions (was D11)
+### Workspace Organization Conventions
 
 **Question**: Are file naming conventions and splitting guidance concrete enough?
 
-**When to decide**: After more user testing; partially addressed by Plan 04 A (skipped file warning).
+**When to decide**: After more user testing; partially addressed by Plan 05 A (skipped file warning).
 
-### BPMN Export Fidelity (was D13)
+### BPMN Export Fidelity
 
 **Question**: What's acceptable information loss when exporting to BPMN?
 
-**When to decide**: Before Plan 15 Phase 2.
+**When to decide**: Before Plan 16 Phase 2.
 
-### Process Mining Import (was D14)
+### Process Mining Import
 
 **Question**: What observation types are needed for process mining data import?
 
@@ -72,7 +72,7 @@ Track deferred design decisions, larger features, and infrastructure changes tha
 
 **Question**: Are the current format definitions right? Duration uses `30min`, `2h`, `1.5d`, `1wk`, `3mo`. Is ISO 8601 (`PT30M`) correctly rejected? Are rate expressions expressive enough?
 
-**When to decide**: After format validation testing (partially addressed by Plan 04 D).
+**When to decide**: After format validation testing (partially addressed by Plan 05 D).
 
 ### Expand HypothesisNode `about` Scope (was F6)
 
@@ -101,12 +101,6 @@ Gap: No display labels ("1.1", "1.2.3") independent of IDs.
 Gap: Only `priority` enum. No numeric or multi-dimensional scoring.
 
 **Recommendation**: `priority` + `custom` covers most needs.
-
-### Rename `source` → `citation` on HypothesisNode
-
-Context: HypothesisNode `source` means "evidence citation" not "knowledge provenance." Renaming clarifies distinction from Insight `sources`.
-
-**When**: After Plan 01 ships. Consider as part of next schema version.
 
 ### KPI.actuals (time-series data)
 

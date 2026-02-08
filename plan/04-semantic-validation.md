@@ -1,7 +1,7 @@
-# 03 — Semantic Validation
+# 04 — Semantic Validation
 
 > **Status**: Proposed
-> **Depends on**: 01, 02 (schema must be stable before adding semantic checks)
+> **Depends on**: 01, 02, 03 (schema must be stable before adding semantic checks)
 > **Effort**: Medium (one session)
 > **References**: [Evaluation Findings](_reference/EVALUATION-FINDINGS.md)
 

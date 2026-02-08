@@ -1,4 +1,4 @@
-# 04 — Validation Bugs & Critical UX Fixes
+# 05 — Validation Bugs & Critical UX Fixes
 
 > **Status**: Proposed
 > **Depends on**: Nothing (existing bugs, can start anytime)

@@ -9,7 +9,7 @@
 
 ## Goal
 
-Resolve only the design questions that block schema work (Plans 01–03). Make a decision, document it in `docs/DESIGN-DECISIONS.md`, move on. Remaining design questions live in [Plan 17](17-future.md).
+Resolve only the design questions that block schema work (Plans 01–04). Make a decision, document it in `docs/DESIGN-DECISIONS.md`, move on. Remaining design questions live in [Plan 18](18-future.md).
 
 ---
 
@@ -21,7 +21,7 @@ Resolve only the design questions that block schema work (Plans 01–03). Make a
 
 **Recommendation**: **Add it.** Consistent with other types. Distinct from RACI (step-level) and Phase.owner (phase-level).
 
-**Blocks**: Plan 02
+**Blocks**: Plan 03
 
 ---
 
@@ -33,7 +33,7 @@ Resolve only the design questions that block schema work (Plans 01–03). Make a
 
 **Recommendation**: **Keep one-way (KPI→Step).** Tooling provides reverse lookup (`ubml trace`, `ubml show`). Document this in CLI help.
 
-**Blocks**: Plan 03 (semantic validation), Plan 07 (schema discovery)
+**Blocks**: Plan 04 (semantic validation), Plan 08 (schema discovery)
 
 ---
 
@@ -45,7 +45,7 @@ Resolve only the design questions that block schema work (Plans 01–03). Make a
 
 **Recommendation**: **Add `seq`.** Needed for `par` blocks with ordered tracks. Sequential is the default at process level, but explicit `seq` is required inside structured blocks.
 
-**Blocks**: Plan 02
+**Blocks**: Plan 03
 
 ---
 
@@ -57,7 +57,7 @@ Resolve only the design questions that block schema work (Plans 01–03). Make a
 
 **Recommendation**: **Document as a DD, no schema change.** Write a short Design Decision clarifying: UBML describes what happens and who's responsible; it does not describe execution logic, routing rules, or system integrations. Reference DD-006.
 
-**Blocks**: Plan 13 (concepts documentation)
+**Blocks**: Plan 14 (concepts documentation)
 
 ---
 
@@ -74,7 +74,7 @@ Resolve only the design questions that block schema work (Plans 01–03). Make a
 
 **Recommendation**: **Option C.** Document-level property sets the default (progressive modeling). CLI flag overrides for CI/CD or batch checking. Default when omitted: `standard`.
 
-**Blocks**: Plan 03 (semantic validation)
+**Blocks**: Plan 04 (semantic validation)
 
 ---
 
@@ -85,4 +85,4 @@ For each decision:
 2. Add rationale to `docs/DESIGN-DECISIONS.md`
 3. Mark decided here (update this file)
 
-**Deferred decisions** (D5–D14 from original plan) → [Plan 17](17-future.md)
+**Deferred decisions** → [Plan 18](18-future.md)

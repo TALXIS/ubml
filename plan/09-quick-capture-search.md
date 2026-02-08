@@ -1,7 +1,7 @@
-# 08 — Quick Capture & Search
+# 09 — Quick Capture & Search
 
 > **Status**: Proposed
-> **Depends on**: 01, 02 (schema stable), 05 (help topics exist)
+> **Depends on**: 01, 03 (schema stable), 06 (help topics exist)
 > **Effort**: Medium (one session)
 > **References**: [Evaluation Findings](_reference/EVALUATION-FINDINGS.md)
 
