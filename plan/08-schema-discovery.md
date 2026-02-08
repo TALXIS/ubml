@@ -45,14 +45,7 @@ Use `required` from schema for the first group. Common vs advanced derived from 
 
 ## C. Validation Suggestions Mode
 
-`ubml validate --suggest` provides proactive advice beyond errors:
-
-- Process has no RACI assignment on any step
-- KPI defined but not linked to any step or process
-- Actor defined but never referenced in any process
-- Insight has no `about` references
-
-These are **suggestions**, not errors — the model is valid but potentially incomplete.
+**NOTE**: This functionality is now covered by Plan 19 (Refinement Questions). The `ubml validate --refine` flag provides structured, prioritized suggestions for incomplete elements. See Plan 19 for full design.
 
 ---
 
@@ -60,5 +53,5 @@ These are **suggestions**, not errors — the model is valid but potentially inc
 
 - [ ] Implement `ubml schema --find <property>` search
 - [ ] Implement categorized property display (required/common/advanced)
-- [ ] Implement `ubml validate --suggest` mode
-- [ ] Tests for each feature
+- [ ] ~~Implement `ubml validate --suggest` mode~~ → Deferred to Plan 19 (`ubml validate --refine`)
+- [ ] Tests for schema discovery features

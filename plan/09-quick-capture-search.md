@@ -32,11 +32,11 @@ Currently requires manual YAML editing. CLI shortcuts make capture possible duri
 
 ```bash
 ubml find "Jan Til"     # Fuzzy search across all elements by name/text
-ubml list actors        # Quick reference table of all actors with IDs
-ubml list processes     # All processes with IDs and names
 ```
 
-**Scope**: `find` does fuzzy text search across all element names, descriptions, and text fields. `list <type>` prints a formatted table of all elements of that type.
+**Scope**: `find` does fuzzy text search across all element names, descriptions, and text fields.
+
+**Note**: For listing elements by type, use the existing `ubml show <type>` command (e.g., `ubml show actors`, `ubml show processes`).
 
 ---
 
@@ -56,6 +56,6 @@ Answers "where did this come from?" by walking the knowledge chain, and "where i
 - [ ] Add inline flags to `ubml add insight` (--source, --kind, --about)
 - [ ] Add inline flags to `ubml add source` (--name, --type, --date)
 - [ ] Implement `ubml find <query>` fuzzy search
-- [ ] Implement `ubml list <type>` formatted table
 - [ ] Implement `ubml trace <id>` reference chain
+- [ ] Tests for each new command/flag
 - [ ] Tests for each new command/flag

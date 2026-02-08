@@ -35,7 +35,7 @@
 | 06 | [CLI Error Messages](06-cli-error-messages.md) | Duration hints, ref context, RACI guidance, help topics, knowledge layer coverage | Medium | 01, 03 |
 | 07 | [Templates & Examples](07-templates-examples.md) | Fix templates, quality audit, `ubml examples` command | Medium | 01, 03 |
 | 08 | [Schema Discovery](08-schema-discovery.md) | Property search, categorized display, `--suggest` mode | Medium | 01, 03 |
-| 09 | [Quick Capture & Search](09-quick-capture-search.md) | Inline add flags, `ubml find`, `ubml list`, `ubml trace` | Medium | 01, 03, 06 |
+| 09 | [Quick Capture & Search](09-quick-capture-search.md) | Inline add flags, `ubml find`, `ubml trace` | Medium | 01, 03, 06 |
 | 10 | [Refactoring & Health](10-refactoring-health.md) | `ubml rename`, `ubml doctor`, `ubml report`, `ubml lint`, `ubml migrate` | Large | 04, 05 |
 
 ### Milestone 3: Documentation (make it learnable)
