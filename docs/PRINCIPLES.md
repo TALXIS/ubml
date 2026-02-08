@@ -17,13 +17,7 @@ The goal is a **focused, coherent notation** that serves its purpose: enabling b
 
 ### Target Audience
 
-UBML is designed for **business analysts and management consultants** — professionals who understand organizations, not software engineering. Every design decision must be evaluated from their perspective.
-
-These users:
-- Think in terms of *who does what*, *where time goes*, *what causes pain*, *how to improve ROI*
-- Work in workshops, interviews, and stakeholder sessions — often capturing knowledge in real-time
-- Need to communicate findings to executives and domain experts who have zero tolerance for technical notation
-- May need to export to formal standards (BPMN, ArchiMate) when required by enterprise clients
+UBML is designed for **business analysts and management consultants** — professionals who understand organizations, not software engineering. Every design decision must be evaluated from their perspective. For detailed persona definitions, see [CONSUMERS.md](CONSUMERS.md).
 
 ### Design Goal
 

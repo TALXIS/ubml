@@ -83,21 +83,11 @@ When you can describe your business in UBML, you can instruct AI to analyze it, 
 
 ## Who UBML Is For
 
-UBML is designed for practitioners who understand business:
-
-- **Management consultants** running workshops and stakeholder interviews
-- **Business analysts** mapping how organizations actually operate
-- **Strategy teams** building business cases for change
-- **Operations leaders** identifying bottlenecks and improvement opportunities
-
-These practitioners don't think in swimlanes and gateways. They think in:
-
-- *Who does what?*
-- *Where does time go?*
-- *What's causing pain?*
-- *How do we make more money?*
+UBML is designed for practitioners who understand business — management consultants, business analysts, operations leaders, and the client stakeholders they work with. These practitioners don't think in swimlanes and gateways. They think in: *Who does what? Where does time go? What's causing pain? How do we make more money?*
 
 UBML speaks that language.
+
+For detailed persona definitions and the collaboration model, see [CONSUMERS.md](CONSUMERS.md).
 
 ---
 

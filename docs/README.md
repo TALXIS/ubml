@@ -13,8 +13,9 @@ These documents define the **notation and abstractions** of the Unified Business
 | [PRINCIPLES.md](PRINCIPLES.md) | Binding constraints that govern language design decisions |
 | [DESIGN-DECISIONS.md](DESIGN-DECISIONS.md) | Specific choices made, alternatives rejected, and why |
 | [projections/](projections/README.md) | How UBML maps to BPMN, ArchiMate, UML, Mermaid, PlantUML, and other standards — and what each standard captures that UBML cannot |
+| [CONSUMERS.md](CONSUMERS.md) | Who uses UBML, what they need, and how they interact with the tooling |
 | [plan/00-design-decisions.md](../plan/00-design-decisions.md) | Open design questions and unresolved topics |
 
 **Audience**: Maintainers and contributors evolving the language.
 
-**Primary user of UBML**: Business consultants and analysts who understand organizations, not software engineering. Every design decision must be evaluated from their perspective.
+**Primary users of UBML**: See [CONSUMERS.md](CONSUMERS.md) for detailed persona definitions. Every design decision must be evaluated from their perspective.
