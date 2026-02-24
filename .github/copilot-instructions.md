@@ -28,7 +28,9 @@ Note: Some duplication exists - check for hardcoded element types, validation lo
 ## Updating UBML Version
 
 1. Update `package.json` version (e.g., `1.3.0` → `1.4.0`)
-2. Run: `npm run update-schema-versions && npm run generate && npm run verify-versions`
+2. Run: `npm run update-schema-versions` (renames schema folder, updates all version strings)
+3. Run: `npm run generate` (regenerates TypeScript types)
+4. Run: `npm run verify-versions` (verifies consistency)
 
 ## Guidance
 

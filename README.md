@@ -5,212 +5,260 @@
 
 **A notation for understanding how organizations create and deliver value.**
 
-UBML is a YAML-based format for capturing business processes, organizational structures, and strategic initiatives. It bridges the gap between informal workshop discovery and formal business modeling—designed from the ground up for AI assistance and modern development workflows.
+UBML is a YAML-based format for capturing business processes, organizational structures, and strategic initiatives. It provides structure for the space between informal workshop discovery and formal business modeling — designed for business analysts and management consultants, with first-class support for AI assistance and version control.
 
-> 📖 **[Read the full vision →](./docs/VISION.md)**
+**[Vision](./docs/VISION.md)** · **[Getting Started](#getting-started)** · **[Example Workspace](./example/)** · **[Documentation](#documentation)** · **[Personas](./docs/CONSUMERS.md)** · **[npm](https://www.npmjs.com/package/ubml)**
 
 ---
 
 ## The Problem
 
-Software development is getting dramatically faster. AI-assisted coding tools are turning what took weeks into hours. But this creates a new bottleneck: **understanding what to build**.
+AI-assisted coding is compressing implementation timelines from weeks to hours. But a new bottleneck has emerged: **understanding what to build**. Implementation accelerates while specification remains stuck in slides, scattered notes, and diagrams that can't be validated or versioned.
 
-The gap is widening. Implementation accelerates while specification stays stuck in slides, scattered notes, and diagrams that can't be validated or versioned. Organizations produce more software, faster, that doesn't match how the business actually works.
+Existing tools don't address this well:
 
-Traditional modeling tools don't help:
-- **UML/BPMN** demand precise semantics before you've understood the business
-- **Diagramming tools** present blank canvases with no guidance
-- **Workshop notes** can't be validated, connected, or processed
+- **UML/BPMN** require precise semantics before you've understood the business
+- **Diagramming tools** present a blank canvas with no structure or guidance
+- **Workshop notes** can't be validated, connected across sources, or processed by machines
+- **Process mining** reveals *what* happened but rarely *why*
 
-UBML solves this by treating business understanding as code—structured, validated, version-controlled, and designed for AI assistance.
+UBML bridges the gap between informal discovery and formal modeling — structured enough for validation and AI processing, readable enough for stakeholders who have never seen a modeling notation.
 
----
-
-## Who Is This For?
-
-UBML is for everyone who needs to understand how a business works:
-
-| Role | Use Case |
-|------|----------|
-| **Software engineers** | Understand the real-world context and motivation behind what you're building |
-| **Management consultants** | Capture workshop findings in structured, validated models |
-| **Business analysts** | Map how organizations actually operate |
-| **Strategy teams** | Build ROI-backed business cases for change |
-| **Operations leaders** | Identify bottlenecks and improvement opportunities |
-| **Tool developers** | Embed UBML editing in web applications |
-
-Whether you're figuring out *what to build* or *why it matters*, UBML provides a shared language between business and technology.
+[Read the full vision](./docs/VISION.md)
 
 ---
 
-## What You Can Model
+## Key Characteristics
 
-| Domain | Elements |
-|--------|----------|
-| **Processes** | Workflows (L1–L4), steps, decisions, phases |
-| **Organization** | Roles, teams, systems, resource pools, skills |
-| **Information** | Entities, documents, locations, relationships |
-| **Strategy** | Value streams, capabilities, products, portfolios |
-| **Analysis** | KPIs, ROI models, simulation scenarios |
-| **Improvements** | Hypothesis trees to identify how to make more money |
+- **Human-readable YAML** — Business stakeholders can read and validate models without learning a notation
+- **Validation** — Schema checking, cross-document reference validation, and business rule verification
+- **Version control** — Plain text files designed for Git: change history, branching, concurrent editing
+- **Editor support** — Auto-complete, error highlighting, and field descriptions in VS Code
+- **AI-ready** — Semantic structure designed as input for AI-assisted modeling and analysis
+- **Progressive formalization** — Start with rough models during workshops, add rigor as understanding deepens
+- **Standard projections** — Export to BPMN, ArchiMate, UML, Mermaid, PlantUML when formal notation is required
+- **Open standard** — MIT licensed, no vendor lock-in, no proprietary formats
 
 ---
 
-## Key Features
+## What a Workspace Contains
 
-- **Human-readable YAML** — Business people can read and validate models
-- **Validation built-in** — Catch errors as you type, verify cross-document references
-- **Version control with Git** — Track changes like code, see who changed what when
-- **Editor support** — Red squiggles in VS Code show errors immediately
-- **AI-ready** — Semantic structure designed for AI assistance
-- **Open standard** — MIT licensed, no vendor lock-in
+A UBML workspace is a structured model of an organization — designed to be maintained across multiple improvement cycles rather than delivered once and discarded.
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        STRATEGY                             │
+│       Value streams, capabilities, products, portfolios     │
+├─────────────────────────────────────────────────────────────┤
+│                     CHANGE & ANALYSIS                       │
+│     Hypotheses, scenarios, KPIs, ROI business cases         │
+├─────────────────────────────────────────────────────────────┤
+│                     OPERATIONAL MODEL                       │
+│         Processes, actors, entities, resources              │
+├─────────────────────────────────────────────────────────────┤
+│                       KNOWLEDGE                             │
+│       Sources, insights, glossary, evidence chains          │
+├─────────────────────────────────────────────────────────────┤
+│                       WORKSPACE                             │
+│            Configuration, scope, and conventions            │
+└─────────────────────────────────────────────────────────────┘
+```
+
+Information flows between layers: knowledge feeds the operational model, the model informs analysis, analysis shapes strategy, and strategic priorities direct where to gather more knowledge. See [Workspace Anatomy](./docs/WORKSPACE-SEMANTICS.md) for details.
+
+---
+
+## Format
+
+UBML files are plain YAML:
+
+```yaml
+ubml: "1.4"
+
+processes:
+  PR00001:
+    name: "Customer Onboarding"
+    description: "End-to-end process for onboarding new customers"
+    level: 3
+
+    steps:
+      ST00001:
+        name: "Receive Customer Application"
+        kind: action
+        inputs:
+          - ref: EN00001  # Customer Application Form
+        outputs:
+          - ref: EN00002  # Verified Customer Record
+
+      ST00002:
+        name: "Verify Customer Identity"
+        kind: action
+        inputs:
+          - ref: EN00002
+          - ref: EN00003  # ID Documents
+
+      ST00003:
+        name: "Review Application"
+        kind: decision
+        description: "Approval or rejection decision point"
+```
+
+Files can be opened in any text editor, reviewed in Git diffs, and processed by AI assistants. The format is readable by both business stakeholders and engineers.
+
+---
+
+## Audience
+
+UBML is designed for consultant-led engagements that transition into client self-service. All participants work in the same workspace on the same model, with views adapted to their role.
+
+| Role | What you do with UBML |
+|------|----------------------|
+| **Business Analysts** | Process transcripts and interviews into validated models. Map end-to-end workflows. Build hypothesis trees. |
+| **Management Consultants** | Drop in meeting notes, capture observations, review models, present findings to leadership. |
+| **Client Stakeholders** | Validate models — confirm "yes, this is what we actually do." Provide corrections and context. |
+| **Operations Leaders** | Identify bottlenecks, define KPIs, evaluate business cases for proposed changes. |
+| **Strategy Teams** | Map capabilities, design value streams, prioritize investments across initiatives. |
+| **Software Developers** | Receive business context — understand *why* the process works this way before building. |
+
+See [Personas & Consumers](./docs/CONSUMERS.md) for detailed definitions.
+
+---
+
+## Why Plain Text
+
+The choice of YAML plain text is deliberate:
+
+- **Ownership** — Models are files, not database records in a vendor's cloud. They can be shared, archived, and processed with any tool.
+- **Version control** — Git provides change history, branching, and concurrent editing across analysts without overwriting.
+- **AI compatibility** — Semantic YAML structure is well-suited for AI-assisted modeling: gap identification, hypothesis generation, and structuring unstructured interview notes.
+- **Validation** — Unlike diagrams, text can be automatically checked for structural correctness, missing fields, and broken cross-references.
+- **Durability** — Plain text remains readable indefinitely. A workspace created in Year 1 should still be usable in Year 5.
+
+---
+
+## Improvement Cycle
+
+UBML supports iterative organizational improvement — the workspace persists across cycles rather than being delivered once:
+
+```
+  ┌────────────────────────────────────────────────┐
+  │                                                │
+  ▼                                                │
+Capture as-is → Analyze → Plan → Execute → Absorb ┘
+```
+
+1. **Capture** — Model how the business actually operates today
+2. **Analyze** — Decompose issues, form hypotheses, simulate scenarios, build business cases
+3. **Plan** — Prioritize improvements, sequence initiatives, define the target operating model
+4. **Execute** — Implement changes (outside UBML — this is project management territory)
+5. **Absorb** — Yesterday's target state becomes today's baseline. The model is ready for the next cycle.
+
+Process changes trace back through the initiative that delivered them, the hypothesis that proposed them, and the evidence that justified them. The workspace accumulates context across cycles.
+
+---
+
+## Relationship to Formal Standards
+
+UBML does not replace BPMN, ArchiMate, or UML. It sits upstream as the working format where business understanding is captured. When a client or enterprise tooling requires a formal notation, UBML exports to it.
+
+| Standard | UBML Relationship |
+|----------|-------------------|
+| **BPMN 2.0** | Primary process export target |
+| **ArchiMate 3.2** | Business and strategy layer mapping |
+| **UML 2.5** | Activity, Use Case, Class, State Machine diagrams |
+| **DMN / CMMN** | Decision modeling and case management |
+| **Lean VSM** | Native value stream stage and flow time support |
+| **Mermaid / PlantUML** | Markdown-embeddable diagrams for documentation |
+
+Exports are lossy by design — UBML captures stakeholder context, hypotheses, and evidence chains that formal notations have no place for. The UBML model remains the source of truth. See [Projections & Export Mappings](./docs/projections/) for detailed mapping documentation.
 
 ---
 
 ## Getting Started
 
-### Prerequisites
-
-You'll need **Node.js** installed (version 18 or later). Check if you have it:
-
-```bash
-node --version
-```
-
-If you don't have Node.js, download it from [nodejs.org](https://nodejs.org/).
-
-> **Note:** UBML uses the command line for now. We're building visual tools, but you'll need a terminal to get started.
-
 ### 1. Create Your First Workspace
-
-Use `npx` to run UBML:
 
 ```bash
 npx ubml init my-first-project
 cd my-first-project
 ```
 
-> **Tip:** Install globally with `npm install -g ubml` if you'll use UBML frequently. Then you can run `ubml` instead of `npx ubml`.
+This generates template files with example content showing the UBML structure.
 
-This creates a folder with **template files** containing example content:\n\n```
-my-first-project/
-├── my-first-project.workspace.ubml.yaml  # Workspace config
-├── process.ubml.yaml                      # Example process with steps
-└── actors.ubml.yaml                       # Example roles and teams
-```
+> You'll need [Node.js](https://nodejs.org/) 18+. Visual tools are coming — for now, UBML uses the command line.
 
-The templates show you the UBML structure with realistic examples.
-
-### 2. Explore with CLI or Editor
-
-**Option A: Use the CLI** (Recommended for getting started):
+### 2. Explore and Build
 
 ```bash
-# Browse your model structure
+# Browse your model
 npx ubml show process
 
-# Add elements interactively
-npx ubml add step
-npx ubml add actor
-```
+# Add elements interactively — the CLI guides you
+npx ubml add process "Order Fulfillment"
+npx ubml add step "Receive Order"
+npx ubml add actor "Warehouse Worker"
 
-The CLI guides you through adding elements with prompts and validation.
-
-**Option B: Edit files directly** (If you prefer text editing):
-
-Open in VS Code:
-
-```bash
-code .
-```
-
-If you have VS Code installed, this opens the folder. UBML automatically configures schema validation so you get:
-- **Auto-complete** as you type
-- **Red squiggles** when something's wrong  
-- **Tooltips** explaining what each field means
-
-**Don't have VS Code?** Any text editor works, but you won't get live validation.
-
-### 3. Validate Your Model
-
-```bash
-# Validate a single file
-npx ubml validate process.ubml.yaml
-
-# Validate everything in your workspace
+# Validate everything
 npx ubml validate .
 ```
 
-UBML checks:
-- **Schema** — Are all required fields present? Are values the right type?
-- **References** — Do all IDs exist? Are cross-document references valid?
-- **Business rules** — Does the model make sense?
+Or open the folder in VS Code — UBML configures schema validation automatically for auto-complete, error highlighting, and field descriptions.
 
-### 4. Start Modeling
+### 3. Iterate
 
-#### CLI-Based Workflow (Recommended)
+Start with process and actors. Add entities, metrics, hypotheses, and strategy as understanding deepens. UBML supports progressive formalization — rough models are valid, additional rigor is optional until needed. See the [example workspace](./example/) for a complete sample.
 
-Use commands to build your model:
+---
 
-```bash
-# Add a new process
-npx ubml add process "Order Fulfillment"
+## File Types
 
-# Add steps to your process
-npx ubml add step "Receive Order"
-npx ubml add step "Pick Items"
-npx ubml add step "Pack and Ship"
+All files end in `.ubml.yaml`. Add them as you need them:
 
-# Add actors
-npx ubml add actor "Warehouse Worker"
-npx ubml add actor "Shipping System"
-```
+| File Type | What Goes There |
+|-----------|----------------|
+| `*.workspace.ubml.yaml` | Project scope and configuration |
+| `*.process.ubml.yaml` | How work gets done — workflows, steps, decisions |
+| `*.actors.ubml.yaml` | Who does the work — roles, teams, systems |
+| `*.entities.ubml.yaml` | What they work with — documents, data, locations |
+| `*.metrics.ubml.yaml` | How you measure — KPIs, costs, targets |
+| `*.hypotheses.ubml.yaml` | Problem analysis — issue trees, root causes |
+| `*.strategy.ubml.yaml` | Strategic elements — capabilities, value streams |
+| `*.scenarios.ubml.yaml` | What-if analysis — simulations, forecasts |
+| `*.sources.ubml.yaml` | Where knowledge comes from — interviews, documents |
+| `*.insights.ubml.yaml` | What was learned — pains, observations, opportunities |
+| `*.glossary.ubml.yaml` | Shared vocabulary — domain-specific term definitions |
 
-The CLI:
-- ✅ Guides you with prompts
-- ✅ Validates as you go
-- ✅ Maintains correct structure
-- ✅ Prevents syntax errors
+---
 
-#### File-Based Workflow (Alternative)
+## Documentation
 
-If you prefer editing files directly:
+| Document | What You'll Find |
+|----------|-----------------|
+| **[Vision](./docs/VISION.md)** | Why UBML exists, the specification crisis, what success looks like |
+| **[Workspace Anatomy](./docs/WORKSPACE-SEMANTICS.md)** | How the five conceptual layers connect and what each contains |
+| **[Design Principles](./docs/PRINCIPLES.md)** | Binding constraints that govern every language design decision |
+| **[Design Decisions](./docs/DESIGN-DECISIONS.md)** | Specific choices made, alternatives rejected, and rationale |
+| **[Personas & Consumers](./docs/CONSUMERS.md)** | Who uses UBML, what they need, and how they collaborate |
+| **[Projections & Exports](./docs/projections/)** | How UBML maps to BPMN, ArchiMate, UML, Mermaid, PlantUML, and more |
+| **[Example Workspace](./example/)** | A complete sample workspace with all document types |
+| **[Schema Reference](./schemas/)** | The YAML schema definitions that power validation |
+| **[Contributing](./CONTRIBUTING.md)** | Development setup and contribution guidelines |
+| **[Changelog](./CHANGELOG.md)** | Notable changes to UBML |
+| **[Code of Conduct](./CODE_OF_CONDUCT.md)** | Community standards |
 
-1. **Study the templates** — Understand the YAML structure
-2. **Modify carefully** — Keep the format, change the content
-3. **Validate often** — Run `npx ubml validate .` after changes
+### Projection Details
 
-| Start With | Then Add |
-|------------|----------|
-| Process steps (what happens) | Actors (who does it) |
-| Inputs/outputs (what's needed) | Entities (data model) |
-| Decision points | Metrics (how to measure) |
-
-**Recommended approach:** Start with CLI to learn the structure, then edit files directly when you're comfortable.
-
-### 5. Common CLI Commands
-
-```bash
-# View your model
-npx ubml show process          # Show all processes
-npx ubml show actors           # Show all actors
-npx ubml show entities         # Show all entities
-
-# Add elements
-npx ubml add process           # Add a new process (interactive)
-npx ubml add step              # Add a step to a process
-npx ubml add actor             # Add a role, team, or system
-
-# Validate and check
-npx ubml validate .            # Validate entire workspace
-npx ubml validate --fix        # Auto-fix common issues
-
-# Get help
-npx ubml --help                # Show all commands
-npx ubml add --help            # Help for specific command
-```
-
-For the complete command reference, run `npx ubml --help`.
+| Target Standard | Mapping Document |
+|----------------|-----------------|
+| BPMN 2.0 | **[BPMN Projection](./docs/projections/BPMN.md)** |
+| ArchiMate 3.2 | **[ArchiMate Projection](./docs/projections/ARCHIMATE.md)** |
+| UML 2.5 | **[UML Projection](./docs/projections/UML.md)** |
+| DMN / CMMN | **[DMN-CMMN Projection](./docs/projections/DMN-CMMN.md)** |
+| BMM 1.3 | **[BMM Projection](./docs/projections/BMM.md)** |
+| Value Stream Mapping | **[VSM Projection](./docs/projections/VSM.md)** |
+| Mermaid | **[Mermaid Rendering](./docs/projections/MERMAID.md)** |
+| PlantUML | **[PlantUML Rendering](./docs/projections/PLANTUML.md)** |
+| Data Formats | **[Data Format Mappings](./docs/projections/DATA-FORMATS.md)** |
 
 ---
 
@@ -222,92 +270,28 @@ UBML works as a library in any JavaScript/TypeScript environment:
 npm install ubml
 ```
 
-### Core Usage
-
 ```typescript
 import { parse, validate } from 'ubml';
-import { validateWorkspace } from 'ubml/node';  // Node.js file operations
-import ubml from 'ubml/eslint';                 // ESLint plugin
+import { validateWorkspace } from 'ubml/node';
+import ubml from 'ubml/eslint';
 ```
 
-**Key capabilities:**
-- **Parse** UBML files from YAML strings
-- **Validate** schema + cross-document references
-- **Serialize** back to YAML
-- **TypeScript types** for all UBML elements
-- **ESLint integration** for linting UBML files
-- **Universal** — Works in browser, Node, Deno, Bun (zero Node dependencies)
-
-📖 Full API documentation and developer guide coming soon
-
----
-
-## File Types
-
-UBML uses different file types for different aspects of your business model. All files end in `.ubml.yaml`:
-
-| File Type | What Goes There | Examples |
-|-----------|----------------|----------|
-| `*.workspace.ubml.yaml` | Project configuration | Workspace name, included files |
-| `*.process.ubml.yaml` | How work gets done | "Customer Onboarding", "Order Fulfillment" |
-| `*.actors.ubml.yaml` | Who/what does the work | Roles, teams, systems, tools |
-| `*.entities.ubml.yaml` | Information model | Documents, products, locations |
-| `*.metrics.ubml.yaml` | How you measure | KPIs, costs, time tracking |
-| `*.hypotheses.ubml.yaml` | Problem analysis | Issue trees, root causes |
-| `*.strategy.ubml.yaml` | Strategic elements | Capabilities, value streams |
-| `*.scenarios.ubml.yaml` | What-if analysis | Simulations, forecasts |
-
-**Start with just process + actors.** Add other file types as you need them.
-
----
-
-## Next Steps
-
-### Learn More
-
-| Resource | What You'll Learn |
-|----------|------------------|
-| **[Vision](./docs/VISION.md)** | Why UBML exists, what problems it solves |
-| **[Design Principles](./docs/PRINCIPLES.md)** | How the language is designed |
-| **[Example Workspace](./example)** | Real-world sample with all document types |
-| **CLI Help** | Run `ubml --help` for all commands |
-| **Schema Explorer** | Run `ubml schema` to browse interactively |
-
-### Get Help
-
-- **Questions?** Open a [GitHub Discussion](https://github.com/NETWORG/ubml/discussions)
-- **Found a bug?** [File an issue](https://github.com/NETWORG/ubml/issues)
-- **Want to contribute?** See [CONTRIBUTING.md](./CONTRIBUTING.md)
+Parse UBML files, validate schema + cross-document references, serialize back to YAML. Full TypeScript types for all elements. Works in browser, Node, Deno, Bun — zero Node dependencies in the core.
 
 ---
 
 ## Open Standard
 
-UBML is released under the MIT License. Your models belong to you—plain text files you can version, export, and process with any tool. No vendor lock-in, no proprietary formats.
+UBML is released under the MIT License and developed in the open. Models are plain text files that can be versioned, exported, and processed with any tool. Commercial tooling may be built on top of UBML, but the notation and models carry no vendor dependency.
 
 ---
 
-## Contributing
+## Get Involved
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for development setup.
-
-```bash
-# Install dependencies
-npm install
-
-# Build
-npm run build
-
-# Test
-npm run test
-```
+- **Questions?** [GitHub Discussions](https://github.com/TALXIS/ubml/discussions)
+- **Found a bug?** [File an issue](https://github.com/TALXIS/ubml/issues)
+- **Want to contribute?** [Contributing guide](./CONTRIBUTING.md)
 
 ---
 
-## License
-
-MIT — see [LICENSE](./LICENSE)
-
----
-
-*UBML is developed by [NETWORG](https://networg.com), a consulting and technology firm focused on business process improvement.*
+*UBML is developed by [NETWORG](https://networg.com), a consulting and technology firm focused on business process improvement. Part of the [TALXIS](https://talxis.com) platform ecosystem.*
