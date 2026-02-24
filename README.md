@@ -1,4 +1,4 @@
-# UBML — Unified Business Modeling Language
+# UBML - Unified Business Modeling Language
 
 [![npm version](https://img.shields.io/npm/v/ubml.svg)](https://www.npmjs.com/package/ubml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
@@ -141,9 +141,9 @@ The choice of YAML plain text is deliberate:
 UBML supports iterative organizational improvement — the workspace persists across cycles rather than being delivered once:
 
 ```
-  ┌────────────────────────────────────────────────┐
-  │                                                │
-  ▼                                                │
+ ┌────────────────────────────────────────────────┐
+ │                                                │
+ ▼                                                │
 Capture as-is → Analyze → Plan → Execute → Absorb ┘
 ```
 
