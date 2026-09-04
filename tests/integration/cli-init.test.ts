@@ -9,6 +9,7 @@ import { mkdtempSync, rmSync, existsSync, readdirSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
 import { SCHEMA_VERSION } from '../../src/constants.js';
+import { DOCUMENT_TYPES } from '../../src/generated/data.js';
 import { execSync } from 'child_process';
 
 describe('CLI Init Command', () => {
@@ -137,6 +138,34 @@ describe('CLI Init Command', () => {
       // Full should create multiple files
       const ubmlFiles = files.filter(f => f.endsWith('.ubml.yaml'));
       expect(ubmlFiles.length).toBeGreaterThan(1);
+    });
+  });
+
+  describe('VS Code schema settings', () => {
+    it('should scaffold .vscode/settings.json pointing at the current schema version for every document type', () => {
+      const result = runUbml('init test-project');
+      expect(result.exitCode).toBe(0);
+
+      const settingsPath = join(tempDir, 'test-project', '.vscode', 'settings.json');
+      expect(existsSync(settingsPath)).toBe(true);
+
+      const settings = JSON.parse(readFileSync(settingsPath, 'utf8'));
+      const schemas = settings['yaml.schemas'] as Record<string, string[]>;
+      const schemaUrls = Object.keys(schemas);
+
+      // Regression test for https://github.com/TALXIS/ubml/issues/34:
+      // settings.json must reference the current SCHEMA_VERSION (not a stale
+      // hardcoded one) and must include every known document type, since
+      // types added in newer schema versions (e.g. insights, sources) were
+      // previously missing.
+      for (const type of DOCUMENT_TYPES) {
+        const expectedUrl = `https://ubml.talxis.com/schemas/${SCHEMA_VERSION}/documents/${type}.schema.yaml`;
+        expect(schemaUrls).toContain(expectedUrl);
+      }
+
+      for (const url of schemaUrls) {
+        expect(url).toContain(`/schemas/${SCHEMA_VERSION}/`);
+      }
     });
   });
 

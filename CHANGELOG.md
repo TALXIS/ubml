@@ -9,3 +9,29 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Initial development. Schema structure and core concepts are stabilizing.
 
 See `/plan/README.md` for the roadmap and `/plan/00-design-decisions.md` for open design questions.
+
+## [1.4.0] - 2026-09-04
+
+### Added
+
+- **Knowledge layer**: two new document types for capturing where information comes from and what was learned from it.
+  - `sources` (`*.sources.ubml.yaml`) — catalog of knowledge sources: interviews, meetings, workshops, documents, emails, surveys, observations, system exports, research.
+  - `insights` (`*.insights.ubml.yaml`) — atomic derived knowledge (pain, opportunity, process-fact, stakeholder, decision, risk, assumption, constraint) that stays understandable in isolation, with an `IN#####` ID and a `SR#####` ID for sources.
+  - New `derivedFrom` reference field on actors and hypothesis nodes, linking model elements back to the insights that justified them.
+  - Hypothesis `source` field now accepts a typed `SourceRef` (`SR#####`) in addition to free text.
+  - `ubml init`, `ubml add`, and `ubml help` all support the two new document types (init now scaffolds a sample `insights.ubml.yaml`).
+- `ubml` CLI now checks once a day for newer releases and prints an update notice.
+- `ubml validate` now warns (`SKIPPED_FILE`) about `*.ubml.yaml` files that don't match any recognized document-type naming pattern, instead of silently ignoring them.
+- More validation error hints for properties placed on the wrong document type (`owner`, `properties`, `goal`, `objective`, `target`).
+- New docs: `docs/WORKSPACE-SEMANTICS.md`, `docs/CONSUMERS.md`, and a `docs/projections/` guide covering BPMN, UML, ArchiMate, BMM, DMN/CMMN, Mermaid, PlantUML, VSM and other export targets.
+
+### Changed
+
+- Schema version bumped to **1.4** — all schema `$id`s and the `ubml:` document version now point at `/schemas/1.4/...`.
+- **Breaking (scenarios schema):** renamed `evidence` → `observations` (and the `Evidence` type → `Observation`) in `*.scenarios.ubml.yaml` for consistency with the knowledge layer's terminology. Existing scenario files using `evidence:` need to rename the field to `observations:`.
+
+### Fixed
+
+- `ubml init` scaffolds `.vscode/settings.json` with `yaml.schemas` pointing at the current schema version for every known document type. The previously published `1.3.0` build predated the knowledge layer, so its `.vscode/settings.json` was missing `insights`/`sources` entries entirely ([#34](https://github.com/TALXIS/ubml/issues/34)).
+- Fixed CLI command execution to use the correct distribution path after global install.
+- CI/publish pipeline reliability fixes (dependency cache cleanup, explicit build step before `npm publish`).
