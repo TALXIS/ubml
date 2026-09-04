@@ -481,8 +481,8 @@ export async function validate(
   // Phase 1: Validate each document against its schema
   for (const doc of documents) {
     const schemaResult = validator.validateDocument(doc);
-    errors.push(...schemaResult.errors);
-    warnings.push(...schemaResult.warnings);
+    errors.push(...schemaResult.errors.map((err) => ({ ...err, filepath: doc.meta.filename })));
+    warnings.push(...schemaResult.warnings.map((warn) => ({ ...warn, filepath: doc.meta.filename })));
   }
   
   // Phase 2: Validate cross-document references using semantic validator

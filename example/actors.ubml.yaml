@@ -17,7 +17,7 @@ actors:
     description: "Dedicated specialist for complex customer onboarding cases"
     skills:
       - SK00001
-      - SK003
+      - SK00003
 
   AC00003:
     name: "CRM System"
