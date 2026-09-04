@@ -100,7 +100,7 @@ $defs:
           Can reference actors by ID or use plain text for external participants.
         type: array
         items:
-          oneOf:
+          anyOf:
             - $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
             - type: string
       

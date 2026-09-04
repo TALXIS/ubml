@@ -10,6 +10,14 @@ Initial development. Schema structure and core concepts are stabilizing.
 
 See `/plan/README.md` for the roadmap and `/plan/00-design-decisions.md` for open design questions.
 
+## [1.4.1] - 2026-09-04
+
+### Fixed
+
+- **`ubml validate <dir>` was silently skipping all schema validation.** The workspace-level validator ran each document's schema check but never attached a `filepath` to the resulting errors/warnings, and the file-result distribution step only keeps errors that have one — so every schema violation (missing required fields, invalid enum values, disallowed properties, bad patterns, etc.) was discarded for the whole workspace. Only cross-document reference errors and semantic warnings were ever reported. Single-file validation (`ubml validate <file>`) was unaffected. Now `ubml validate <dir>` reports schema errors correctly, attributed to the right file.
+- `sources.participants` and `hypotheses` node `source` accepted a typed ID (`AC#####` / `SR#####`) *or* free text via `oneOf`, but any string shaped like a valid ID matched both branches, so ajv rejected it as "ambiguous" — the exact form shown in the `sources` schema's own example. Changed both to `anyOf`.
+- Fixed the repo's own `example/` workspace, which the bug above had been silently letting through invalid: `example/actors.ubml.yaml` referenced a non-existent skill ID (`SK003` instead of `SK00003`).
+
 ## [1.4.0] - 2026-09-04
 
 ### Added

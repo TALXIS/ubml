@@ -305,7 +305,7 @@ $defs:
           Source of the evidence or claim.
           Can be a Source ID (SO#####) for typed reference,
           or free text for citations, documents, or interviews.
-        oneOf:
+        anyOf:
           - $ref: "../defs/refs.defs.yaml#/$defs/SourceRef"
           - type: string
       
