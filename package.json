@@ -72,7 +72,7 @@
     "prepublishOnly": "npm run verify-versions && npm run build && npm run test"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.2",
+    "@eslint/js": "^10.0.1",
     "@types/eslint": "^9.6.1",
     "@types/node": "^25.0.6",
     "@types/update-notifier": "^6.0.8",
