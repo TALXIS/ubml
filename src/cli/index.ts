@@ -28,6 +28,7 @@ import { addCommand } from './commands/add/index';
 import { showCommand } from './commands/show';
 import { helpCommand } from './commands/help';
 import { syntaxCommand, idsCommand, enumsCommand, nextidCommand, syncidsCommand } from './commands/ref';
+import { walkCommand } from './commands/walk';
 
 /**
  * Create and configure the CLI program.
@@ -67,6 +68,7 @@ ${chalk.dim('Documentation: https://ubml.talxis.com/docs')}
   program.addCommand(syntaxCommand());    // Quick syntax lookup
   program.addCommand(idsCommand());       // ID patterns
   program.addCommand(enumsCommand());     // Enum values
+  program.addCommand(walkCommand());      // Stakeholder review bookkeeping
   program.addCommand(nextidCommand());    // Next available ID
   program.addCommand(syncidsCommand());   // Sync ID stats from files
 
