@@ -12,6 +12,10 @@ See `/plan/README.md` for the roadmap and `/plan/00-design-decisions.md` for ope
 
 ### Fixed
 
+- **`ubml add` scaffolded a document that `ubml validate` rejects, for 13 of the 13 document types it can create.** `transformTemplateData` hardcoded `properties: []` for every section, so `TEMPLATE_DATA` carried no property information at all. The scaffolder then wrote an item key with an empty body — `TM01000:` with nothing under it parses as `null`, not an object — and validation failed on a file the tool had just produced. Types that appeared to work did so only because `items.ts` carried a hand-written example for them. Section properties are now extracted from the schema, resolving `$ref` into `types/`, so the scaffold satisfies the schema it was generated from.
+- Reference placeholders were always `AC#####` regardless of what the field accepts, so a scaffolded step link failed its own pattern check. The prefix now comes from the referenced definition's own pattern.
+- Required array and object properties were filled with the string `TODO`, which is a type error the moment it is written.
+- Section ID prefixes were read with a two-letter regex, so `roiAnalyses` (`ROI#####`) was scaffolded as `RO#####`.
 - `ubml add hypotheses` wrote `root` and `children` as `{id, text, …}` objects and arrays; the schema wants `HY#####`-keyed maps. The scaffold was teaching a shape its own bundled validator refuses.
 - `ubml add process` wrote an `id` property inside the process. The ID is the key and `Process` declares no `id`, so `additionalProperties: false` rejected it.
 - Removed `templateDefaults.entities.type` from the entities schema. `Entity` has no `type` property and sets `additionalProperties: false`, so the default made every scaffolded entities document invalid.

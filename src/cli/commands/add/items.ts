@@ -57,9 +57,15 @@ export function generateSectionItems(
       } else if (prop.default !== undefined) {
         requiredProps[prop.name] = prop.default;
       } else if (prop.type === 'ref') {
-        // Reference fields should use a placeholder ID pattern
+        // Reference fields get a placeholder of the kind the schema demands -
+        // a step link wants ST#####, not AC#####.
         // Uses addOffset series to avoid conflicts with init templates
-        requiredProps[prop.name] = formatId('AC', ID_CONFIG.addOffset);
+        const refPrefix = (prop.refPrefix ?? 'AC') as IdPrefix;
+        requiredProps[prop.name] = formatId(refPrefix, ID_CONFIG.addOffset);
+      } else if (prop.type === 'array') {
+        requiredProps[prop.name] = [];
+      } else if (prop.type === 'object') {
+        requiredProps[prop.name] = {};
       } else {
         requiredProps[prop.name] = 'TODO';
       }
@@ -228,7 +234,7 @@ export function generateHypothesisTreeItems(
   const offset = ID_CONFIG.addOffset;
   // HT pattern for hypothesis trees (not a standard IdPrefix in metadata)
   const htId = `HT${String(offset).padStart(ID_CONFIG.digitLength, '0')}`;
-  
+
   // Nodes are HY-keyed objects under root/children, not a list of {id, ...}.
   const hy = (n: number) => `HY${String(n).padStart(ID_CONFIG.digitLength, '0')}`;
   const h1 = hy(offset);
