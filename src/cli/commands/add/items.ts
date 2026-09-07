@@ -132,9 +132,9 @@ export function generateProcessItems(
   const stEnd = formatId('ST', offset + 199);
   const acRef = formatId('AC', offset);
   
-  // Build steps inline - processes need nested structure
+  // Build steps inline - processes need nested structure.
+  // The ID is the key; the schema has no `id` property on a process.
   const processContent = `
-    id: ${prId}
     name: "${displayName}"
     description: "TODO: Describe what this process achieves"
     level: 3
@@ -229,11 +229,12 @@ export function generateHypothesisTreeItems(
   // HT pattern for hypothesis trees (not a standard IdPrefix in metadata)
   const htId = `HT${String(offset).padStart(ID_CONFIG.digitLength, '0')}`;
   
-  // H prefix is used for hypothesis nodes within a tree
-  const h1 = `H${String(offset).padStart(ID_CONFIG.digitLength - 1, '0')}`;
-  const h2 = `H${String(offset + 1).padStart(ID_CONFIG.digitLength - 1, '0')}`;
-  const h3 = `H${String(offset + 2).padStart(ID_CONFIG.digitLength - 1, '0')}`;
-  
+  // Nodes are HY-keyed objects under root/children, not a list of {id, ...}.
+  const hy = (n: number) => `HY${String(n).padStart(ID_CONFIG.digitLength, '0')}`;
+  const h1 = hy(offset);
+  const h2 = hy(offset + 10);
+  const h3 = hy(offset + 20);
+
   const treeContent = `
     name: "${displayName} Analysis"
     SCQH:
@@ -242,19 +243,19 @@ export function generateHypothesisTreeItems(
       question: "How can we improve?"
       hypothesis: "By doing X we can achieve Y"
     root:
-      id: ${h1}
-      text: "Main hypothesis to validate"
-      type: hypothesis
-      status: untested
-      children:
-        - id: ${h2}
-          text: "Sub-hypothesis 1"
-          type: hypothesis
-          status: untested
-        - id: ${h3}
-          text: "Sub-hypothesis 2"
-          type: hypothesis
-          status: untested`;
+      ${h1}:
+        text: "Main hypothesis to validate"
+        type: hypothesis
+        status: untested
+        children:
+          ${h2}:
+            text: "Sub-hypothesis 1"
+            type: hypothesis
+            status: untested
+          ${h3}:
+            text: "Sub-hypothesis 2"
+            type: hypothesis
+            status: untested`;
   
   return [{
     id: htId,

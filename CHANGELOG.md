@@ -10,6 +10,12 @@ Initial development. Schema structure and core concepts are stabilizing.
 
 See `/plan/README.md` for the roadmap and `/plan/00-design-decisions.md` for open design questions.
 
+### Fixed
+
+- `ubml add hypotheses` wrote `root` and `children` as `{id, text, …}` objects and arrays; the schema wants `HY#####`-keyed maps. The scaffold was teaching a shape its own bundled validator refuses.
+- `ubml add process` wrote an `id` property inside the process. The ID is the key and `Process` declares no `id`, so `additionalProperties: false` rejected it.
+- Removed `templateDefaults.entities.type` from the entities schema. `Entity` has no `type` property and sets `additionalProperties: false`, so the default made every scaffolded entities document invalid.
+
 ## [1.4.1] - 2026-09-04
 
 ### Fixed
