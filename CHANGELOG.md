@@ -21,6 +21,10 @@ See `/plan/README.md` for the roadmap and `/plan/00-design-decisions.md` for ope
 - `ubml add process` wrote an `id` property inside the process. The ID is the key and `Process` declares no `id`, so `additionalProperties: false` rejected it.
 - Removed `templateDefaults.entities.type` from the entities schema. `Entity` has no `type` property and sets `additionalProperties: false`, so the default made every scaffolded entities document invalid.
 
+### Added
+
+- `tests/integration/cli-add-validates.test.ts` — asserts that every type `ubml add` can create produces a document `ubml validate` accepts. All 13 cases fail against the previous behaviour.
+
 ## [1.4.1] - 2026-09-04
 
 ### Fixed
