@@ -25,6 +25,7 @@ See `/plan/README.md` for the roadmap and `/plan/00-design-decisions.md` for ope
 
 ### Added
 
+- `derivedFrom` on `valueStreams` and `capabilities`. Every other element type could cite the insights behind it; strategy could not, so a strategy document's provenance was prose the validator never saw. It is now checked like anywhere else.
 - `tests/integration/cli-add-validates.test.ts` — asserts that every type `ubml add` can create produces a document `ubml validate` accepts. All 13 cases fail against the previous behaviour.
 
 ## [1.4.1] - 2026-09-04

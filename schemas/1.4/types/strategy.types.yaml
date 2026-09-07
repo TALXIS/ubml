@@ -116,6 +116,14 @@ $defs:
         description: "Value stream owner/sponsor."
         $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
       
+      derivedFrom:
+        description: |
+          Insights that support or justify this element.
+          Links it back to the knowledge that informed it.
+        type: array
+        items:
+          $ref: "../defs/refs.defs.yaml#/$defs/InsightRef"
+
       tags:
         description: "Tags for filtering and views."
         type: array
@@ -250,6 +258,14 @@ $defs:
         description: "Capability owner."
         $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
       
+      derivedFrom:
+        description: |
+          Insights that support or justify this element.
+          Links it back to the knowledge that informed it.
+        type: array
+        items:
+          $ref: "../defs/refs.defs.yaml#/$defs/InsightRef"
+
       tags:
         description: "Tags for filtering and views."
         type: array
