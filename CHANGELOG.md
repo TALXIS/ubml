@@ -13,6 +13,7 @@ See `/plan/README.md` for the roadmap and `/plan/00-design-decisions.md` for ope
 ### Fixed
 
 - **`ubml add` scaffolded a document that `ubml validate` rejects, for 13 of the 13 document types it can create.** `transformTemplateData` hardcoded `properties: []` for every section, so `TEMPLATE_DATA` carried no property information at all. The scaffolder then wrote an item key with an empty body — `TM01000:` with nothing under it parses as `null`, not an object — and validation failed on a file the tool had just produced. Types that appeared to work did so only because `items.ts` carried a hand-written example for them. Section properties are now extracted from the schema, resolving `$ref` into `types/`, so the scaffold satisfies the schema it was generated from.
+- Sequence-typed sections (`links`, glossary `categories`) were scaffolded as ID-keyed maps. They now scaffold as an empty list with the item shape shown in comments, because a sample item would carry references to IDs the user has not created yet.
 - Reference placeholders were always `AC#####` regardless of what the field accepts, so a scaffolded step link failed its own pattern check. The prefix now comes from the referenced definition's own pattern.
 - Required array and object properties were filled with the string `TODO`, which is a type error the moment it is written.
 - Section ID prefixes were read with a two-letter regex, so `roiAnalyses` (`ROI#####`) was scaffolded as `RO#####`.
