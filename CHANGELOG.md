@@ -25,6 +25,7 @@ See `/plan/README.md` for the roadmap and `/plan/00-design-decisions.md` for ope
 
 ### Added
 
+- **`ubml walk`** — bookkeeping for a stakeholder review of extracted insights. `walk next` shows the next `proposed` insight in the order the material was produced, with the source text beside the claim and a position counter; `walk set <id> <status>` records the answer. Deliberately stops at bookkeeping: reading a reviewer's reply, judging an ambiguous answer, or noticing that a correction changed the meaning is the caller's, not the CLI's. `set` rewrites one line rather than reserialising, because a workspace is a document a human is reading and its comments and quoting are content.
 - `derivedFrom` on `valueStreams` and `capabilities`. Every other element type could cite the insights behind it; strategy could not, so a strategy document's provenance was prose the validator never saw. It is now checked like anywhere else.
 - `tests/integration/cli-add-validates.test.ts` — asserts that every type `ubml add` can create produces a document `ubml validate` accepts. All 13 cases fail against the previous behaviour.
 
