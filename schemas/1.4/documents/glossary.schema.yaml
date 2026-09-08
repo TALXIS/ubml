@@ -140,6 +140,20 @@ properties:
           source:
             description: "Source or authority for the definition."
             type: string
+
+          reviewStatus:
+            description: |
+              Whether a reviewer approved the modelling decision behind this term.
+              Absent means not specified, never accepted.
+            $ref: "../defs/shared.defs.yaml#/$defs/ReviewStatus"
+
+          derivedFrom:
+            description: |
+              Insights that support or justify this definition.
+              Links the term back to the knowledge that informed it.
+            type: array
+            items:
+              $ref: "../defs/refs.defs.yaml#/$defs/InsightRef"
           
           tags:
             description: "Tags for filtering."

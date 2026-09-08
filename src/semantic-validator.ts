@@ -400,8 +400,50 @@ export interface WorkspaceValidationResult {
 }
 
 /**
+ * Count elements whose modelling decision is still awaiting a reviewer.
+ *
+ * Walks the parsed content rather than the schema, so it picks up every element
+ * type that carries reviewStatus without needing to know which those are.
+ */
+export function findProposedElements(content: unknown): string[] {
+  const ids: string[] = [];
+
+  const walk = (value: unknown, key?: string): void => {
+    if (!value || typeof value !== 'object') return;
+    if (Array.isArray(value)) {
+      for (const item of value) walk(item);
+      return;
+    }
+    const obj = value as Record<string, unknown>;
+    if (obj.reviewStatus === 'proposed') {
+      // Name them. A count tells a reviewer there is work and not where it is.
+      ids.push(key ?? String(obj.name ?? 'unnamed'));
+    }
+    for (const [childKey, child] of Object.entries(obj)) walk(child, childKey);
+  };
+
+  walk(content);
+  return ids;
+}
+
+function countProposedElements(
+  documents: UBMLDocument[]
+): { ids: string[]; files: string[] } {
+  const ids: string[] = [];
+  const files: string[] = [];
+
+  for (const doc of documents) {
+    const found = findProposedElements(doc.content);
+    ids.push(...found);
+    files.push(...found.map(() => doc.meta.filename || 'unknown'));
+  }
+
+  return { ids, files };
+}
+
+/**
  * Validate workspace structure and conventions.
- * 
+ *
  * Checks for:
  * - Missing workspace file
  * - Multiple singleton documents (workspace, glossary, strategy)
@@ -459,6 +501,27 @@ export function validateWorkspaceStructure(
         suggestion: 'Add actors.ubml.yaml to define who performs process steps',
       });
     }
+  }
+
+  // Surface modelling decisions nobody has approved.
+  //
+  // derivedFrom proves an element came from evidence a reviewer confirmed. It
+  // says nothing about whether anyone agreed that this evidence should become
+  // THIS element, and a workspace where that was never asked looks exactly like
+  // one where it was. Absent reviewStatus is treated as accepted, so this only
+  // fires where extraction explicitly marked its own suggestion.
+  const proposed = countProposedElements(documents);
+  if (proposed.ids.length > 0) {
+    const shown = proposed.ids.slice(0, 8).join(', ');
+    const rest = proposed.ids.length - 8;
+    warnings.push({
+      message: proposed.ids.length === 1
+        ? `1 model element carries reviewStatus: proposed (${shown})`
+        : `${proposed.ids.length} model elements carry reviewStatus: proposed: ${shown}${rest > 0 ? `, and ${rest} more` : ''}`,
+      code: 'ubml/unreviewed-model-elements',
+      files: [...new Set(proposed.files)],
+      suggestion: 'A reviewer has not approved these modelling decisions. Walk them, then set reviewStatus: accepted or rejected',
+    });
   }
 
   // Suggest glossary for complex workspaces
