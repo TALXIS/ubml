@@ -290,10 +290,38 @@ describe('ID Scanner', () => {
 
     it('should respect minStart option', () => {
       createWorkspaceFile();
-      
+
       const { id } = getNextAvailableId('AC', tempDir, { minStart: 2000, updateStats: false });
-      
+
       expect(id).toBe('AC02000');
+    });
+
+    it('should not consume the ID it reports', () => {
+      createWorkspaceFile();
+      createCacheFile({ AC: 1050 });
+
+      // Asking three times must answer the same three times: a query that
+      // mutates the cache climbs, and the caller cannot tell.
+      const first = getNextAvailableId('AC', tempDir).id;
+      const second = getNextAvailableId('AC', tempDir).id;
+      const third = getNextAvailableId('AC', tempDir).id;
+
+      expect([first, second, third]).toEqual(['AC01060', 'AC01060', 'AC01060']);
+      expect(readCacheFile()?.AC).toBe(1050);
+    });
+
+    it('should continue an existing low-numbered sequence instead of jumping to addOffset', () => {
+      createWorkspaceFile();
+      createFileWithIds('actors.ubml.yaml', {
+        actors: {
+          AC00011: { name: 'Actor 11' },
+        },
+      });
+
+      const { id } = getNextAvailableId('AC', tempDir, { updateStats: false });
+
+      // Not AC01000: minStart floors an empty workspace, not a continuation.
+      expect(id).toBe('AC00020');
     });
   });
 
@@ -352,6 +380,23 @@ describe('ID Scanner', () => {
   });
 
   describe('syncIdStats', () => {
+    it('should lower a cached value that is ahead of the files', () => {
+      createWorkspaceFile();
+      createCacheFile({ AC: 1020 });
+      createFileWithIds('actors.ubml.yaml', {
+        actors: {
+          AC00011: { name: 'Actor 11' },
+        },
+      });
+
+      const stats = syncIdStats(tempDir);
+
+      // The scan is authoritative. Keeping the larger value leaves syncids
+      // unable to repair the stale high-water mark it exists to repair.
+      expect(stats.AC).toBe(11);
+      expect(readCacheFile()?.AC).toBe(11);
+    });
+
     it('should sync cache from files', () => {
       createWorkspaceFile();
       createFileWithIds('actors.ubml.yaml', {
