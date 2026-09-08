@@ -276,12 +276,37 @@ $defs:
             - $ref: "../defs/refs.defs.yaml#/$defs/EntityRef"
             - $ref: "../defs/refs.defs.yaml#/$defs/ProcessRef"
       
+      quote:
+        description: |
+          The words that were said, verbatim, from the source this insight
+          cites.
+
+          One entry per continuous span. A passage that reads continuously on
+          screen is often not continuous in the file - another speaker drops a
+          "Yeah." into the middle of it - and splicing those into one string
+          produces a quote that cannot be found in the source it claims to come
+          from. Keep them separate and each one stays checkable.
+
+          Separate from `context`, which is the reading of the quote rather
+          than the quote itself. Where both are present a reader sees what was
+          said and then what it was taken to mean.
+        type: array
+        items:
+          type: string
+        examples:
+          - - "we send the invoice only after the manager signs off"
+            - "Right, yes."
+
       context:
         description: |
           Human-readable context for future readers.
           Explain the circumstances: what prompted this, what was happening,
           any relevant body language or tone. This field helps someone
           understand the insight 3 years from now without chasing sources.
+
+          Not the quote: the words that were said belong in `quote`, which is
+          checkable against the source. This is what they meant and why it
+          matters.
         type: string
       
       tags:
