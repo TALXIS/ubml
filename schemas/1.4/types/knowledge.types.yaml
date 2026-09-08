@@ -162,6 +162,7 @@ $defs:
       - proposed: Captured but not yet reviewed/validated
       - validated: Confirmed as accurate by review or evidence
       - disputed: Challenged or contradicted by other information
+      - deferred: Reviewed, and settling it needs somebody not in the room
       - retired: No longer relevant (superseded or context changed)
       
       MINIMAL EXAMPLE (capture in seconds):
@@ -220,8 +221,14 @@ $defs:
         description: |
           Validation status of this insight.
           Insights start as 'proposed' and move through review.
+
+          'deferred' is an answer, not the absence of one: a reviewer reached
+          this claim and decided not to decide, usually because confirming it
+          needs somebody who was not in the room. Tooling that offers the next
+          unreviewed claim skips it; tooling that reports what is outstanding
+          counts it separately.
         type: string
-        enum: [proposed, validated, disputed, retired]
+        enum: [proposed, validated, disputed, deferred, retired]
         default: proposed
         x-ubml:
           propertyNames: ["status"]
