@@ -4,7 +4,7 @@
  * File system operations for validating UBML documents.
  */
 
-import { resolve, basename } from 'path';
+import { resolve, basename, dirname } from 'path';
 import { type FileSystem, nodeFS } from './fs.js';
 import { parseFile } from './parser.js';
 import { 
@@ -317,6 +317,59 @@ async function findSkippedUBMLFiles(
  * }
  * ```
  */
+/**
+ * Check that every source's companion file actually resolves.
+ *
+ * `file` is documented as a path relative to the document that declares it, and
+ * `url` is where an external artefact lives. Putting a URL in `file` validates
+ * cleanly today and quietly defeats the point: the text an extraction quoted
+ * from is no longer in the workspace, so no reader can check a quote against it.
+ *
+ * A dangling path is worse still - it looks like the evidence is filed when it
+ * is not.
+ */
+async function checkSourceFiles(
+  documents: UBMLDocument[],
+  fs: FileSystem
+): Promise<FileValidationError[]> {
+  const errors: FileValidationError[] = [];
+
+  for (const doc of documents) {
+    if (doc.meta.type !== 'sources' || !doc.meta.filepath) continue;
+
+    const sources = (doc.content as { sources?: Record<string, { file?: unknown }> })?.sources;
+    if (!sources) continue;
+
+    const dir = dirname(doc.meta.filepath);
+
+    for (const [id, source] of Object.entries(sources)) {
+      const file = source?.file;
+      if (typeof file !== 'string' || !file) continue;
+
+      if (file.includes('://')) {
+        errors.push({
+          code: 'SOURCE_FILE_IS_URL',
+          message: `${id}: \`file\` holds a URL. Use \`url\` for the artefact and \`file\` for a text copy stored beside the workspace`,
+          path: `/sources/${id}/file`,
+          filepath: doc.meta.filepath,
+        });
+        continue;
+      }
+
+      if (!(await fs.exists(resolve(dir, file)))) {
+        errors.push({
+          code: 'SOURCE_FILE_MISSING',
+          message: `${id}: \`file\` points at "${file}", which does not exist`,
+          path: `/sources/${id}/file`,
+          filepath: doc.meta.filepath,
+        });
+      }
+    }
+  }
+
+  return errors;
+}
+
 export async function validateWorkspace(
   dir: string,
   options: ValidateOptions = {}
@@ -386,6 +439,10 @@ export async function validateWorkspace(
   // Validate workspace structure
   const structureResult = validateWorkspaceStructure(documents);
 
+  // A source whose companion file does not resolve is evidence that cannot be
+  // re-read, which is the one thing a source entry exists to guarantee.
+  const sourceFileErrors = await checkSourceFiles(documents, fs);
+
   // Check for skipped UBML files (files not matching expected patterns)
   const skippedFiles = await findSkippedUBMLFiles(absoluteDir, fs, files);
   const skippedWarnings: WorkspaceWarning[] = skippedFiles.map(file => ({
@@ -412,6 +469,14 @@ export async function validateWorkspace(
       if (fileResult) {
         fileResult.warnings.push(warning as FileValidationWarning);
       }
+    }
+  }
+
+  for (const error of sourceFileErrors) {
+    const fileResult = fileResults.find(f => f.path === error.filepath);
+    if (fileResult) {
+      fileResult.errors.push(error);
+      fileResult.valid = false;
     }
   }
 
