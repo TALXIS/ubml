@@ -17,6 +17,7 @@ import {
   detectDocumentType,
 } from '../../metadata.js';
 import { INDENT, header, subheader, dim, highlight, success } from '../formatters/text';
+import { findProposedElements } from '../../semantic-validator.js';
 
 // =============================================================================
 // Workspace Parsing
@@ -283,7 +284,33 @@ function showSummary(dir: string): void {
   console.log();
   console.log(dim('─'.repeat(60)));
   console.log(dim(`Total: ${info.files.length} files, ${info.totalElements} elements`));
+
+  const proposed = countProposedInFiles(info.files.map((f) => f.path));
+  if (proposed > 0) {
+    console.log(
+      dim(`${proposed} of them carry reviewStatus: proposed - nobody has approved that modelling yet`),
+    );
+  }
   console.log();
+}
+
+/**
+ * How many elements are still awaiting a reviewer.
+ *
+ * Read from the files rather than tracked during the scan: `show` builds a view
+ * of a handful of element types, and this has to count every type that carries
+ * reviewStatus, including ones the view never renders.
+ */
+function countProposedInFiles(paths: string[]): number {
+  let count = 0;
+  for (const path of paths) {
+    try {
+      count += findProposedElements(parseYaml(readFileSync(path, 'utf8'))).length;
+    } catch {
+      // a file that will not parse is already reported by validate
+    }
+  }
+  return count;
 }
 
 /**
