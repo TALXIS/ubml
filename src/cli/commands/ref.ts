@@ -179,13 +179,13 @@ function showNextId(prefix: string, options: { dir?: string; scan?: boolean }): 
       console.log();
     }
     
-    // Get next available ID using stats or scanning
-    const result = getNextAvailableId(idPrefix, dir, { useGaps: true, updateStats: true });
-    
+    // Reporting the next ID must not consume it - see updateStats.
+    const result = getNextAvailableId(idPrefix, dir, { useGaps: true });
+
     console.log(`  Prefix:  ${highlight(idPrefix)} (${elementType})`);
     console.log(`  Next ID: ${code(result.id)}`);
     if (result.usedStats) {
-      console.log(`  Source:  ${dim('workspace idStats (fast)')}`);
+      console.log(`  Source:  ${dim('cached idStats — run `ubml syncids` if this looks wrong')}`);
     } else {
       console.log(`  Source:  ${dim('file scan (no idStats found)')}`);
     }

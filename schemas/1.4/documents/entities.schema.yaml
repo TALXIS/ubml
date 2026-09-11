@@ -48,10 +48,6 @@ x-ubml-cli:
     - "Optionally add locations for physical context"
   exampleFilename: "entities.ubml.yaml"
   exampleFilenameAlternative: "data-model.entities.ubml.yaml"
-  templateDefaults:
-    entities:
-      type: "business-object"
-
 type: object
 additionalProperties: false
 required: [ubml]

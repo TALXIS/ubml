@@ -1350,3 +1350,244 @@ We evaluated three approaches to progressive formalization:
 | **P5.2** Required Properties Minimal | Required fields already minimal; refinement questions handle the rest |
 | **P12.1** Minimal Capture Friction | Rough capture is valid; questions guide, never block |
 | **P12.7** Progressive Refinement Through Questions | Core mechanism for progressive formalization |
+
+---
+
+## DD-012: Model Elements Record Whether Their Modelling Decision Was Approved
+
+**Status**: Accepted
+
+### Context
+
+DD-008 gave model elements `derivedFrom`, so any element can be traced back to
+the insight that justified it, and any insight back to its source. That closed
+the problem DD-008 named: "model elements appear without justification".
+
+Running the chain end to end on a live engagement showed it closes only half of
+it. Traceability and approval are different guarantees, and the language had a
+field for one of them.
+
+In that engagement a stakeholder confirmed 185 insights one at a time. The model
+was then derived from them in a single pass of 41 elements, and that pass decided
+things the evidence had not: that two roles named separately in the sources are
+one actor, that three ways of starting a request converge on one process, and
+which of three things a word meant every time the sources used it for all
+three.
+
+Every one of those elements carried a valid `derivedFrom`. Not one of those
+decisions had been reviewed by anybody. A workspace where the modelling was
+argued over and a workspace where it was guessed look identical, because
+`derivedFrom` records where the evidence came from, not whether a human agreed
+with what was built out of it.
+
+Two things follow. First, the interpretation is where the disagreement actually
+lives - the evidence rarely says "this is an actor", it says something a person
+then decides to model as one. Second, if a workspace can only be reviewed after
+the model exists, the review arrives when the modelling is expensive to change
+and the source material is weeks cold.
+
+### Decision
+
+Every element type that can carry `derivedFrom` also carries an optional
+`reviewStatus`: `proposed`, `accepted` or `rejected`.
+
+Extraction may now write an element into its final document with
+`reviewStatus: proposed` alongside the insight that suggested it. A reviewer
+walks the insight and the element it would create together, and approves,
+rejects or modifies the pair. Promotion becomes the flip from `proposed` to
+`accepted`, plus the cross-insight work no single insight can decide.
+
+**Absent means not specified, and nothing more** (P4.4). An element with no
+`reviewStatus` is one nobody recorded a judgement on, which is the honest
+reading of every workspace written before the field existed - and of the 41
+elements above, where claiming they were accepted would be exactly the false
+comfort this decision exists to remove. Tooling that gates on approval looks for
+an explicit `accepted`; tooling that surfaces unreviewed work looks for an
+explicit `proposed`. Neither reads anything into silence.
+
+`ubml validate` reports a count of proposed elements as a workspace hint. It is
+not an error: a workspace mid-review is a legitimate state, and the point is
+that the state is visible rather than indistinguishable from a reviewed one.
+
+### Consequences
+
+**A rejected element is kept, not deleted.** The same reasoning as a `disputed`
+insight: the record that a modelling decision was considered and turned down is
+what stops it being proposed again next quarter.
+
+**`reviewStatus` is deliberately not `status`.** An insight's `status` is a
+judgement about the extraction - did this claim get read correctly. An element's
+`reviewStatus` is a judgement about the interpretation - should this claim be
+modelled this way. Naming them alike would invite conflating two different
+reviews by two different standards.
+
+**The model may now contain elements nobody has agreed to.** That is the point.
+The alternative was a model that contained them anyway with no way to tell.
+
+**Review moves earlier and gets smaller.** A per-insight bundle is reviewable in
+the moment the source is on screen. A 41-element promotion pass is not, which is
+why the one in the engagement above was never reviewed at all.
+
+**An insight can be reviewed and still not resolved, so `status` gains
+`deferred`.** `proposed` was carrying two meanings - nobody has looked at this
+yet, and somebody looked and could not settle it. Tooling reads the first, so a
+claim held open on purpose is offered again every time and the review cannot get
+past it. In the run that produced this decision that stopped the walk with nine
+bundles left, and the rest had to be done by hand.
+
+`deferred` is an answer: a reviewer reached the claim and decided not to decide,
+usually because confirming it needs somebody who was not in the room. It is not
+`disputed`, which says the claim is contested - a deferred claim may be
+perfectly true, and what is missing is the means to confirm it.
+
+Per **P10.5**, the projection: none of the four existing values project to BPMN,
+ArchiMate or UML, and neither does this one. Insight status belongs to the
+knowledge layer, which DD-008 puts beneath the model rather than in it, and
+nothing in that layer is exported.
+
+**Glossary terms are included, and they are not an afterthought.** A definition
+is one of the sharpest modelling decisions a workspace makes. Deciding that three
+words the sources use interchangeably name one thing is an interpretation
+somebody has to agree with, and getting it wrong renames things across every
+other document. Terms had neither `derivedFrom` nor `reviewStatus`, so a glossary
+could not say where a definition came from or who accepted it. Both are added.
+
+Their existing free-text `source` stays and answers a different question - an
+outside authority such as a standard or a handbook, rather than an insight in
+this workspace.
+
+### Alternatives considered
+
+| Alternative | Why not |
+|---|---|
+| A separate `proposals` document type | Duplicates every element shape, then needs a merge step that can drift from what was approved. The element already has an id, a home and `derivedFrom`; only the approval was missing. |
+| Reuse `status` | Collides with the insight meaning and with `HypothesisTree.status`. Two different reviews under one word. |
+| Default `proposed` | Marks every existing workspace unreviewed on upgrade, and P4.4 forbids a default on an enum regardless. |
+| A `superseded` value | Invented by analogy with the ADR vocabulary, with no demonstrated use. An insight links what it supersedes; an element state carrying no link is strictly weaker, and `rejected` plus a replacement already says it. |
+| Keep review at promotion only | What was measured to fail. Review that arrives after the model is built reviews a fait accompli. |
+| Branch, review the diff, merge (P1.4) | The unit is wrong. A pull request presents the changeset, and a changeset of 41 elements is exactly the unreviewed promotion pass this decision exists to stop. A diff also cannot say which insight justified which element, so the reviewer reads the model without the evidence beside it. Git records that a change was approved; it cannot record that a named person agreed with an interpretation, which is what the field holds. Both still apply: this branch was itself reviewed as a pull request. |
+| A `proposed/` folder (P1.4) | Same objection, plus a move. An element approved in `proposed/` has to be copied into `current/`, and from then on the id lives in two places and the reviewed text can drift from the shipped one. |
+
+### Related principles
+
+| Principle | Relationship |
+|-----------|--------------|
+| **P1.1** Single Source of Truth | The element stays the single place; approval is a field on it, not a copy elsewhere |
+| **P4.3** Schema Always Fully Validated | `reviewStatus` is schema-checked like everything else; unreviewed is a state, not a draft mode |
+| **P4.4** No Hidden Defaults | Absence means not specified. The first draft of this decision made it mean accepted, which P4.4 forbids in its own words |
+| **P2.3** Uniform Optional Property Behavior | Absent, null and empty are all "not specified"; the validator distinguishes none of them |
+| **P12.1** Minimal Capture Friction | Extraction may propose freely; the friction is at approval, where it belongs |
+| **P1.3** Computed Values Are Not Stored | The reason DD-011 rejected a stored `maturity`: completeness is computable from what is present. Approval is not. No amount of reading the model reveals whether a person agreed with it, so it must be recorded rather than derived. This is the line between the two decisions |
+| **P1.4** No Built-In Version Control | Read as covering this, and it does not. `reviewStatus` is not version history, change tracking or a diff, and the "current/proposed folders" in its rationale are as-is and to-be states of a *process* - two models of the business, not one model awaiting sign-off. The collision is on the word, not the concept. See the two rows above |
+| **P11.1** Fix Design Flaws Immediately | The document-level `status: draft \| review \| approved \| archived` in `ubml.schema.yaml` is a second approval vocabulary, unused by any workspace in this repository. It is not what this decision uses, because approval is per modelling decision and a file is not one. Left in place here rather than removed in a decision about something else |
+
+---
+
+## DD-013: The Text an Extraction Read Lives in the Workspace
+
+**Status**: Accepted
+
+**Amends**: P12.2 (Catalog, Not Container)
+
+### Context
+
+P12.2 says the workspace catalogs where information lives, not the information
+itself, and names "recordings, PDFs, transcripts" as things that live
+externally. Its rationale is size: *"Git repos should stay small."*
+
+That reasoning holds for the artefact and not for its text, and the two have
+been treated as one thing.
+
+A source entry exists so that a claim can be checked against what was read. In
+practice that check fails. In one engagement the workspace pointed at a Loop
+document, which is editable in place, so the evidence could change under the
+model without anything noticing; the analyst worked around it by snapshotting to
+a second uncontrolled location. In the same workspace all five sources put a
+SharePoint URL in `file`, a property documented as a path relative to the
+declaring document. Both validated cleanly.
+
+The size argument does not survive contact with the numbers. Five meeting
+transcripts are under 150KB of text. The recordings they came from are three
+orders of magnitude larger.
+
+### Decision
+
+**The artefact stays out. The text an extraction actually read comes in.**
+
+The schema already had both fields and they were not being used as intended:
+
+- `url` — where the artefact lives: the recording, the PDF, the SharePoint item
+- `file` — a path, relative to the declaring document, to the text stored
+  alongside the workspace
+
+`ubml validate` now enforces what the property always meant. A `file` that holds
+a URL is an error, naming `url` as the field for it. A `file` that resolves to
+nothing is an error, because a dangling pointer is worse than an absent one: it
+looks like the evidence is filed when it is not.
+
+A source with no `file` remains valid. A corridor conversation has no artefact,
+and pretending otherwise would push analysts to invent one.
+
+**Conversion is not UBML's job.** Getting text out of a `.docx`, a `.pdf` or an
+audio recording is a solved problem with several good tools, and the right one
+depends on the format. UBML takes no dependency on any of them; the pipeline
+that produces a workspace chooses, and records which it used in the source's
+`notes` — because a quote that reads oddly may be the speaker or may be the
+converter, and a reader cannot tell the difference without being told.
+
+### Consequences
+
+**Client material moves into a git repo, and this is not a boundary the repo
+had already crossed.** The first draft of this decision claimed it was, on the
+grounds that insights already quote the sources verbatim. That is wrong, and the
+workspace that motivated the decision disproves it: 185 insights quote about
+40,000 characters, selected; the two transcripts they were drawn from contain
+everything nobody chose to extract. Those same source entries record what was
+left out - an SSO problem for a named customer, a test account, twenty minutes
+of unrelated operations per meeting. Selective quotation is not containment.
+
+Two costs follow, and neither is hypothetical:
+
+- **Reach.** A transcript in a document store has revocable access. A transcript
+  in git is on every laptop that ever cloned the repo, and stays there.
+- **Erasure.** A retention policy or a deletion request is a normal operation on
+  a document store and a history rewrite in git.
+
+**So this is a per-workspace decision, not a language-level default.** UBML makes
+storing the text possible and checks the pointer; it does not decide that a given
+workspace should. A workspace that stores source text should say so in its README
+along with who can read the repo. A workspace under retention or erasure
+obligations should keep pointing with `url` and accept that its quotes cannot be
+re-checked from inside.
+
+**The pull the other way is real too.** Extraction is re-swept when the workspace
+gains new document types, looking for what the earlier pass had no reason to see.
+That needs the whole source, not the passages already quoted, so storing excerpts
+only is not a free compromise - it trades a confidentiality risk for a
+completeness one.
+
+**The repo grows by the size of its text.** Transcripts are text and text
+diffs well. A workspace whose sources are genuinely large — a thousand-page
+export — should keep pointing at it with `url` and store an excerpt.
+
+**Provenance improves twice over.** The text is versioned, so a change to it
+shows up in `git log` beside the insights that quote it, and the artefact is
+still named, so the original remains findable.
+
+### Alternatives considered
+
+| Alternative | Why not |
+|---|---|
+| A new `textFile` field beside `file` | Three fields for two things. `file` already meant this; it was being misused, and adding a field rewards the misuse rather than fixing it. |
+| A `convertedBy` schema field | `notes` already carries this in practice and is proven to. A field on a hunch is what P4.4 exists to discourage. |
+| A `ubml source add` command that converts | Puts document conversion, and its dependency tree, inside a modelling tool. It saves nothing an agent cannot do with the existing commands. |
+| Store a checksum of the text | Git already detects that the text changed. |
+| Leave P12.2 alone and keep snapshotting externally | What was measured to fail: a second uncontrolled location, and a `file` field holding URLs in every source of a real workspace. |
+
+### Related principles
+
+| Principle | Relationship |
+|-----------|--------------|
+| **P12.2** Catalog, Not Container | Amended. The artefact is still catalogued; its text is now contained |
+| **P1.4** No Built-In Version Control | Git versions the stored text; no checksum or revision field is added |
+| **P12.1** Minimal Capture Friction | A source with no text stays valid, so capture is never blocked on conversion |

@@ -405,9 +405,11 @@ Users must be able to record knowledge with as little structure as they have at 
 
 #### P12.2: Catalog, Not Container
 
-The workspace catalogs where information lives, not the information itself. Large artifacts (recordings, PDFs, transcripts) live externally; the workspace stores just enough metadata to find them later.
+The workspace catalogs where information lives, not the information itself. Large artifacts (recordings, PDFs, source documents) live externally; the workspace stores just enough metadata to find them later.
 
 **Rationale:** Git repos should stay small. Knowledge sources are diverse and large. The workspace needs to know what exists and where to find it, not store everything.
+
+**Amended by DD-013:** the artifact stays out, the text an extraction actually read comes in. A recording is three orders of magnitude larger than its transcript, and a source entry exists so a quote can be checked against what was read - which is only possible if that text is in the workspace and versioned with the claims that cite it. `url` names the artifact; `file` is the text beside the workspace.
 
 #### P12.3: Append-Friendly Knowledge
 

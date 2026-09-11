@@ -220,8 +220,14 @@ $defs:
         description: |
           Validation status of this insight.
           Insights start as 'proposed' and move through review.
+
+          'deferred' is an answer, not the absence of one: a reviewer reached
+          this claim and decided not to decide, usually because confirming it
+          needs somebody who was not in the room. Tooling that offers the next
+          unreviewed claim skips it; tooling that reports what is outstanding
+          counts it separately.
         type: string
-        enum: [proposed, validated, disputed, retired]
+        enum: [proposed, validated, disputed, deferred, retired]
         default: proposed
         x-ubml:
           propertyNames: ["status"]

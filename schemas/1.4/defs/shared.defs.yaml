@@ -224,6 +224,38 @@ $defs:
       - urgent
 
   # ==========================================================================
+  # REVIEW STATUS
+  # ==========================================================================
+
+  ReviewStatus:
+    description: |
+      Whether a human has approved the MODELLING DECISION that put this element
+      in the model.
+
+      Distinct from the status of an insight, which is about the extraction.
+      derivedFrom proves an element came from evidence somebody confirmed; it
+      says nothing about whether anyone agreed that this evidence should become
+      THIS actor, with THIS name, merged with THAT one. That judgement is the
+      element's own, and until now the model had nowhere to record it.
+
+      Absent means not specified, and nothing more (P4.4). An element with no
+      reviewStatus is one nobody recorded a judgement on - which is honest about
+      every workspace written before this field existed, and about anything an
+      importer produced. Tooling that gates on approval looks for an explicit
+      accepted; tooling that surfaces unreviewed work looks for an explicit
+      proposed. Neither reads anything into silence.
+
+      VALUES:
+      - proposed: suggested by extraction, nobody has reviewed the decision
+      - accepted: a reviewer agreed this is how the evidence should be modelled
+      - rejected: a reviewer disagreed; kept so the decision is not re-proposed
+    type: string
+    enum:
+      - proposed
+      - accepted
+      - rejected
+
+  # ==========================================================================
   # COMMENT REQUIREMENT
   # ==========================================================================
 

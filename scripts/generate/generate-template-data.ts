@@ -28,6 +28,8 @@ export interface SectionInfo {
   description: string;
   requiredProps: string[];
   properties: PropertyInfo[];
+  /** True when the section is a YAML sequence rather than an ID-keyed map. */
+  isArray?: boolean;
   defaults?: Record<string, unknown>;
 }
 
@@ -38,6 +40,8 @@ export interface PropertyInfo {
   required: boolean;
   enumValues?: string[];
   default?: unknown;
+  /** For type 'ref': the ID prefix the reference must carry, e.g. 'ST'. */
+  refPrefix?: string;
 }
 
 // =============================================================================
@@ -56,8 +60,9 @@ export function transformTemplateData(templates: TemplateData[]): DocumentTempla
       name: s.name,
       idPrefix: s.idPrefix ?? '',
       description: s.description,
-      requiredProps: s.required ? [s.name] : [],
-      properties: [],
+      requiredProps: s.properties.filter((p) => p.required).map((p) => p.name),
+      properties: s.properties,
+      isArray: s.isArray,
       defaults: t.templateDefaults?.[s.name],
     })),
     requiredDocProps: [],
@@ -96,6 +101,8 @@ export interface PropertyInfo {
   required: boolean;
   enumValues?: string[];
   default?: unknown;
+  /** For type 'ref': the ID prefix the reference must carry, e.g. 'ST'. */
+  refPrefix?: string;
 }
 
 export interface SectionInfo {
@@ -104,6 +111,8 @@ export interface SectionInfo {
   description: string;
   requiredProps: string[];
   properties: PropertyInfo[];
+  /** True when the section is a YAML sequence rather than an ID-keyed map. */
+  isArray?: boolean;
   defaults?: Record<string, unknown>;
 }
 

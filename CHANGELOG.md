@@ -10,6 +10,31 @@ Initial development. Schema structure and core concepts are stabilizing.
 
 See `/plan/README.md` for the roadmap and `/plan/00-design-decisions.md` for open design questions.
 
+### Fixed
+
+- **`ubml add` scaffolded a document that `ubml validate` rejects, for 13 of the 13 document types it can create.** `transformTemplateData` hardcoded `properties: []` for every section, so `TEMPLATE_DATA` carried no property information at all. The scaffolder then wrote an item key with an empty body — `TM01000:` with nothing under it parses as `null`, not an object — and validation failed on a file the tool had just produced. Types that appeared to work did so only because `items.ts` carried a hand-written example for them. Section properties are now extracted from the schema, resolving `$ref` into `types/`, so the scaffold satisfies the schema it was generated from.
+- Sequence-typed sections (`links`, glossary `categories`) were scaffolded as ID-keyed maps. They now scaffold as an empty list with the item shape shown in comments, because a sample item would carry references to IDs the user has not created yet.
+- Reference placeholders were always `AC#####` regardless of what the field accepts, so a scaffolded step link failed its own pattern check. The prefix now comes from the referenced definition's own pattern.
+- Required array and object properties were filled with the string `TODO`, which is a type error the moment it is written.
+- Section ID prefixes were read with a two-letter regex, so `roiAnalyses` (`ROI#####`) was scaffolded as `RO#####`.
+- `ubml add hypotheses` wrote `root` and `children` as `{id, text, …}` objects and arrays; the schema wants `HY#####`-keyed maps. The scaffold was teaching a shape its own bundled validator refuses.
+- `ubml add process` wrote an `id` property inside the process. The ID is the key and `Process` declares no `id`, so `additionalProperties: false` rejected it.
+- Removed `templateDefaults.entities.type` from the entities schema. `Entity` has no `type` property and sets `additionalProperties: false`, so the default made every scaffolded entities document invalid.
+- **`ubml nextid` could not be trusted as a source of truth, three ways.** It wrote its own answer back to the cache, so asking twice gave two answers and the number climbed on every call. `writeIdStats` only ever kept the larger of the cached and supplied value, so `syncids` could not lower a stale entry, which is the one case it exists for. And `minStart` was applied even when IDs already existed, so a workspace numbered from 1 was told its next actor was `AC01000`, leaving a 989-wide hole and two disjoint ranges in one document. A query no longer mutates the cache, a scan replaces rather than merges, and the floor applies only to a workspace with no IDs yet.
+- `ubml nextid` printed `Highest:` from the cache while presenting it as fact. It now names the cache as its source and points at `ubml syncids`.
+
+### Added
+
+- **`ubml walk`** — bookkeeping for a stakeholder review of extracted insights. `walk next` shows the next `proposed` insight in the order the material was produced, with the source text beside the claim and a position counter; `walk set <id> <status>` records the answer. Deliberately stops at bookkeeping: reading a reviewer's reply, judging an ambiguous answer, or noticing that a correction changed the meaning is the caller's, not the CLI's. `set` rewrites one line rather than reserialising, because a workspace is a document a human is reading and its comments and quoting are content.
+- `derivedFrom` on `valueStreams` and `capabilities`. Every other element type could cite the insights behind it; strategy could not, so a strategy document's provenance was prose the validator never saw. It is now checked like anywhere else.
+- `tests/integration/cli-add-validates.test.ts` — asserts that every type `ubml add` can create produces a document `ubml validate` accepts. All 13 cases fail against the previous behaviour.
+### Added
+
+- **`reviewStatus` on every element that can carry `derivedFrom`** (`proposed` | `accepted` | `rejected`). `derivedFrom` proves an element came from evidence somebody confirmed; it says nothing about whether anyone agreed that evidence should become THIS element, with THIS name, merged with THAT one. A workspace whose modelling was argued over and one whose modelling was guessed looked identical. Extraction can now propose an element beside the insight that suggested it, and a reviewer approves the pair. Absence means not specified and nothing more, per P4.4. See DD-012.
+- `ubml walk` drives the whole bundle: `walk next` shows the elements a claim proposes beside the claim itself, and `walk set` records either half - an insight takes `validated`/`disputed`, an element takes `accepted`/`rejected`, and the id says which is meant. Reviewing a claim without the element it would create approves the extraction and leaves the interpretation unasked.
+- `ubml validate` reports how many model elements are still `proposed`, as a workspace hint rather than an error - a workspace mid-review is a legitimate state, it just should not be indistinguishable from a reviewed one.
+- **`ubml validate` enforces what `file` on a source always meant.** It is documented as a path relative to the declaring document, and a real workspace had all five sources holding a SharePoint URL there instead - which validated cleanly and quietly meant no reader could check a quote against what was read. A URL in `file` is now an error naming `url` as the right field, and a `file` that resolves to nothing is an error too, because a dangling pointer looks like filed evidence and is not. A source with no `file` stays valid: a corridor conversation has no artifact. See DD-013, which amends P12.2 - the artifact stays out, the text an extraction read comes in.
+
 ## [1.4.1] - 2026-09-04
 
 ### Fixed
