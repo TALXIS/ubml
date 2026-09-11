@@ -85,10 +85,11 @@ insights:
   it('shows the source text beside the claim', () => {
     const out = runUbml('walk next');
 
-    expect(out).toContain('Source says');
     expect(out).toContain('the verbatim thing someone said');
-    expect(out).toContain('Extracted as');
     expect(out).toContain('From the earlier note.');
+    // Both quoted, because both are things the reviewer is asked to agree with.
+    expect(out).toContain('> the verbatim thing someone said');
+    expect(out).toContain('> From the earlier note.');
   });
 
   it('puts the source before the extraction, and the ID last', () => {
@@ -96,22 +97,35 @@ insights:
 
     // The rules this replaces used to live in the skill: label both blocks,
     // evidence before claim, ID last so the reviewer reads before decoding.
-    expect(out.indexOf('Source says')).toBeLessThan(out.indexOf('Extracted as'));
-    expect(out.indexOf('Extracted as')).toBeLessThan(out.indexOf('IN01000'));
+    expect(out.indexOf('the verbatim thing someone said'))
+      .toBeLessThan(out.indexOf('From the earlier note.'));
+    expect(out.indexOf('From the earlier note.')).toBeLessThan(out.indexOf('IN01000'));
     expect(out.trimEnd().endsWith('IN01000')).toBe(true);
   });
 
   it('leads with position, not identity', () => {
     const out = runUbml('walk next');
 
-    expect(out).toMatch(/Source 1 of 2 .* insight 1 of 1/);
-    expect(out.indexOf('Source 1 of 2')).toBeLessThan(out.indexOf('IN01000'));
+    expect(out).toMatch(/source 1\/2, 1\/1 claims/);
+    expect(out.indexOf('source 1/2')).toBeLessThan(out.indexOf('IN01000'));
   });
 
-  it('opens a source with how many insights it holds', () => {
+  it('opens a source with what it is and who was there', () => {
     const out = runUbml('walk next');
 
-    expect(out).toContain('1 insights');
+    // A name alone left the reviewer nothing to go and check the claim against.
+    expect(out).toContain('claims 1');
+    expect(out).toContain('type document');
+  });
+
+  it('shows every field of the claim, not the handful it once loaded', () => {
+    const out = runUbml('walk next');
+
+    // Tags, links and the note explaining the reading never reached the
+    // reviewer, because the loader did not read them off the file.
+    expect(out).toContain('kind ');
+    expect(out).toContain('confidence ');
+    expect(out).toContain('date ');
   });
 
   it('counts as restating only what points back at an earlier source', () => {
@@ -215,9 +229,11 @@ actors:
 
       // Reviewing the claim without it approves the extraction and leaves the
       // interpretation unasked.
-      expect(out).toContain('Would add');
-      expect(out).toContain('AC01000');
+      expect(out).toContain('Model Update');
       expect(out).toContain('actor');
+      // Named, not numbered: an id tells a reviewer nothing about whether the
+      // element is right.
+      expect(out).toContain('Someone the claim implies');
     });
 
     it('records the element with its own vocabulary', () => {
