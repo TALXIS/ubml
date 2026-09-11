@@ -152,7 +152,15 @@ function extractItemProperties(item: SchemaNode | null): TemplateProperty[] {
   );
 
   return Object.entries(props).map(([name, prop]) => {
-    const enumValues = Array.isArray(prop.enum) ? (prop.enum as string[]) : undefined;
+    // An enum behind a $ref is still an enum. Reading only the inline form
+    // dropped every shared vocabulary - reviewStatus among them - so the CLI
+    // could print one half of a pair and look complete.
+    const inlineEnum = Array.isArray(prop.enum) ? (prop.enum as string[]) : undefined;
+    const refEnum = typeof prop.$ref === 'string'
+      ? resolveRef(prop.$ref)?.enum
+      : undefined;
+    const enumValues = inlineEnum
+      ?? (Array.isArray(refEnum) ? (refEnum as string[]) : undefined);
     const description = typeof prop.description === 'string'
       ? prop.description.split('\n')[0]
       : '';

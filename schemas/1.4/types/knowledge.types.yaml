@@ -304,6 +304,22 @@ $defs:
           - - "we send the invoice only after the manager signs off"
             - "Right, yes."
 
+      reviewedBy:
+        description: |
+          Who settled this insight's status, when that is not whoever commits
+          the file. Written by `ubml walk set --by`.
+
+          Usually it is the same person, and then this field says nothing the
+          commit does not already say. Leave it out. Asking a reviewer who they
+          are before the walk starts spends their first answer on a question
+          nobody needed.
+
+          It earns its place when the two come apart: a walk run on somebody
+          else's behalf, or a room where different people settled different
+          claims. There the commit names whoever typed, and this names whoever
+          decided.
+        type: string
+
       context:
         description: |
           Human-readable context for future readers.
