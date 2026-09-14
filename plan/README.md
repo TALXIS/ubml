@@ -62,6 +62,7 @@
 |---|------|-------|--------|------------|
 | 19 | [Refinement Questions](19-refinement-questions.md) | Schema-declared questions, refinement engine, CLI `ubml refine`, ESLint rule, computed maturity | Large | 04, 06, 08, 15 |
 | 20 | [Analysis Feedback Loops](20-analysis-feedback-loops.md) | Cross-element references, consulting framework gaps, cyclic analysis workflow support | Large | 19, 04, 00 |
+| 21 | [`ubml next`](21-next-command.md) | Model-scope view of what is outstanding and who owes the next move | Small | 04 |
 
 ---
 
