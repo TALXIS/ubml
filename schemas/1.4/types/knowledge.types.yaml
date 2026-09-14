@@ -337,6 +337,25 @@ $defs:
           decided.
         type: string
 
+      answeredBy:
+        description: |
+          Who can settle this claim, where that is not whoever is walking it.
+
+          The counterpart of `reviewedBy`: one is who settled a claim, this is
+          who still can. `deferred` means reviewed and needing somebody who was
+          not in the room, and without this the somebody is nowhere, so a
+          question waiting on a partner and one waiting on a colleague are
+          indistinguishable to anybody reading the file and to `ubml next`.
+
+          Plain text, like `attribution`, because the answerer is often outside
+          the model - a market, a finance organisation, a partner nobody has
+          made an actor for. Where they are modelled, prefer their `AC#####` so
+          the model and `ubml next --with` agree about who is meant.
+
+          Read in place of `custom.answeredBy`, which earlier workspaces used
+          and which is still honoured.
+        type: string
+
       context:
         description: |
           Human-readable context for future readers.

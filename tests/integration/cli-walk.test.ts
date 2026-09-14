@@ -77,6 +77,43 @@ insights:
     }
   }
 
+  describe('who can settle it', () => {
+    it('records the answerer on a claim being deferred', () => {
+      // Deferring without this leaves a question nobody is carrying, which is
+      // how a workspace ends up unable to say what it is waiting on and from
+      // whom.
+      const out = runUbml('walk set IN01000 deferred --to "HGC"');
+
+      expect(out).toContain('HGC');
+      const file = readFileSync(join(tempDir, 'insights.ubml.yaml'), 'utf8');
+      expect(file).toContain('answeredBy: HGC');
+
+      const lines = file.split('\n');
+      const at = lines.findIndex((l) => l.includes('answeredBy:'));
+      expect(lines[at - 1].trim()).toBe('status: deferred');
+    });
+
+    it('says so rather than swallowing it when the element cannot hold one', () => {
+      // An element is a modelling decision; the open question lives on the
+      // claim beneath it.
+      writeFileSync(
+        join(tempDir, 'process.ubml.yaml'),
+        `ubml: "${SCHEMA_VERSION}"
+processes:
+  PR01000:
+    name: A process
+    reviewStatus: proposed
+    derivedFrom: [IN01000]
+`,
+      );
+
+      const out = runUbml('walk set PR01000 rejected --to "HGC"');
+
+      expect(out).toContain('not recorded on an element');
+      expect(readFileSync(join(tempDir, 'process.ubml.yaml'), 'utf8')).not.toContain('HGC');
+    });
+  });
+
   describe('who settled it', () => {
     it('writes the reviewer onto a claim that has never carried one', () => {
       // The delegated walk is the only case --by is for, and on a fresh

@@ -679,7 +679,7 @@ function setStatus(
   file: string,
   id: string,
   status: string,
-  field: 'status' | 'reviewStatus' | 'reviewedBy' = 'status',
+  field: 'status' | 'reviewStatus' | 'reviewedBy' | 'answeredBy' = 'status',
 ): string | undefined {
   const original = readFileSync(file, 'utf8');
   const eol = original.includes('\r\n') ? '\r\n' : '\n';
@@ -704,7 +704,7 @@ function setStatus(
   // in the file, otherwise at the end of the element's own block.
   let blockEnd = -1;
   let after = -1;
-  const preferAfter = field === 'reviewedBy' ? 'status' : null;
+  const preferAfter = field === 'reviewedBy' || field === 'answeredBy' ? 'status' : null;
 
   for (let i = start + 1; i < src.length; i++) {
     if (!src[i].trim() || src[i].trimStart().startsWith('#')) continue;
@@ -842,7 +842,7 @@ function doContext(id: string, options: { dir: string; lines: string }): void {
   console.log();
 }
 
-function doSet(id: string, status: string, options: { dir: string; by?: string }): void {
+function doSet(id: string, status: string, options: { dir: string; by?: string; to?: string }): void {
   const walkable = load(options.dir);
   const { bySource } = walkable;
   const all = [...bySource.values()].flat();
@@ -892,6 +892,23 @@ function doSet(id: string, status: string, options: { dir: string; by?: string }
     console.log(dim('  --by is not recorded on an element; the commit is what names who accepted it'));
   } else {
     console.log(`${highlight(id)} ${dim('→')} ${status}`);
+  }
+
+  // Who can still settle it. Deferring without this leaves a question nobody
+  // is carrying, which is how a workspace ends up with sixteen of them and no
+  // way to tell which are waiting on a partner and which on a colleague.
+  if (options.to && !isElement) {
+    const unrecorded = setStatus(file, id, options.to, 'answeredBy');
+    if (!unrecorded) {
+      console.log(dim(`  answered by ${options.to}`));
+    } else {
+      console.error(chalk.red(`${unrecorded} The status was written; answeredBy was not.`));
+      process.exitCode = 1;
+    }
+  } else if (options.to) {
+    // An element is a modelling decision; the open question is on the claim
+    // beneath it, which is where an answerer belongs.
+    console.log(dim('  --to is not recorded on an element; set it on the claim it rests on'));
   }
 
   if (isElement && status === 'accepted') {
@@ -947,6 +964,7 @@ export function walkCommand(): Command {
     )
     .option('-d, --dir <directory>', 'Workspace directory', '.')
     .option('--by <name>', 'Who settled it, when that is not whoever commits the file')
+    .option('--to <name>', 'Who can settle it, for a claim being deferred')
     .action(doSet);
 
   return command;
