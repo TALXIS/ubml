@@ -25,6 +25,7 @@ See `/plan/README.md` for the roadmap and `/plan/00-design-decisions.md` for ope
 
 ### Added
 
+- `ubml validate` warns (`ubml/superseded-not-retired`) when an insight names what it `supersedes` and the claim it replaces is not `retired`. Without it a workspace can assert a claim and its replacement at once, and every element citing either still looks sourced. An older claim with no `status` counts as `proposed`, the schema default. A warning, because the model still reads and the fix is one word.
 - `walk next` shows the whole bundle: the claim with its date, tags, note and who said it; the source it cites, with who was there and the path of the stored text a quote can be checked against; ids resolved to names wherever one is known; a step placed in its process, "step 2 of 16", by the shortest path from an entry point; a parent's child elements counted rather than printed, each reviewed on its own; and a note when the same source later revises the claim, so it is not settled blind.
 - `walk legend` prints what each status means for a claim and for an element, side by side, out of the schema. The first bundle of a source points at it.
 - `walk context <id>` prints the passage a claim's quote came from in the stored text, with what was said either side of it.

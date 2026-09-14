@@ -322,6 +322,36 @@ export function validateDocuments(
     }
   }
 
+  // An insight that has been replaced should say so in its status. The
+  // newer claim already names what it supersedes; without this the older one
+  // keeps asserting itself and every element citing it still looks sourced.
+  for (const document of documents) {
+    const insights = (document.content as Record<string, unknown>)?.insights;
+    if (!insights || typeof insights !== 'object') continue;
+
+    for (const [id, body] of Object.entries(insights as Record<string, unknown>)) {
+      const replaced = (body as Record<string, unknown>)?.supersedes;
+      if (typeof replaced !== 'string') continue;
+
+      const older = findInsight(documents, replaced);
+      if (!older) continue; // an undefined reference, already reported above
+
+      if (older.status !== 'retired') {
+        const filepath = document.meta.filename || 'unknown';
+        const location = document.getSourceLocation(`/insights/${id}`);
+        warnings.push({
+          message:
+            `"${id}" supersedes "${replaced}", which is still ` +
+            `${older.status ?? 'proposed'} - a replaced insight should be retired`,
+          filepath,
+          path: `insights.${id}`,
+          code: 'ubml/superseded-not-retired',
+          ...(location && { line: location.line, column: location.column }),
+        });
+      }
+    }
+  }
+
   for (const document of documents) {
     const filepath = document.meta.filename || 'unknown';
     const visit = (value: unknown, path: string[]): void => {
