@@ -36,7 +36,7 @@ description: |
 x-ubml-cli:
   category: advanced
   categoryDisplayName: "Advanced"
-  workflowOrder: 9
+  workflowOrder: 11
   shortDescription: "Define business terminology and definitions."
   defaultFilename: "glossary"
   detectBy:

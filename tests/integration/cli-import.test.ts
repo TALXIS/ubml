@@ -173,4 +173,19 @@ describe('ubml import', () => {
     expect(readFileSync(join(dir, 'demo-workspace', 'sources', 'kickoff.md'), 'utf8')).toContain('So the invoice waits');
     expect(existsSync(join(dir, 'sources'))).toBe(false);
   });
+
+  it('help quickstart prints an import that runs as written in the workspace it says to make', () => {
+    const vtt = join(dir, 'call.vtt');
+    const workspace = join(dir, 'my-project');
+    writeFileSync(vtt, RUN, 'utf8');
+    ubml('init my-project');
+
+    const printed = ubml('help quickstart').match(/ubml import \S+ (\S+)/);
+    expect(printed).not.toBeNull();
+    const target = (printed as RegExpMatchArray)[1].replace('<name>', 'kickoff');
+
+    ubml(`import "${vtt}" ${target}`, workspace);
+
+    expect(readFileSync(join(workspace, target), 'utf8')).toContain('So the invoice waits');
+  });
 });

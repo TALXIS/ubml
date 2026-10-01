@@ -37,7 +37,7 @@ description: |
 x-ubml-cli:
   category: knowledge
   categoryDisplayName: "Knowledge"
-  workflowOrder: 16
+  workflowOrder: 3
   shortDescription: "Atomic derived knowledge — pains, opportunities, process facts, risks."
   defaultFilename: "insights"
   detectBy:

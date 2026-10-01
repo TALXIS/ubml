@@ -36,7 +36,7 @@ description: |
 x-ubml-cli:
   category: advanced
   categoryDisplayName: "Advanced"
-  workflowOrder: 10
+  workflowOrder: 12
   shortDescription: "Define custom perspectives and diagram configurations."
   defaultFilename: "views"
   detectBy:

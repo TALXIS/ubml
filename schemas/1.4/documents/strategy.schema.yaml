@@ -38,7 +38,7 @@ description: |
 x-ubml-cli:
   category: strategy
   categoryDisplayName: "Strategy"
-  workflowOrder: 8
+  workflowOrder: 10
   shortDescription: "Define value streams, capabilities, products, and services."
   defaultFilename: "enterprise"
   detectBy:

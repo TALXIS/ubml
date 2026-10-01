@@ -9,6 +9,7 @@ import { mkdtempSync, rmSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
 import { execSync } from 'child_process';
+import { SCAFFOLDED_TYPES } from '../../src/cli/commands/init.js';
 
 describe('CLI Help Command', () => {
   let tempDir: string;
@@ -166,6 +167,23 @@ describe('CLI Help Command', () => {
       expect(result.stdout.toLowerCase()).toContain('workspace');
       expect(result.stdout.toLowerCase()).toContain('actor');
       expect(result.stdout.toLowerCase()).toContain('process');
+    });
+
+    it.each([...SCAFFOLDED_TYPES])('points at the %s document init scaffolds rather than adding a second', (type) => {
+      for (const topic of ['workflow', type]) {
+        const { stdout } = runUbml(`help ${topic}`);
+
+        expect(stdout).not.toMatch(new RegExp(`ubml add ${type}\\s*$`, 'm'));
+        expect(stdout).toContain(`${type}.ubml.yaml`);
+      }
+    });
+
+    it('still offers ubml add for a type init does not scaffold', () => {
+      expect(runUbml('help entities').stdout).toMatch(/ubml add entities\s*$/m);
+    });
+
+    it('says what --minimal leaves out', () => {
+      expect(runUbml('help workflow').stdout).toContain('--minimal writes only the workspace');
     });
   });
 

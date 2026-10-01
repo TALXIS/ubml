@@ -37,7 +37,7 @@ description: |
 x-ubml-cli:
   category: analysis
   categoryDisplayName: "Analysis & Planning"
-  workflowOrder: 7
+  workflowOrder: 9
   shortDescription: "Define simulation scenarios for what-if analysis."
   defaultFilename: "baseline"
   detectBy:
