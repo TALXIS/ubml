@@ -92,10 +92,18 @@ function asTurns(cues: Cue[]): string[] {
   return turns;
 }
 
-function doImport(file: string, options: { out?: string; title?: string }): void {
+function doImport(
+  file: string,
+  destination: string | undefined,
+  options: { out?: string; title?: string },
+): void {
   const path = resolve(file);
   if (extname(path).toLowerCase() !== '.vtt') {
     console.error(chalk.red('Only .vtt is read today. Convert other exports by hand and keep the words verbatim.'));
+    process.exit(1);
+  }
+  if (destination && options.out) {
+    console.error(chalk.red('Say where to write it once: as the second argument or with -o, not both.'));
     process.exit(1);
   }
 
@@ -133,7 +141,7 @@ function doImport(file: string, options: { out?: string; title?: string }): void
     ...turns.flatMap((t) => [t, '']),
   ].join('\n');
 
-  const out = resolve(options.out ?? `${basename(path, extname(path))}.md`);
+  const out = resolve(destination ?? options.out ?? `${basename(path, extname(path))}.md`);
   mkdirSync(dirname(out), { recursive: true });
   writeFileSync(out, body, 'utf8');
 
@@ -148,6 +156,7 @@ export function importCommand(): Command {
   command
     .description('Turn a meeting transcript into the text a source points at')
     .argument('<file>', 'A WebVTT transcript')
+    .argument('[out]', 'Where to write it, the same as -o')
     .option('-o, --out <path>', 'Where to write it')
     .option('-t, --title <title>', 'Title line')
     .action(doImport);

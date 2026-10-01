@@ -12,6 +12,7 @@ import { execSync } from 'child_process';
 import { existsSync, mkdtempSync, rmSync, writeFileSync, readFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join, resolve } from 'path';
+import { printedCommands, runAsPrinted } from './printed-commands.js';
 
 let dir: string;
 const ubmlBin = resolve(process.cwd(), 'dist', 'cli.js');
@@ -56,6 +57,14 @@ function run(args: string): string {
     // what it said is on stderr.
     return failed.stdout || failed.stderr || '';
   }
+}
+
+function ubml(args: string, cwd = dir): string {
+  return execSync(`node ${ubmlBin} ${args}`, {
+    cwd,
+    encoding: 'utf8',
+    env: { ...process.env, FORCE_COLOR: '0' },
+  });
 }
 
 describe('ubml import', () => {
@@ -130,5 +139,38 @@ describe('ubml import', () => {
     writeFileSync(docx, 'not really a docx', 'utf8');
 
     expect(run(`"${docx}"`)).toContain('Only .vtt');
+  });
+
+  it('takes where to write it as a second argument', () => {
+    const vtt = join(dir, 'meeting.vtt');
+    const out = join(dir, 'kickoff.md');
+    writeFileSync(vtt, RUN, 'utf8');
+
+    run(`"${vtt}" "${out}"`);
+
+    expect(readFileSync(out, 'utf8')).toContain('until the manager signs it');
+  });
+
+  it('refuses a destination given both ways rather than pick one', () => {
+    const vtt = join(dir, 'meeting.vtt');
+    writeFileSync(vtt, RUN, 'utf8');
+
+    expect(run(`"${vtt}" "${join(dir, 'a.md')}" -o "${join(dir, 'b.md')}"`)).toContain('not both');
+    expect(existsSync(join(dir, 'a.md'))).toBe(false);
+    expect(existsSync(join(dir, 'b.md'))).toBe(false);
+  });
+
+  it.each([['init demo-workspace'], ['init demo-workspace --minimal']])('%s prints next steps that run in order from where it was run', (printing) => {
+    const vtt = join(dir, 'call.vtt');
+    writeFileSync(vtt, RUN, 'utf8');
+
+    const steps = printedCommands(ubml(printing), 'Next steps:', /─{10}/);
+    const ran = runAsPrinted(steps, dir, { '<meeting.vtt>': vtt, '<name>': 'kickoff' });
+
+    expect(steps[0]).toBe('cd demo-workspace');
+    expect(steps.some((step) => step.startsWith('ubml import'))).toBe(true);
+    expect(ran.filter((r) => r.status !== 0).map((r) => `${r.command}: ${r.output}`)).toEqual([]);
+    expect(readFileSync(join(dir, 'demo-workspace', 'sources', 'kickoff.md'), 'utf8')).toContain('So the invoice waits');
+    expect(existsSync(join(dir, 'sources'))).toBe(false);
   });
 });

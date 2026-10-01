@@ -45,8 +45,9 @@ export function createProgram(): Command {
     .addHelpText('after', `
 ${chalk.bold('Getting Started:')}
   ${chalk.cyan('ubml init my-project')}     Create a new UBML workspace
+  ${chalk.cyan('cd my-project')}            Work inside it
   ${chalk.cyan('ubml schema')}              Explore what you can model
-  ${chalk.cyan('ubml add process')}         Add a new process file
+  ${chalk.cyan('ubml add')}                 See what you can add to it
   ${chalk.cyan('ubml validate .')}          Validate all files
 
 ${chalk.bold('Learn More:')}
