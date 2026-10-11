@@ -1,6 +1,6 @@
 # 21 — `ubml next`
 
-> **Status**: Proposed
+> **Status**: Implemented as `ubml next`
 > **Depends on**: Plan 04 (semantic validation), the `walk` command
 > **Effort**: Small — one command, no schema change
 > **References**: `src/cli/commands/walk.ts`

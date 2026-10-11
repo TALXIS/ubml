@@ -110,7 +110,7 @@ function load(dir: string): { claims: Claim[]; others: unknown[] } {
  * Claims joined by `related`, so one undecided thing reads as one item rather
  * than as several unrelated ones.
  */
-function cluster(open: Claim[]): { group: Claim[]; links: Map<string, Set<string>> } {
+function cluster(open: Claim[]): Map<string, Set<string>> {
   const byId = new Map(open.map((c) => [c.id, c]));
   const links = new Map<string, Set<string>>();
   for (const claim of open) {
@@ -120,7 +120,7 @@ function cluster(open: Claim[]): { group: Claim[]; links: Map<string, Set<string
       links.set(other, (links.get(other) ?? new Set()).add(claim.id));
     }
   }
-  return { group: open, links };
+  return links;
 }
 
 function components(open: Claim[], links: Map<string, Set<string>>): Claim[][] {
@@ -180,7 +180,7 @@ function run(scope: string[], options: { dir: string; with?: string }): void {
     others.reduce<number>((n, doc) => n + countUnreviewed(doc, tagged), 0);
 
   const open = claims.filter((c) => c.status === 'deferred' && tagged(c.tags));
-  const { links } = cluster(open);
+  const links = cluster(open);
   let groups = components(open, links);
 
   if (options.with) {
@@ -213,7 +213,13 @@ function run(scope: string[], options: { dir: string; with?: string }): void {
   }
 
   if (!groups.length) {
-    console.log('Nothing is waiting on anybody outside this review.');
+    if (options.with) {
+      console.log(`Nothing deferred to anyone matching "${options.with}".`);
+    } else if (unreviewed > 0) {
+      console.log('Nothing deferred so far.');
+    } else {
+      console.log('Nothing is waiting on anybody outside this review.');
+    }
     console.log();
   }
 
@@ -231,5 +237,17 @@ export function nextCommand(): Command {
     .argument('[tags...]', 'Limit to elements carrying any of these tags')
     .option('-d, --dir <path>', 'Workspace directory', '.')
     .option('--with <name>', 'Only what this person can answer')
+    .addHelpText(
+      'after',
+      [
+        '',
+        'Who answers a claim is read from its custom.answeredBy; it is never inferred.',
+        '',
+        'Examples:',
+        '  ubml next                      everything outstanding in the workspace',
+        '  ubml next billing fulfilment   claims tagged billing or fulfilment',
+        '  ubml next --with AC00004       what one answerer owes (any part of answeredBy, any case)',
+      ].join('\n'),
+    )
     .action((tags: string[], options: { dir: string; with?: string }) => run(tags, options));
 }

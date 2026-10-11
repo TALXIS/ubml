@@ -11,6 +11,7 @@ import { execSync } from 'child_process';
 import { mkdtempSync, rmSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join, resolve } from 'path';
+import { SCHEMA_VERSION } from '../../src/constants.js';
 
 let dir: string;
 
@@ -32,7 +33,7 @@ beforeAll(() => {
   dir = mkdtempSync(join(tmpdir(), 'ubml-next-'));
 
   write('insights.ubml.yaml', [
-    'ubml: "1.4"',
+    `ubml: "${SCHEMA_VERSION}"`,
     'name: Insights',
     'insights:',
     '  IN00001:',
@@ -79,15 +80,17 @@ let oneTag: string;
 let twoTags: string;
 let filtered: string;
 let midWalk: string;
+let nobody: string;
 
 describe('ubml next', () => {
   beforeAll(() => {
     oneTag = runUbml('next billing');
     twoTags = runUbml('next fulfilment billing');
     filtered = runUbml('next fulfilment billing --with AC00004');
+    nobody = runUbml('next fulfilment billing --with nobody');
 
     write('more.insights.ubml.yaml', [
-      'ubml: "1.4"',
+      `ubml: "${SCHEMA_VERSION}"`,
       'name: More',
       'insights:',
       '  IN00007:',
@@ -97,7 +100,7 @@ describe('ubml next', () => {
     ]);
     midWalk = runUbml('next billing');
     rmSync(join(dir, 'more.insights.ubml.yaml'));
-  });
+  }, 60_000);
 
   it('keeps linked claims with nothing authored as one item', () => {
     expect(oneTag).toContain('The head of something undecided with nothing authored.');
@@ -136,6 +139,11 @@ describe('ubml next', () => {
   it('narrows to what one person can answer', () => {
     expect(filtered).toContain('A question for a named person.');
     expect(filtered).not.toContain('The head of something undecided with nothing authored.');
+  });
+
+  it('names the filter when it leaves nothing', () => {
+    expect(nobody).toContain('Nothing deferred to anyone matching "nobody".');
+    expect(nobody).not.toContain('Nothing is waiting on anybody');
   });
 
   it('says the list is incomplete while anything is unreviewed', () => {
