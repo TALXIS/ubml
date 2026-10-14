@@ -254,6 +254,23 @@ $defs:
         description: |
           Who said or observed this. Plain text — can be a name, role, or
           description like "multiple workshop participants".
+
+          Where it says somebody accepted or agreed, the quote has to show them
+          engaging with the substance: asking what was meant, restating it in
+          their own words, or reasoning about what follows from it. A short
+          "yeah" or "OK" is a signal to keep talking at least as often as it is
+          an answer, and inside a list read out to close a meeting it is almost
+          always the former. Cite the engagement rather than the
+          acknowledgement. Where there is no engagement to cite, the claim is
+          the speaker's own position and this field says only who stated it.
+
+          Some people agree by saying yes and nothing else, and a workspace
+          that will not record their agreement records nothing. Where the
+          brevity is the person rather than the moment, write that in `notes` -
+          whose habit it is and what the reading rests on - and leave
+          `confidence` at what a bare yes is worth. An override somebody can
+          read is one they can argue with; one taken in silence cannot be told
+          apart from the mistake it resembles.
         type: string
       
       date:
