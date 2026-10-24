@@ -66,9 +66,27 @@ export function generateSectionYaml(
   // Generate sample items based on section type
   const items = generateSectionItems(docType, section, name);
   
+  // A sequence section is a YAML list; an ID-keyed section is a map.
+  const isArray = section.isArray ?? false;
+
+  if (isArray) {
+    // Sequence items are mandatory-field-heavy and usually reference IDs the
+    // user has not created yet, so scaffold an empty list and show the shape as
+    // a comment. An empty list validates; a dangling reference does not.
+    lines.push('  []');
+    for (const item of items) {
+      let first = true;
+      for (const [key, value] of Object.entries(item.properties)) {
+        lines.push(`  ${first ? '# - ' : '#   '}${key}: ${formatValue(value)}`);
+        first = false;
+      }
+    }
+    return lines;
+  }
+
   for (const item of items) {
     lines.push(`  ${item.id}:`);
-    
+
     // Check for raw YAML content (pre-formatted)
     const rawContent = item.properties.__raw;
     if (rawContent && typeof rawContent === 'string') {
@@ -78,7 +96,7 @@ export function generateSectionYaml(
       // Output regular properties
       for (const [key, value] of Object.entries(item.properties)) {
         const propInfo = section.properties.find(p => p.name === key);
-        const comment = propInfo?.enumValues 
+        const comment = propInfo?.enumValues
           ? `  # ${propInfo.enumValues.join(' | ')}`
           : '';
         lines.push(`    ${key}: ${formatValue(value)}${comment}`);
@@ -90,7 +108,7 @@ export function generateSectionYaml(
       }
     }
   }
-  
+
   return lines;
 }
 

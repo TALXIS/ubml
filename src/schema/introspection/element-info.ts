@@ -10,7 +10,7 @@ import {
   ID_PREFIXES,
   type IdPrefix,
 } from '../../generated/data.js';
-import { typeSchemas, refsDefsSchema } from '../../generated/bundled.js';
+import { typeSchemas, refsDefsSchema, sharedDefsSchema } from '../../generated/bundled.js';
 import { getTypeString } from '../utils.js';
 import type {
   ElementTypeInfo,
@@ -68,7 +68,7 @@ export function getElementTypeInfo(elementType: string): ElementTypeInfo | undef
             type: getTypeString(propSchema),
             description: (propSchema.description as string)?.split('\n')[0] ?? '',
             required: required.includes(propName),
-            enumValues: propSchema.enum as string[] | undefined,
+            enumValues: enumOf(propSchema),
             examples: propSchema.examples as unknown[] | undefined,
             pattern: propSchema.pattern as string | undefined,
             default: propSchema.default,
@@ -91,6 +91,26 @@ export function getElementTypeInfo(elementType: string): ElementTypeInfo | undef
   }
 
   return undefined;
+}
+
+/**
+ * The values a property may take, whether the enum is written on the property
+ * or behind a $ref.
+ *
+ * A shared vocabulary lives in defs and is referenced from every type that
+ * carries it, so reading only the inline form prints one half of a pair and
+ * looks complete - `reviewStatus` was invisible to `ubml enums` for exactly
+ * this reason, while `status` beside it printed.
+ */
+function enumOf(prop: Record<string, unknown>): string[] | undefined {
+  if (Array.isArray(prop.enum)) return prop.enum as string[];
+  const ref = typeof prop.$ref === 'string' ? prop.$ref : undefined;
+  const name = ref?.split('/$defs/')[1];
+  if (!name) return undefined;
+  const defs = (sharedDefsSchema as Record<string, unknown>).$defs as
+    Record<string, Record<string, unknown>> | undefined;
+  const target = defs?.[name];
+  return Array.isArray(target?.enum) ? (target.enum as string[]) : undefined;
 }
 
 /**
@@ -189,7 +209,7 @@ export function getConceptInfo(conceptName: string): {
             type: getTypeString(propSchema),
             description: (propSchema.description as string) ?? '',
             required: required.includes(propName),
-            enumValues: propSchema.enum as string[] | undefined,
+            enumValues: enumOf(propSchema),
             examples: propSchema.examples as unknown[] | undefined,
             pattern: propSchema.pattern as string | undefined,
             default: propSchema.default,

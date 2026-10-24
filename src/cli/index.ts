@@ -28,6 +28,8 @@ import { addCommand } from './commands/add/index';
 import { showCommand } from './commands/show';
 import { helpCommand } from './commands/help';
 import { syntaxCommand, idsCommand, enumsCommand, nextidCommand, syncidsCommand } from './commands/ref';
+import { walkCommand } from './commands/walk';
+import { importCommand } from './commands/import';
 
 /**
  * Create and configure the CLI program.
@@ -43,8 +45,9 @@ export function createProgram(): Command {
     .addHelpText('after', `
 ${chalk.bold('Getting Started:')}
   ${chalk.cyan('ubml init my-project')}     Create a new UBML workspace
+  ${chalk.cyan('cd my-project')}            Work inside it
   ${chalk.cyan('ubml schema')}              Explore what you can model
-  ${chalk.cyan('ubml add process')}         Add a new process file
+  ${chalk.cyan('ubml add')}                 See what you can add to it
   ${chalk.cyan('ubml validate .')}          Validate all files
 
 ${chalk.bold('Learn More:')}
@@ -67,6 +70,8 @@ ${chalk.dim('Documentation: https://ubml.talxis.com/docs')}
   program.addCommand(syntaxCommand());    // Quick syntax lookup
   program.addCommand(idsCommand());       // ID patterns
   program.addCommand(enumsCommand());     // Enum values
+  program.addCommand(walkCommand());      // Stakeholder review bookkeeping
+  program.addCommand(importCommand());    // Transcript to the text a source cites
   program.addCommand(nextidCommand());    // Next available ID
   program.addCommand(syncidsCommand());   // Sync ID stats from files
 

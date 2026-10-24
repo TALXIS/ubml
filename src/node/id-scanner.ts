@@ -116,22 +116,35 @@ export function readIdStats(dir: string): IdStats | undefined {
  * Write idStats to the cache file.
  * Creates the .ubml directory if it doesn't exist.
  */
-export function writeIdStats(dir: string, stats: IdStats): boolean {
+export function writeIdStats(
+  dir: string,
+  stats: IdStats,
+  options: {
+    /**
+     * Replace the cached value instead of keeping the larger of the two.
+     * A scan of the files is authoritative and may legitimately be LOWER than
+     * what is cached - after a branch switch, or when ids were deleted. Merging
+     * there would keep a stale high-water mark forever, which is exactly what
+     * the caller doing the scan is trying to correct.
+     */
+    replace?: boolean;
+  } = {}
+): boolean {
   try {
     ensureUbmlDir(dir);
     const cachePath = getIdCachePath(dir);
-    
+
     // Merge with existing stats (only update, don't remove)
     const existingStats = readIdStats(dir) ?? {};
     const mergedStats: IdStats = { ...existingStats };
-    
+
     for (const [prefix, value] of Object.entries(stats)) {
       const existingValue = mergedStats[prefix as IdPrefix] ?? 0;
-      if (value !== undefined && value > existingValue) {
+      if (value !== undefined && (options.replace || value > existingValue)) {
         mergedStats[prefix as IdPrefix] = value;
       }
     }
-    
+
     const cache: IdStatsCache = {
       version: 1,
       maxIds: mergedStats,
@@ -246,11 +259,18 @@ export function getNextAvailableId(
     useGaps?: boolean;
     /** Minimum starting number (defaults to addOffset) */
     minStart?: number;
-    /** Update workspace idStats after generating ID */
+    /**
+     * Record the returned ID as the new high-water mark.
+     *
+     * Only true when the caller is about to write that ID into a document.
+     * Asking what the next ID would be must not consume it: a query that
+     * mutates the cache returns a different answer every time it is asked, and
+     * the caller has no way to tell that is happening.
+     */
     updateStats?: boolean;
   } = {}
 ): { id: string; usedStats: boolean } {
-  const { useGaps = true, minStart = ID_CONFIG.addOffset, updateStats = true } = options;
+  const { useGaps = true, minStart = ID_CONFIG.addOffset, updateStats = false } = options;
   
   // Try to use workspace stats first (fast path)
   const stats = readIdStats(dir);
@@ -282,17 +302,13 @@ export function getNextAvailableId(
     // No existing IDs, start from minStart
     nextNum = minStart;
   } else if (useGaps) {
-    // Round up to next multiple of 10
+    // Round up to next multiple of 10. minStart is the floor for a workspace
+    // with no IDs yet; once IDs exist the sequence continues from them, or a
+    // workspace numbered from 1 gets a 989-wide hole and two disjoint ranges
+    // in one document.
     nextNum = Math.ceil((maxNum + 1) / 10) * 10;
-    // Ensure we're at least at minStart
-    if (nextNum < minStart) {
-      nextNum = minStart;
-    }
   } else {
     nextNum = maxNum + 1;
-    if (nextNum < minStart) {
-      nextNum = minStart;
-    }
   }
   
   const id = formatId(prefix, nextNum);
@@ -410,11 +426,13 @@ export function syncIdStats(dir: string): IdStats {
     }
   }
   
-  // Write to cache
+  // Write to cache. The scan is authoritative, so replace rather than merge -
+  // a merge would silently discard a corrected value that is lower than the
+  // stale one, leaving syncids unable to repair the case it exists for.
   if (Object.keys(stats).length > 0) {
-    writeIdStats(dir, stats);
+    writeIdStats(dir, stats, { replace: true });
   }
-  
+
   return stats;
 }
 

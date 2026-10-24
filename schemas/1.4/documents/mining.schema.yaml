@@ -36,7 +36,7 @@ description: |
 x-ubml-cli:
   category: advanced
   categoryDisplayName: "Advanced"
-  workflowOrder: 12
+  workflowOrder: 14
   shortDescription: "Configure process mining data sources and mappings."
   defaultFilename: "event-log"
   detectBy:

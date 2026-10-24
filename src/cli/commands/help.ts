@@ -26,6 +26,7 @@ import {
   type DocumentType,
 } from '../../metadata.js';
 import { INDENT, header, subheader, dim, code, highlight } from '../formatters/text';
+import { SCAFFOLDED_TYPES, addCommandFor } from './init';
 
 // =============================================================================
 // Helpers
@@ -99,37 +100,45 @@ function showQuickstart(): void {
   
   console.log(subheader('1. Initialize a Workspace'));
   console.log();
-  console.log(INDENT + code('ubml init my-project') + dim('     # Create new project'));
+  console.log(INDENT + code('ubml init my-project') + dim('     # Scaffold - never write one by hand'));
   console.log(INDENT + code('cd my-project'));
-  console.log(INDENT + code('code .') + dim('                     # Open in VS Code'));
+  console.log(INDENT + dim('README.md says what each file holds and the order they are worked in'));
   console.log();
-  
-  console.log(subheader('2. Explore What You Can Model'));
+
+  console.log(subheader('2. Register the Evidence First'));
   console.log();
-  console.log(INDENT + code('ubml schema') + dim('                # See document types'));
-  console.log(INDENT + code('ubml help process') + dim('          # Learn about processes'));
-  console.log(INDENT + code('ubml help workflow') + dim('         # Recommended order'));
+  console.log(INDENT + code('ubml import call.vtt sources/<name>.md') + dim('   # convert a transcript'));
+  console.log(INDENT + dim('Record it in sources.ubml.yaml: what it is, when, who was there.'));
+  console.log(INDENT + dim('The stored text is what every quote is checked against.'));
   console.log();
-  
-  console.log(subheader('3. Add Content'));
+
+  console.log(subheader('3. Draw Claims From It'));
   console.log();
-  console.log(INDENT + code('ubml add') + dim('                   # See what you can add'));
-  console.log(INDENT + code('ubml add process') + dim('           # Add a process file'));
-  console.log(INDENT + code('ubml add actors') + dim('            # Add actors/roles'));
+  console.log(INDENT + dim('One claim each, quoted verbatim, citing the source it came from.'));
+  console.log(INDENT + code('ubml help insights') + dim('         # what a claim carries'));
   console.log();
-  
-  console.log(subheader('4. Validate Your Model'));
+
+  console.log(subheader('4. Walk Them With Somebody Who Was There'));
   console.log();
-  console.log(INDENT + code('ubml validate .') + dim('            # Check for errors'));
+  console.log(INDENT + code('ubml walk next') + dim('             # the next claim, source beside it'));
+  console.log(INDENT + code('ubml walk legend') + dim('           # what each status means'));
+  console.log(INDENT + code('ubml walk set <id> validated'));
   console.log();
-  
-  console.log(subheader('5. Visualize'));
+
+  console.log(subheader('5. Model What Was Settled'));
   console.log();
-  console.log(INDENT + code('ubml show') + dim('                  # See workspace summary'));
-  console.log(INDENT + code('ubml show tree') + dim('             # Hierarchical view'));
+  console.log(INDENT + code('ubml add') + dim('                   # see what you can add'));
+  console.log(INDENT + dim('Every element carries derivedFrom, naming the claim it rests on.'));
   console.log();
-  
-  console.log(dim('─'.repeat(60)));
+
+  console.log(subheader('6. Validate'));
+  console.log();
+  console.log(INDENT + code('ubml validate .') + dim('            # zero errors before anything is merged'));
+  console.log(INDENT + code('ubml show tree') + dim('             # see the shape'));
+  console.log();
+
+  console.log(dim('\u2500'.repeat(60)));
+  console.log(dim('A model built before its evidence is an opinion. Sources first, always.'));
   console.log(dim('More: ubml help <topic>  |  Topics: concepts, step, actor, ids'));
   console.log();
 }
@@ -242,7 +251,7 @@ function showDocumentHelp(docType: string): void {
   }
   
   console.log(subheader('Quick Start'));
-  console.log(INDENT + code(`ubml add ${docType}`));
+  for (const line of howToStart(docType as DocumentType)) console.log(INDENT + line);
   console.log();
 }
 
@@ -397,6 +406,15 @@ function showRaciHelp(): void {
   console.log();
 }
 
+function howToStart(type: DocumentType): string[] {
+  if (type === 'workspace') return [code(addCommandFor(type)) + dim(' writes <name>.workspace.ubml.yaml')];
+  if (!(SCAFFOLDED_TYPES as readonly DocumentType[]).includes(type)) return [code(addCommandFor(type))];
+  return [
+    code('ubml init') + dim(` scaffolds ${type}.ubml.yaml - add to it, or name another:`),
+    code(addCommandFor(type)),
+  ];
+}
+
 function showWorkflow(): void {
   console.log();
   console.log(header('Recommended Modeling Workflow'));
@@ -410,12 +428,13 @@ function showWorkflow(): void {
     const info = getDocumentTypeInfo(item.type);
     console.log(`${step}. ${highlight(item.type)} - ${info?.title || item.type}`);
     console.log(INDENT + dim(item.reason));
-    console.log(INDENT + code(`ubml add ${item.type}`));
+    for (const line of howToStart(item.type)) console.log(INDENT + line);
     console.log();
     step++;
   }
   
   console.log(dim('─'.repeat(60)));
+  console.log(dim('ubml init --minimal writes only the workspace; ubml add <type> creates each of the others'));
   console.log(dim('This order minimizes forward references and validates progressively'));
   console.log();
 }

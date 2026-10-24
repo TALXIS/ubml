@@ -223,6 +223,20 @@ export function extractReferencedIds(
   return refs;
 }
 
+/** The insight behind an id, wherever in the workspace it was written. */
+function findInsight(
+  documents: UBMLDocument[],
+  id: string,
+): { status?: string } | undefined {
+  for (const document of documents) {
+    const insights = (document.content as Record<string, unknown>)?.insights;
+    if (insights && typeof insights === 'object' && id in insights) {
+      return (insights as Record<string, { status?: string }>)[id];
+    }
+  }
+  return undefined;
+}
+
 /**
  * Validate cross-document references in a collection of pre-parsed documents.
  * 
@@ -306,6 +320,63 @@ export function validateDocuments(
         });
       }
     }
+  }
+
+  // An insight that has been replaced should say so in its status. The
+  // newer claim already names what it supersedes; without this the older one
+  // keeps asserting itself and every element citing it still looks sourced.
+  for (const document of documents) {
+    const insights = (document.content as Record<string, unknown>)?.insights;
+    if (!insights || typeof insights !== 'object') continue;
+
+    for (const [id, body] of Object.entries(insights as Record<string, unknown>)) {
+      const replaced = (body as Record<string, unknown>)?.supersedes;
+      if (typeof replaced !== 'string') continue;
+
+      const older = findInsight(documents, replaced);
+      if (!older) continue; // an undefined reference, already reported above
+
+      if (older.status !== 'retired') {
+        const filepath = document.meta.filename || 'unknown';
+        const location = document.getSourceLocation(`/insights/${id}`);
+        warnings.push({
+          message:
+            `"${id}" supersedes "${replaced}", which is still ` +
+            `${older.status ?? 'proposed'} - a replaced insight should be retired`,
+          filepath,
+          path: `insights.${id}`,
+          code: 'ubml/superseded-not-retired',
+          ...(location && { line: location.line, column: location.column }),
+        });
+      }
+    }
+  }
+
+  for (const document of documents) {
+    const filepath = document.meta.filename || 'unknown';
+    const visit = (value: unknown, path: string[]): void => {
+      if (!value || typeof value !== 'object') return;
+      if (Array.isArray(value)) {
+        value.forEach((item, index) => visit(item, [...path, String(index)]));
+        return;
+      }
+      const obj = value as Record<string, unknown>;
+      const id = path[path.length - 1];
+      if (obj.reviewStatus === 'accepted' && id && isValidId(id)) {
+        const location = document.getSourceLocation(`/${path.join('/')}`);
+        for (const message of unvalidatedApproval(id, obj.derivedFrom, (ref) => findInsight(documents, ref))) {
+          warnings.push({
+            message,
+            filepath,
+            path: path.join('.'),
+            code: 'ubml/accepted-on-unvalidated-insight',
+            ...(location && { line: location.line, column: location.column }),
+          });
+        }
+      }
+      for (const [key, child] of Object.entries(obj)) visit(child, [...path, key]);
+    };
+    visit(document.content, []);
   }
 
   // Check for unused IDs (warning only)
@@ -399,9 +470,82 @@ export interface WorkspaceValidationResult {
   documentTypes: Map<DocumentType, string[]>;
 }
 
+export function unvalidatedApproval(
+  id: string,
+  derivedFrom: unknown,
+  insightOf: (ref: string) => { status?: string } | undefined,
+): string[] {
+  const cited = Array.isArray(derivedFrom)
+    ? derivedFrom.filter((ref): ref is string => typeof ref === 'string')
+    : [];
+  if (cited.length === 0) {
+    return [`"${id}" is accepted and cites no insight - an accepted element rests on evidence`];
+  }
+  return cited.flatMap((ref) => {
+    const insight = insightOf(ref);
+    const status = insight?.status ?? 'proposed';
+    if (!insight || status === 'validated') return [];
+    // Retired is settled: the claim was withdrawn, so nothing rests on it and
+    // there is no judgement to make. Deferred is not, and whether it matters
+    // depends on something only a reader can see - whether this element states
+    // the thing the claim leaves open. Saying "should rest on validated
+    // insights" for both is false for half of them, and a rule that is wrong
+    // half the time gets read past.
+    if (status === 'retired') {
+      return [`"${id}" is accepted and rests on "${ref}", which was withdrawn - cite what replaced it, or drop it`];
+    }
+    if (status === 'deferred') {
+      return [`"${id}" is accepted and rests on "${ref}", which is still open - if this element states what that claim leaves open it is not accepted; if the claim would only extend it later, this is fine`];
+    }
+    return [`"${id}" is accepted and rests on "${ref}", which is ${status} - an accepted element rests on evidence somebody has confirmed`];
+  });
+}
+
+/**
+ * Count elements whose modelling decision is still awaiting a reviewer.
+ *
+ * Walks the parsed content rather than the schema, so it picks up every element
+ * type that carries reviewStatus without needing to know which those are.
+ */
+export function findProposedElements(content: unknown): string[] {
+  const ids: string[] = [];
+
+  const walk = (value: unknown, key?: string): void => {
+    if (!value || typeof value !== 'object') return;
+    if (Array.isArray(value)) {
+      for (const item of value) walk(item);
+      return;
+    }
+    const obj = value as Record<string, unknown>;
+    if (obj.reviewStatus === 'proposed') {
+      // Name them. A count tells a reviewer there is work and not where it is.
+      ids.push(key ?? String(obj.name ?? 'unnamed'));
+    }
+    for (const [childKey, child] of Object.entries(obj)) walk(child, childKey);
+  };
+
+  walk(content);
+  return ids;
+}
+
+function countProposedElements(
+  documents: UBMLDocument[]
+): { ids: string[]; files: string[] } {
+  const ids: string[] = [];
+  const files: string[] = [];
+
+  for (const doc of documents) {
+    const found = findProposedElements(doc.content);
+    ids.push(...found);
+    files.push(...found.map(() => doc.meta.filename || 'unknown'));
+  }
+
+  return { ids, files };
+}
+
 /**
  * Validate workspace structure and conventions.
- * 
+ *
  * Checks for:
  * - Missing workspace file
  * - Multiple singleton documents (workspace, glossary, strategy)
@@ -459,6 +603,27 @@ export function validateWorkspaceStructure(
         suggestion: 'Add actors.ubml.yaml to define who performs process steps',
       });
     }
+  }
+
+  // Surface modelling decisions nobody has approved.
+  //
+  // derivedFrom proves an element came from evidence a reviewer confirmed. It
+  // says nothing about whether anyone agreed that this evidence should become
+  // THIS element, and a workspace where that was never asked looks exactly like
+  // one where it was. An absent reviewStatus means not specified (P4.4), so
+  // this counts only the elements explicitly marked proposed.
+  const proposed = countProposedElements(documents);
+  if (proposed.ids.length > 0) {
+    const shown = proposed.ids.slice(0, 8).join(', ');
+    const rest = proposed.ids.length - 8;
+    warnings.push({
+      message: proposed.ids.length === 1
+        ? `1 model element carries reviewStatus: proposed (${shown})`
+        : `${proposed.ids.length} model elements carry reviewStatus: proposed: ${shown}${rest > 0 ? `, and ${rest} more` : ''}`,
+      code: 'ubml/unreviewed-model-elements',
+      files: [...new Set(proposed.files)],
+      suggestion: 'A reviewer has not approved these modelling decisions. Walk them, then set reviewStatus: accepted or rejected',
+    });
   }
 
   // Suggest glossary for complex workspaces

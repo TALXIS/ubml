@@ -8,7 +8,7 @@
 
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { existsSync, writeFileSync, readdirSync } from 'fs';
+import { existsSync, writeFileSync, readdirSync, mkdirSync } from 'fs';
 import { join, resolve, basename } from 'path';
 import { findWorkspaceFile } from '../../../node/id-scanner';
 import {
@@ -23,6 +23,7 @@ import {
 import { INDENT, success, highlight, code, dim } from '../../formatters/text';
 import { toKebabCase } from '../../../utils/index.js';
 import { createCommentedTemplate } from './templates.js';
+import { SCAFFOLDED_TYPES } from '../init';
 
 /**
  * Find existing UBML files in a directory.
@@ -106,8 +107,12 @@ function showWhatCanBeAdded(dir: string): void {
   console.log('Usage: ' + code('ubml add <type> [name]'));
   console.log();
   console.log('Examples:');
-  console.log(INDENT + code('ubml add process') + dim('              # Creates process.ubml.yaml'));
-  console.log(INDENT + code('ubml add process order-fulfillment') + dim(' # Creates order-fulfillment.process.ubml.yaml'));
+  const example = (command: string, file: string): void => {
+    console.log(INDENT + code(command.padEnd(36)) + dim(`# Creates ${file}`));
+  };
+  const unheld = DOCUMENT_TYPES.find((type) => type !== 'workspace' && !existingTypes.includes(type));
+  if (unheld) example(`ubml add ${unheld}`, `${getDefaultName(unheld, dir)}.${unheld}.ubml.yaml`);
+  example('ubml add process order-fulfillment', 'order-fulfillment.process.ubml.yaml');
   console.log();
 }
 
@@ -161,6 +166,25 @@ function addDocument(
   const filename = `${baseName}.${type}.ubml.yaml`;
   const filepath = join(dir, filename);
 
+  const held = findExistingUbmlFiles(dir).filter((f) => f.type === type);
+  const workspace = type === 'workspace' ? held.find((f) => f.path !== filepath || !options.force) : undefined;
+  if (workspace) {
+    console.error(chalk.red(`Error: This folder already has a workspace: ${basename(workspace.path)}`));
+    console.error();
+    console.error('A folder holds one workspace. Edit that one.');
+    process.exit(1);
+  }
+
+  const sameType = name ? undefined : held.find((f) => f.path !== filepath);
+  if (sameType) {
+    const article = /^[aeiou]/.test(type) ? 'an' : 'a';
+    console.error(chalk.red(`Error: This workspace already has ${article} ${type} document: ${basename(sameType.path)}`));
+    console.error();
+    console.error('Add to that one, or name another:');
+    console.error(INDENT + code(`ubml add ${type} <name>`));
+    process.exit(1);
+  }
+
   // Check if file exists
   if (existsSync(filepath) && !options.force) {
     console.error(chalk.red(`Error: File already exists: ${filename}`));
@@ -174,6 +198,7 @@ function addDocument(
   const content = createCommentedTemplate(type, name || baseName);
 
   // Write file
+  mkdirSync(dir, { recursive: true });
   writeFileSync(filepath, content);
 
   console.log();
@@ -215,6 +240,7 @@ function addDocument(
  */
 export function addCommand(): Command {
   const command = new Command('add');
+  const unscaffolded = DOCUMENT_TYPES.find((type) => !(SCAFFOLDED_TYPES as readonly DocumentType[]).includes(type));
 
   command
     .description('Add a new UBML document to your workspace')
@@ -227,10 +253,10 @@ Examples:
   ${chalk.dim('# Show available document types')}
   ubml add
 
-  ${chalk.dim('# Add a process document')}
-  ubml add process
+  ${chalk.dim('# Add a document of a type init does not scaffold')}
+  ubml add ${unscaffolded}
 
-  ${chalk.dim('# Add a named process document')}
+  ${chalk.dim('# Add a named process document beside the one init wrote')}
   ubml add process customer-onboarding
 
   ${chalk.dim('# Add actors to a subdirectory')}

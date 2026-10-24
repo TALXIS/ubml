@@ -36,7 +36,7 @@ description: |
 x-ubml-cli:
   category: core
   categoryDisplayName: "Core Modeling"
-  workflowOrder: 2
+  workflowOrder: 4
   shortDescription: "Define people, roles, teams, and systems that participate in processes."
   defaultFilename: "actors"
   detectBy:

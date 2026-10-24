@@ -266,6 +266,12 @@ $defs:
         items:
           type: string
       
+      reviewStatus:
+        description: |
+          Whether a reviewer approved the modelling decision behind this element.
+          Absent means not specified, never accepted.
+        $ref: "../defs/shared.defs.yaml#/$defs/ReviewStatus"
+
       derivedFrom:
         description: |
           Insights that support or justify the existence of this entity.
