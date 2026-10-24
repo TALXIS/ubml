@@ -189,6 +189,23 @@ $defs:
       category: analysis
       categoryDisplayName: "Analysis"
 
+  HypothesisTreeRef:
+    description: |
+      Reference to a hypothesis tree (HT### pattern).
+
+      A tree carries the SCQH framing its hypothesis nodes hang from.
+
+      Examples: HT00001, HT010, HT100
+    type: string
+    pattern: "^HT\\d{5,}$"
+    x-ubml:
+      prefix: "HT"
+      humanName: "Hypothesis Tree ID"
+      shortDescription: "Hypothesis trees"
+      errorHint: "HT + 5+ digits (e.g., HT00001, HT00010)"
+      category: analysis
+      categoryDisplayName: "Analysis"
+
   SourceRef:
     description: |
       Reference to a knowledge source (SR##### pattern).

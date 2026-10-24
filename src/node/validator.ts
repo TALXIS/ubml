@@ -4,7 +4,7 @@
  * File system operations for validating UBML documents.
  */
 
-import { resolve, basename } from 'path';
+import { resolve, basename, dirname } from 'path';
 import { type FileSystem, nodeFS } from './fs.js';
 import { parseFile } from './parser.js';
 import { 
@@ -317,6 +317,156 @@ async function findSkippedUBMLFiles(
  * }
  * ```
  */
+/**
+ * Check that every source's companion file actually resolves.
+ *
+ * `file` is documented as a path relative to the document that declares it, and
+ * `url` is where an external artefact lives. Putting a URL in `file` validates
+ * cleanly today and quietly defeats the point: the text an extraction quoted
+ * from is no longer in the workspace, so no reader can check a quote against it.
+ *
+ * A dangling path is worse still - it looks like the evidence is filed when it
+ * is not.
+ */
+/** Curly quotes, dashes and runs of space differ between a transcript and a
+ * claim that was copied out of it by hand. None of them change the words. */
+function comparable(text: string): string {
+  return text
+    .replace(/[\u2018\u2019\u02bc]/g, "'")
+    .replace(/[\u201c\u201d]/g, '"')
+    .replace(/[\u2013\u2014]/g, '-')
+    .replace(/\u00a0/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+}
+
+/**
+ * Check that every quote is in the source it claims to come from.
+ *
+ * A quote nobody can find is worse than no quote: it reads as evidence and is
+ * not. Ellipsis marks a cut the extractor made, so each side of it is checked
+ * on its own rather than as one span that was never continuous.
+ */
+async function checkQuotes(
+  documents: UBMLDocument[],
+  fs: FileSystem
+): Promise<{ warnings: FileValidationWarning[]; errors: FileValidationError[] }> {
+  const warnings: FileValidationWarning[] = [];
+  const unquotable: FileValidationError[] = [];
+
+  const fileOf = new Map<string, string>();
+  for (const doc of documents) {
+    if (doc.meta.type !== 'sources' || !doc.meta.filepath) continue;
+    const sources = (doc.content as { sources?: Record<string, { file?: unknown }> })?.sources;
+    const dir = dirname(doc.meta.filepath);
+    for (const [id, source] of Object.entries(sources ?? {})) {
+      if (typeof source?.file === 'string' && source.file && !source.file.includes('://')) {
+        fileOf.set(id, resolve(dir, source.file));
+      }
+    }
+  }
+
+  const text = new Map<string, string>();
+  for (const doc of documents) {
+    if (doc.meta.type !== 'insights' || !doc.meta.filepath) continue;
+    const insights = (doc.content as {
+      insights?: Record<string, { quote?: unknown; source?: unknown }>;
+    })?.insights;
+
+    for (const [id, insight] of Object.entries(insights ?? {})) {
+      const quote = insight?.quote;
+      const spans = typeof quote === 'string' ? [quote] : Array.isArray(quote) ? quote : [];
+      if (!spans.length) continue;
+
+      // Quoting a source nobody can open is the failure this exists to stop:
+      // it reads as evidence, and there is nothing to read it against. A source
+      // nobody quotes needs no file - a corridor conversation is a real source
+      // and produced no artefact.
+      const path = fileOf.get(String(insight?.source ?? ''));
+      if (!path) {
+        unquotable.push({
+          code: 'QUOTED_SOURCE_HAS_NO_FILE',
+          message: `${id} quotes ${String(insight?.source)}, which has no \`file\` to check it against`,
+          path: `/insights/${id}/quote`,
+          filepath: doc.meta.filepath,
+        });
+        continue;
+      }
+
+      if (!text.has(path)) {
+        try {
+          text.set(path, comparable(await fs.readFile(path)));
+        } catch {
+          continue;
+        }
+      }
+      const haystack = text.get(path) as string;
+
+      for (const span of spans) {
+        if (typeof span !== 'string') continue;
+        const parts = span.split(/\s*(?:\.\.\.|\u2026)\s*/).filter((p) => p.trim());
+        for (const part of parts) {
+          if (haystack.includes(comparable(part))) continue;
+          warnings.push({
+            code: 'QUOTE_NOT_IN_SOURCE',
+            message: `${id}: "${part.trim().slice(0, 60)}" is not in ${String(insight?.source)}`,
+            path: `/insights/${id}/quote`,
+            filepath: doc.meta.filepath,
+          });
+        }
+      }
+    }
+  }
+
+  return { warnings, errors: unquotable };
+}
+
+async function checkSourceFiles(
+  documents: UBMLDocument[],
+  fs: FileSystem
+): Promise<FileValidationError[]> {
+  const errors: FileValidationError[] = [];
+
+  for (const doc of documents) {
+    if (doc.meta.type !== 'sources' || !doc.meta.filepath) continue;
+
+    const sources = (doc.content as {
+      sources?: Record<string, { file?: unknown; type?: unknown }>;
+    })?.sources;
+    if (!sources) continue;
+
+    const dir = dirname(doc.meta.filepath);
+
+    for (const [id, source] of Object.entries(sources)) {
+      const file = source?.file;
+
+      if (typeof file !== 'string' || !file) continue;
+
+      if (file.includes('://')) {
+        errors.push({
+          code: 'SOURCE_FILE_IS_URL',
+          message: `${id}: \`file\` holds a URL. Use \`url\` for the artefact and \`file\` for a text copy stored beside the workspace`,
+          path: `/sources/${id}/file`,
+          filepath: doc.meta.filepath,
+        });
+        continue;
+      }
+
+      if (!(await fs.exists(resolve(dir, file)))) {
+        errors.push({
+          code: 'SOURCE_FILE_MISSING',
+          message: `${id}: \`file\` points at "${file}", which does not exist`,
+          path: `/sources/${id}/file`,
+          filepath: doc.meta.filepath,
+        });
+      }
+    }
+  }
+
+  return errors;
+}
+
 export async function validateWorkspace(
   dir: string,
   options: ValidateOptions = {}
@@ -386,6 +536,15 @@ export async function validateWorkspace(
   // Validate workspace structure
   const structureResult = validateWorkspaceStructure(documents);
 
+  // A source whose companion file does not resolve is evidence that cannot be
+  // re-read, which is the one thing a source entry exists to guarantee.
+  const sourceFileErrors = await checkSourceFiles(documents, fs);
+
+  // A quote that cannot be found in the file it cites reads as evidence and is
+  // not. Warned rather than failed: a transcript gets re-cut, and the claim may
+  // be ahead of the stored text rather than wrong.
+  const quoted = await checkQuotes(documents, fs);
+
   // Check for skipped UBML files (files not matching expected patterns)
   const skippedFiles = await findSkippedUBMLFiles(absoluteDir, fs, files);
   const skippedWarnings: WorkspaceWarning[] = skippedFiles.map(file => ({
@@ -412,6 +571,27 @@ export async function validateWorkspace(
       if (fileResult) {
         fileResult.warnings.push(warning as FileValidationWarning);
       }
+    }
+  }
+
+  for (const error of sourceFileErrors) {
+    const fileResult = fileResults.find(f => f.path === error.filepath);
+    if (fileResult) {
+      fileResult.errors.push(error);
+      fileResult.valid = false;
+    }
+  }
+
+  for (const warning of quoted.warnings) {
+    const fileResult = fileResults.find(f => f.path === warning.filepath);
+    if (fileResult) fileResult.warnings.push(warning);
+  }
+
+  for (const error of quoted.errors) {
+    const fileResult = fileResults.find(f => f.path === error.filepath);
+    if (fileResult) {
+      fileResult.errors.push(error);
+      fileResult.valid = false;
     }
   }
 

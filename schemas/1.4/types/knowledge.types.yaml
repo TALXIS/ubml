@@ -162,6 +162,7 @@ $defs:
       - proposed: Captured but not yet reviewed/validated
       - validated: Confirmed as accurate by review or evidence
       - disputed: Challenged or contradicted by other information
+      - deferred: Reviewed, and settling it needs somebody not in the room
       - retired: No longer relevant (superseded or context changed)
       
       MINIMAL EXAMPLE (capture in seconds):
@@ -220,8 +221,14 @@ $defs:
         description: |
           Validation status of this insight.
           Insights start as 'proposed' and move through review.
+
+          'deferred' is an answer, not the absence of one: a reviewer reached
+          this claim and decided not to decide, usually because confirming it
+          needs somebody who was not in the room. Tooling that offers the next
+          unreviewed claim skips it; tooling that reports what is outstanding
+          counts it separately.
         type: string
-        enum: [proposed, validated, disputed, retired]
+        enum: [proposed, validated, disputed, deferred, retired]
         default: proposed
         x-ubml:
           propertyNames: ["status"]
@@ -247,6 +254,23 @@ $defs:
         description: |
           Who said or observed this. Plain text — can be a name, role, or
           description like "multiple workshop participants".
+
+          Where it says somebody accepted or agreed, the quote has to show them
+          engaging with the substance: asking what was meant, restating it in
+          their own words, or reasoning about what follows from it. A short
+          "yeah" or "OK" is a signal to keep talking at least as often as it is
+          an answer, and inside a list read out to close a meeting it is almost
+          always the former. Cite the engagement rather than the
+          acknowledgement. Where there is no engagement to cite, the claim is
+          the speaker's own position and this field says only who stated it.
+
+          Some people agree by saying yes and nothing else, and a workspace
+          that will not record their agreement records nothing. Where the
+          brevity is the person rather than the moment, write that in `notes` -
+          whose habit it is and what the reading rests on - and leave
+          `confidence` at what a bare yes is worth. An override somebody can
+          read is one they can argue with; one taken in silence cannot be told
+          apart from the mistake it resembles.
         type: string
       
       date:
@@ -276,12 +300,72 @@ $defs:
             - $ref: "../defs/refs.defs.yaml#/$defs/EntityRef"
             - $ref: "../defs/refs.defs.yaml#/$defs/ProcessRef"
       
+      quote:
+        description: |
+          The words that were said, verbatim, from the source this insight
+          cites.
+
+          One entry per continuous span. A passage that reads continuously on
+          screen is often not continuous in the file - another speaker drops a
+          "Yeah." into the middle of it - and splicing those into one string
+          produces a quote that cannot be found in the source it claims to come
+          from. Keep them separate and each one stays checkable.
+
+          Separate from `context`, which is the reading of the quote rather
+          than the quote itself. Where both are present a reader sees what was
+          said and then what it was taken to mean.
+        type: array
+        items:
+          type: string
+        examples:
+          - - "we send the invoice only after the manager signs off"
+            - "Right, yes."
+
+      reviewedBy:
+        description: |
+          Who settled this insight's status, when that is not whoever commits
+          the file. Written by `ubml walk set --by`.
+
+          Usually it is the same person, and then this field says nothing the
+          commit does not already say. Leave it out. Asking a reviewer who they
+          are before the walk starts spends their first answer on a question
+          nobody needed.
+
+          It earns its place when the two come apart: a walk run on somebody
+          else's behalf, or a room where different people settled different
+          claims. There the commit names whoever typed, and this names whoever
+          decided.
+        type: string
+
+      answeredBy:
+        description: |
+          Who can settle this claim, where that is not whoever is walking it.
+
+          The counterpart of `reviewedBy`: one is who settled a claim, this is
+          who still can. `deferred` means reviewed and needing somebody who was
+          not in the room, and without this the somebody is nowhere, so a
+          question waiting on a partner and one waiting on a colleague are
+          indistinguishable to anybody reading the file and to `ubml next`.
+
+          Plain text, like `attribution`, because the answerer is often outside
+          the model - a market, a finance organisation, a partner nobody has
+          made an actor for. Where they are modelled, prefer their `AC#####` so
+          the model and `ubml next --with` agree about who is meant.
+
+          Read in place of `custom.answeredBy`, which earlier workspaces used
+          and which is still honoured.
+        type: string
+
       context:
         description: |
           Human-readable context for future readers.
           Explain the circumstances: what prompted this, what was happening,
           any relevant body language or tone. This field helps someone
           understand the insight 3 years from now without chasing sources.
+
+          Not the quote: the words that were said belong in `quote`, which is
+          checkable against the source. This is what they meant and why it
+          matters.
         type: string
       
       tags:

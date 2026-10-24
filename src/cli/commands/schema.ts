@@ -24,6 +24,7 @@ import {
 import { DOCUMENT_TYPES, type DocumentType } from '../../metadata.js';
 import { documentSchemas } from '../../generated/bundled.js';
 import { INDENT, header, subheader, dim, success, highlight, code } from '../formatters/text';
+import { addCommandFor } from './init';
 
 /**
  * Get human-readable hint for common regex patterns.
@@ -126,7 +127,8 @@ function displayWorkflow(): void {
   console.log();
   console.log('Quick start:');
   console.log(INDENT + code('ubml init my-project') + dim('        # Create a new workspace'));
-  console.log(INDENT + code('ubml add process') + dim('           # Add a process file'));
+  console.log(INDENT + code('cd my-project'));
+  console.log(INDENT + code('ubml add') + dim('                   # See what you can add to it'));
   console.log(INDENT + code('ubml validate .') + dim('            # Validate all files'));
   console.log();
 }
@@ -178,7 +180,7 @@ function displayDocumentType(type: DocumentType, options: { properties?: boolean
     console.log();
     console.log('Use ' + code(`ubml schema ${type} --template`) + ' to see a starter template.');
     console.log('Use ' + code(`ubml schema ${type} --properties`) + ' to see all available properties.');
-    console.log('Use ' + code(`ubml add ${type}`) + ' to create a new file of this type.');
+    console.log('Use ' + code(addCommandFor(type)) + ' to create a new file of this type.');
     console.log();
   }
 }

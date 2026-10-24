@@ -17,6 +17,8 @@ import {
   detectDocumentType,
 } from '../../metadata.js';
 import { INDENT, header, subheader, dim, highlight, success } from '../formatters/text';
+import { findProposedElements } from '../../semantic-validator.js';
+import { addCommandFor } from './init';
 
 // =============================================================================
 // Workspace Parsing
@@ -283,7 +285,33 @@ function showSummary(dir: string): void {
   console.log();
   console.log(dim('─'.repeat(60)));
   console.log(dim(`Total: ${info.files.length} files, ${info.totalElements} elements`));
+
+  const proposed = countProposedInFiles(info.files.map((f) => f.path));
+  if (proposed > 0) {
+    console.log(
+      dim(`${proposed} of them carry reviewStatus: proposed - nobody has approved that modelling yet`),
+    );
+  }
   console.log();
+}
+
+/**
+ * How many elements are still awaiting a reviewer.
+ *
+ * Read from the files rather than tracked during the scan: `show` builds a view
+ * of a handful of element types, and this has to count every type that carries
+ * reviewStatus, including ones the view never renders.
+ */
+function countProposedInFiles(paths: string[]): number {
+  let count = 0;
+  for (const path of paths) {
+    try {
+      count += findProposedElements(parseYaml(readFileSync(path, 'utf8'))).length;
+    } catch {
+      // a file that will not parse is already reported by validate
+    }
+  }
+  return count;
 }
 
 /**
@@ -373,7 +401,7 @@ function showProcesses(dir: string): void {
   if (info.processes.length === 0) {
     console.log(dim('No processes defined'));
     console.log();
-    console.log('Add a process with: ' + chalk.cyan('ubml add process'));
+    console.log('Add a process with: ' + chalk.cyan(addCommandFor('process')));
   } else {
     for (const proc of info.processes) {
       const stepCount = proc.children?.length || 0;
@@ -401,7 +429,7 @@ function showActors(dir: string): void {
   if (info.actors.length === 0) {
     console.log(dim('No actors defined'));
     console.log();
-    console.log('Add actors with: ' + chalk.cyan('ubml add actors'));
+    console.log('Add actors with: ' + chalk.cyan(addCommandFor('actors')));
   } else {
     // Group by type
     const byType = new Map<string, WorkspaceElement[]>();

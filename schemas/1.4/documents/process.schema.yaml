@@ -33,7 +33,7 @@ description: |
 x-ubml-cli:
   category: core
   categoryDisplayName: "Core Modeling"
-  workflowOrder: 3
+  workflowOrder: 5
   shortDescription: "Define business processes with steps, links, and control flow."
   defaultFilename: "sample"
   detectBy:

@@ -215,14 +215,17 @@ describe('Schema Introspection', () => {
   });
 
   describe('getSuggestedNextStep', () => {
-    it('should suggest actors after workspace', () => {
-      const next = getSuggestedNextStep(['workspace']);
-      expect(next?.type).toBe('actors');
+    it('suggests the evidence before anything modelled from it', () => {
+      // A workspace with nothing in it is asked for its sources, not its
+      // actors: a model built before the evidence is an opinion, and nothing
+      // downstream catches it because an element citing no insight is valid.
+      expect(getSuggestedNextStep(['workspace'])?.type).toBe('sources');
+      expect(getSuggestedNextStep(['workspace', 'sources'])?.type).toBe('insights');
     });
 
-    it('should suggest process after actors', () => {
-      const next = getSuggestedNextStep(['workspace', 'actors']);
-      expect(next?.type).toBe('process');
+    it('suggests the model once there are claims to build it from', () => {
+      expect(getSuggestedNextStep(['workspace', 'sources', 'insights'])?.type).toBe('actors');
+      expect(getSuggestedNextStep(['workspace', 'sources', 'insights', 'actors'])?.type).toBe('process');
     });
 
     it('should return undefined when workflow is complete', () => {

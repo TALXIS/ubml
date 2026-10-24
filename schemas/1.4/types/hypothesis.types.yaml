@@ -309,6 +309,12 @@ $defs:
           - $ref: "../defs/refs.defs.yaml#/$defs/SourceRef"
           - type: string
       
+      reviewStatus:
+        description: |
+          Whether a reviewer approved the modelling decision behind this element.
+          Absent means not specified, never accepted.
+        $ref: "../defs/shared.defs.yaml#/$defs/ReviewStatus"
+
       derivedFrom:
         description: |
           Insights that support or justify this hypothesis node.
@@ -416,6 +422,21 @@ $defs:
         type: string
         enum: [draft, in-progress, validated, invalidated, closed]
         default: draft
+
+      reviewStatus:
+        description: |
+          Whether a reviewer approved framing the problem this way. Distinct from
+          `status`, which reports how the analysis is going.
+          Absent means not specified, never accepted.
+        $ref: "../defs/shared.defs.yaml#/$defs/ReviewStatus"
+
+      derivedFrom:
+        description: |
+          Insights that support or justify this framing.
+          Links the tree back to the knowledge that informed it.
+        type: array
+        items:
+          $ref: "../defs/refs.defs.yaml#/$defs/InsightRef"
       
       owner:
         description: "Person responsible for this analysis."

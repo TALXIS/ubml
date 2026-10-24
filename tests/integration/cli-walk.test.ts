@@ -1,0 +1,822 @@
+/**
+ * Walk Command Tests
+ *
+ * `walk next` must pick the next unwalked insight in the order the material was
+ * produced, and `walk set` must change one line and nothing else - the workspace
+ * is a document a human is reading, not a serialisation target.
+ */
+
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { mkdtempSync, rmSync, writeFileSync, readFileSync } from 'fs';
+import { join } from 'path';
+import { tmpdir } from 'os';
+import { execSync, spawnSync } from 'child_process';
+import { SCHEMA_VERSION } from '../../src/constants.js';
+import { parse } from 'yaml';
+
+describe('CLI Walk Command', () => {
+  let tempDir: string;
+  let originalCwd: string;
+
+  const SOURCES = `ubml: "${SCHEMA_VERSION}"
+sources:
+  SR01010:
+    name: Later meeting
+    type: meeting
+    date: "2026-03-01"
+  SR01000:
+    name: Earlier note
+    type: document
+    date: "2026-01-01"
+`;
+
+  // Deliberately awkward: a comment, a blank line and an out-of-order id, all of
+  // which a parse-and-reserialise would quietly rewrite.
+  const INSIGHTS = `ubml: "${SCHEMA_VERSION}"
+
+# hand-written, and it should stay that way
+insights:
+
+  IN01010:
+    text: "From the later meeting."
+    kind: process-fact
+    status: proposed
+    source: SR01010
+    confidence: 0.8
+
+  IN01000:
+    text: "From the earlier note."
+    kind: decision
+    status: proposed
+    source: SR01000
+    confidence: 0.9
+    quote: ["the verbatim thing someone said"]
+    context: "and this is how to read it"
+`;
+
+  beforeEach(() => {
+    originalCwd = process.cwd();
+    tempDir = mkdtempSync(join(tmpdir(), 'ubml-walk-'));
+    writeFileSync(join(tempDir, 'test.workspace.ubml.yaml'), `ubml: "${SCHEMA_VERSION}"\nname: test\n`);
+    writeFileSync(join(tempDir, 'sources.ubml.yaml'), SOURCES);
+    writeFileSync(join(tempDir, 'insights.ubml.yaml'), INSIGHTS);
+  });
+
+  afterEach(() => {
+    process.chdir(originalCwd);
+    rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  function runUbml(args: string): string {
+    const bin = join(originalCwd, 'dist', 'cli.js');
+    try {
+      return execSync(`node ${bin} ${args}`, { cwd: tempDir, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] });
+    } catch (error: unknown) {
+      const failed = error as { stdout?: string; stderr?: string };
+      return failed.stdout || failed.stderr || '';
+    }
+  }
+
+  describe('who can settle it', () => {
+    it('records the answerer on a claim being deferred', () => {
+      // Deferring without this leaves a question nobody is carrying, which is
+      // how a workspace ends up unable to say what it is waiting on and from
+      // whom.
+      const out = runUbml('walk set IN01000 deferred --to "HGC"');
+
+      expect(out).toContain('HGC');
+      const file = readFileSync(join(tempDir, 'insights.ubml.yaml'), 'utf8');
+      expect(file).toContain('answeredBy: HGC');
+
+      const lines = file.split('\n');
+      const at = lines.findIndex((l) => l.includes('answeredBy:'));
+      expect(lines[at - 1].trim()).toBe('status: deferred');
+    });
+
+    it('says so rather than swallowing it when the element cannot hold one', () => {
+      // An element is a modelling decision; the open question lives on the
+      // claim beneath it.
+      writeFileSync(
+        join(tempDir, 'process.ubml.yaml'),
+        `ubml: "${SCHEMA_VERSION}"
+processes:
+  PR01000:
+    name: A process
+    reviewStatus: proposed
+    derivedFrom: [IN01000]
+`,
+      );
+
+      const out = runUbml('walk set PR01000 rejected --to "HGC"');
+
+      expect(out).toContain('not recorded on an element');
+      expect(readFileSync(join(tempDir, 'process.ubml.yaml'), 'utf8')).not.toContain('HGC');
+    });
+  });
+
+  describe('who settled it', () => {
+    it('writes the reviewer onto a claim that has never carried one', () => {
+      // The delegated walk is the only case --by is for, and on a fresh
+      // extraction nothing carries reviewedBy - so rewriting an existing line
+      // was rewriting a line that is never there.
+      const out = runUbml('walk set IN01000 validated --by "Sam Reviewer"');
+
+      expect(out).toContain('Sam Reviewer');
+      const file = readFileSync(join(tempDir, 'insights.ubml.yaml'), 'utf8');
+      expect(file).toContain('reviewedBy: Sam Reviewer');
+    });
+
+    it('puts it beside the answer it qualifies, inside the right claim', () => {
+      runUbml('walk set IN01000 validated --by "Sam Reviewer"');
+
+      const lines = readFileSync(join(tempDir, 'insights.ubml.yaml'), 'utf8').split('\n');
+      const at = lines.findIndex((l) => l.includes('reviewedBy:'));
+      expect(lines[at - 1].trim()).toBe('status: validated');
+      // And on the claim it was asked about, not the one above it.
+      const owner = lines.slice(0, at).reverse().find((l) => /^\s+IN\d+:/.test(l));
+      expect(owner?.trim()).toBe('IN01000:');
+    });
+
+    it('keeps a name that would otherwise end the document', () => {
+      runUbml('walk set IN01000 validated --by "Doe, Jane: deputy"');
+
+      const file = readFileSync(join(tempDir, 'insights.ubml.yaml'), 'utf8');
+      // Unquoted, the colon would make the rest of the line a nested mapping.
+      expect(file).toContain('reviewedBy: "Doe, Jane: deputy"');
+      // And it still reads back as the name that went in.
+      const parsed = parse(file) as { insights: Record<string, { reviewedBy?: string }> };
+      expect(parsed.insights.IN01000.reviewedBy).toBe('Doe, Jane: deputy');
+    });
+
+    it('replaces a reviewer rather than adding a second', () => {
+      runUbml('walk set IN01000 validated --by "Sam Reviewer"');
+      runUbml('walk set IN01000 disputed --by "Alex Reviewer"');
+
+      const file = readFileSync(join(tempDir, 'insights.ubml.yaml'), 'utf8');
+      expect(file.split('reviewedBy:')).toHaveLength(2);
+      expect((parse(file) as { insights: Record<string, { reviewedBy?: string }> }).insights.IN01000.reviewedBy)
+        .toBe('Alex Reviewer');
+    });
+
+    it('updates a reviewer that carries a comment, and keeps the comment', () => {
+      const insights = join(tempDir, 'insights.ubml.yaml');
+      runUbml('walk set IN01000 validated --by "Doe, Jane: deputy"');
+      writeFileSync(insights, readFileSync(insights, 'utf8').replace(
+        'reviewedBy: "Doe, Jane: deputy"',
+        'reviewedBy: "Doe, Jane: deputy"   # on the call',
+      ));
+
+      runUbml('walk set IN01000 validated --by "Sam Reviewer"');
+      const file = readFileSync(insights, 'utf8');
+
+      expect(file).toContain('    reviewedBy: Sam Reviewer   # on the call\n');
+      expect(file.split('reviewedBy:')).toHaveLength(2);
+    });
+
+    it('records who settled a claim whose id carries a comment', () => {
+      const insights = join(tempDir, 'insights.ubml.yaml');
+      writeFileSync(insights, readFileSync(insights, 'utf8').replace('  IN01000:\n', '  IN01000:   # confirmed by phone\n'));
+
+      runUbml('walk set IN01000 validated --by "Sam Reviewer"');
+      const lines = readFileSync(insights, 'utf8').split('\n');
+      const at = lines.findIndex((l) => l.includes('reviewedBy:'));
+
+      expect(lines[at].trim()).toBe('reviewedBy: Sam Reviewer');
+      expect(lines[at - 1].trim()).toBe('status: validated');
+      expect(lines.filter((l) => l.includes('reviewedBy:'))).toHaveLength(1);
+    });
+
+    it('says so rather than swallowing it when the element cannot hold one', () => {
+      // reviewedBy is an insight's field. An element records the judgement in
+      // reviewStatus and who made it in the commit, so a --by here goes
+      // nowhere and the reviewer has to be told that.
+      writeFileSync(
+        join(tempDir, 'process.ubml.yaml'),
+        `ubml: "${SCHEMA_VERSION}"
+processes:
+  PR01000:
+    name: A process
+    reviewStatus: proposed
+    derivedFrom: [IN01000]
+`,
+      );
+
+      const out = runUbml('walk set PR01000 accepted --by "Sam Reviewer"');
+
+      expect(out).toContain('not recorded on an element');
+      expect(readFileSync(join(tempDir, 'process.ubml.yaml'), 'utf8')).not.toContain('Sam Reviewer');
+    });
+
+    it.each(['123', 'true', 'null', '1e3'])('writes %s so it reads back as the name that went in', (name) => {
+      const out = runUbml(`walk set IN01000 validated --by ${name}`);
+
+      expect(out).toContain(`(${name})`);
+      const file = readFileSync(join(tempDir, 'insights.ubml.yaml'), 'utf8');
+      expect(file).toContain(`reviewedBy: "${name}"`);
+      expect((parse(file) as { insights: Record<string, { reviewedBy?: unknown }> }).insights.IN01000.reviewedBy)
+        .toBe(name);
+    });
+
+    it('says the status was written and the reviewer was not, when only the status could be', () => {
+      const insights = join(tempDir, 'insights.ubml.yaml');
+      writeFileSync(insights, INSIGHTS.replace(
+        '    status: proposed\n    source: SR01000\n',
+        '    status: proposed\n    "reviewedBy": Someone\n    source: SR01000\n',
+      ));
+
+      const result = spawnSync(
+        'node',
+        [join(originalCwd, 'dist', 'cli.js'), 'walk', 'set', 'IN01000', 'validated', '--by', 'Sam Reviewer'],
+        { cwd: tempDir, encoding: 'utf8' },
+      );
+
+      expect(result.status).toBe(1);
+      expect(result.stdout).toContain('IN01000');
+      expect(result.stderr).toContain('The status was written; reviewedBy was not.');
+      expect(result.stderr).not.toContain('Nothing was written');
+      const after = (parse(readFileSync(insights, 'utf8')) as {
+        insights: Record<string, { status?: string; reviewedBy?: string }>;
+      }).insights.IN01000;
+      expect(after.status).toBe('validated');
+      expect(after.reviewedBy).toBe('Someone');
+    });
+  });
+
+  it('takes the earliest source first, not the first id', () => {
+    const out = runUbml('walk next');
+
+    expect(out).toContain('IN01000');
+    expect(out).not.toContain('IN01010');
+    expect(out).toContain('Earlier note');
+  });
+
+  it('shows the source text beside the claim', () => {
+    const out = runUbml('walk next');
+
+    // Both quoted, because both are things the reviewer is asked to agree with.
+    expect(out).toContain('> the verbatim thing someone said');
+    expect(out).toContain('> From the earlier note.');
+  });
+
+  it('quotes what was said and does not quote the reading of it', () => {
+    const out = runUbml('walk next');
+
+    // `context` used to carry the quote, so a reviewer could not tell the
+    // evidence from the extractor's gloss on it, and nothing could check
+    // either against the source.
+    expect(out).toContain('and this is how to read it');
+    expect(out).not.toContain('> and this is how to read it');
+  });
+
+  it('puts the source before the extraction, and the ID last', () => {
+    const out = runUbml('walk next');
+
+    // The rules this replaces used to live in the skill: label both blocks,
+    // evidence before claim, ID last so the reviewer reads before decoding.
+    expect(out.indexOf('> the verbatim thing someone said'))
+      .toBeLessThan(out.indexOf('From the earlier note.'));
+    expect(out.indexOf('From the earlier note.')).toBeLessThan(out.indexOf('IN01000'));
+    expect(out.trimEnd().endsWith('IN01000')).toBe(true);
+  });
+
+  it('leads with position, not identity', () => {
+    const out = runUbml('walk next');
+
+    expect(out).toMatch(/source 1\/2, 1\/1 claims/);
+    expect(out.indexOf('source 1/2')).toBeLessThan(out.indexOf('IN01000'));
+  });
+
+  it('opens a source with what it is and who was there', () => {
+    const out = runUbml('walk next');
+
+    // A name alone left the reviewer nothing to go and check the claim against.
+    expect(out).toContain('claims 1');
+    expect(out).toContain('type document');
+  });
+
+  it('shows every field of the claim, not the handful it once loaded', () => {
+    const out = runUbml('walk next');
+
+    // Tags, links and the note explaining the reading never reached the
+    // reviewer, because the loader did not read them off the file.
+    expect(out).toContain('kind ');
+    expect(out).toContain('confidence ');
+    expect(out).toContain('date ');
+  });
+
+  it('counts as restating only what points back at an earlier source', () => {
+    // `related` links any relationship. Counting all of them reported "13 of 15
+    // restating" on a workspace where almost nothing restated anything.
+    writeFileSync(join(tempDir, 'insights.ubml.yaml'), `ubml: "${SCHEMA_VERSION}"
+insights:
+  IN01000:
+    text: "From the earlier note."
+    kind: decision
+    status: proposed
+    source: SR01000
+    related: [IN01020]
+  IN01010:
+    text: "Restates the earlier note."
+    kind: decision
+    status: proposed
+    source: SR01010
+    related: [IN01000]
+  IN01020:
+    text: "Related to a sibling in the same source."
+    kind: decision
+    status: proposed
+    source: SR01000
+    related: [IN01000]
+`);
+
+    // First source: two insights, neither can restate anything earlier.
+    expect(runUbml('walk next')).not.toContain('restating');
+
+    runUbml('walk set IN01000 validated');
+    runUbml('walk set IN01020 validated');
+
+    // Second source: its one insight points back at the first.
+    expect(runUbml('walk next')).toContain('1 restating');
+  });
+
+  it('moves on once an insight is answered', () => {
+    runUbml('walk set IN01000 validated');
+    const out = runUbml('walk next');
+
+    expect(out).toContain('IN01010');
+  });
+
+  it('moves on from a claim the reviewer deferred', () => {
+    // Deferring is an answer. Left as proposed, a claim nobody can settle is
+    // offered again every time and the walk cannot get past it.
+    runUbml('walk set IN01000 deferred');
+    const out = runUbml('walk next');
+
+    expect(out).toContain('IN01010');
+    expect(out).not.toContain('IN01000');
+  });
+
+  it('changes one line and leaves the rest of the file alone', () => {
+    const before = readFileSync(join(tempDir, 'insights.ubml.yaml'), 'utf8');
+
+    runUbml('walk set IN01000 validated');
+    const after = readFileSync(join(tempDir, 'insights.ubml.yaml'), 'utf8');
+
+    const changed = before.split('\n')
+      .map((line, i) => [line, after.split('\n')[i]])
+      .filter(([a, b]) => a !== b);
+
+    expect(changed).toHaveLength(1);
+    expect(changed[0][1]).toContain('validated');
+    expect(after).toContain('# hand-written, and it should stay that way');
+  });
+
+  it('round-trips back to the original bytes', () => {
+    const before = readFileSync(join(tempDir, 'insights.ubml.yaml'), 'utf8');
+
+    runUbml('walk set IN01000 validated');
+    runUbml('walk set IN01000 proposed');
+
+    expect(readFileSync(join(tempDir, 'insights.ubml.yaml'), 'utf8')).toBe(before);
+  });
+
+  it('refuses a status the enum does not have', () => {
+    const out = runUbml('walk set IN01000 invalidated');
+
+    expect(out).not.toContain('→');
+    expect(readFileSync(join(tempDir, 'insights.ubml.yaml'), 'utf8')).toContain('status: proposed');
+  });
+
+  describe('the element half of a bundle', () => {
+    beforeEach(() => {
+      writeFileSync(join(tempDir, 'actors.ubml.yaml'), `ubml: "${SCHEMA_VERSION}"
+actors:
+  AC01000:
+    name: Someone the claim implies
+    type: role
+    kind: human
+    reviewStatus: proposed
+    derivedFrom: [IN01000]
+`);
+    });
+
+    it('shows the element the claim would create', () => {
+      const out = runUbml('walk next');
+
+      // Reviewing the claim without it approves the extraction and leaves the
+      // interpretation unasked.
+      expect(out).toContain('Model Update');
+      expect(out).toContain('actor');
+      // Named, not numbered: an id tells a reviewer nothing about whether the
+      // element is right.
+      expect(out).toContain('Someone the claim implies');
+    });
+
+    it('records the element with its own vocabulary', () => {
+      runUbml('walk set AC01000 accepted');
+
+      expect(readFileSync(join(tempDir, 'actors.ubml.yaml'), 'utf8'))
+        .toContain('reviewStatus: accepted');
+    });
+
+    it('refuses an insight status on an element', () => {
+      runUbml('walk set AC01000 validated');
+
+      expect(readFileSync(join(tempDir, 'actors.ubml.yaml'), 'utf8'))
+        .toContain('reviewStatus: proposed');
+    });
+
+    it('counts the elements left, not the insights', () => {
+      // On a workspace whose claims were settled before reviewStatus existed,
+      // reporting the insight backlog leaves the number unmoved and the command
+      // reads as though it did nothing.
+      const out = runUbml('walk set AC01000 accepted');
+
+      expect(out).toContain('elements awaiting review');
+      expect(out).not.toContain('insights still proposed');
+    });
+
+    it('lets a reviewer change their mind after accepting', () => {
+      runUbml('walk set AC01000 accepted');
+      runUbml('walk set AC01000 rejected');
+
+      expect(readFileSync(join(tempDir, 'actors.ubml.yaml'), 'utf8'))
+        .toContain('reviewStatus: rejected');
+    });
+
+    it('stops offering it once answered', () => {
+      runUbml('walk set AC01000 accepted');
+
+      expect(runUbml('walk next')).not.toContain('Model Update');
+    });
+
+    it('updates a reviewStatus that carries a comment, and keeps the comment', () => {
+      const actors = join(tempDir, 'actors.ubml.yaml');
+      writeFileSync(actors, readFileSync(actors, 'utf8').replace(
+        'reviewStatus: proposed',
+        'reviewStatus: proposed # agreed in the kickoff?',
+      ));
+
+      runUbml('walk set AC01000 accepted');
+      const after = readFileSync(actors, 'utf8');
+
+      expect(after).toContain('    reviewStatus: accepted # agreed in the kickoff?\n');
+      expect(after.split('reviewStatus:')).toHaveLength(2);
+    });
+
+    it('finds an element whose id carries a comment', () => {
+      const actors = join(tempDir, 'actors.ubml.yaml');
+      writeFileSync(actors, readFileSync(actors, 'utf8').replace('  AC01000:\n', '  AC01000:   # confirmed by phone\n'));
+
+      const out = runUbml('walk set AC01000 accepted');
+      const after = readFileSync(actors, 'utf8');
+
+      expect(out).toContain('→');
+      expect(after).toContain('  AC01000:   # confirmed by phone\n');
+      expect(after).toContain('    reviewStatus: accepted\n');
+    });
+
+    it('reads past comments under an element, deeper than its fields or at the margin', () => {
+      const actors = join(tempDir, 'actors.ubml.yaml');
+      writeFileSync(actors, readFileSync(actors, 'utf8').replace(
+        '  AC01000:\n',
+        '  AC01000:\n        # deeper than the fields\n# at the margin\n',
+      ));
+
+      const out = runUbml('walk set AC01000 accepted');
+      const after = readFileSync(actors, 'utf8');
+
+      expect(out).toContain('→');
+      expect(after).toContain('    reviewStatus: accepted\n');
+      expect((parse(after) as { actors: Record<string, { reviewStatus: string }> }).actors.AC01000.reviewStatus).toBe('accepted');
+    });
+
+    it('does not call the walk finished while an element still awaits review', () => {
+      runUbml('walk set IN01000 validated');
+      runUbml('walk set IN01010 disputed');
+
+      const out = runUbml('walk next');
+
+      expect(out).not.toContain('finished');
+      expect(out).toContain('AC01000');
+    });
+
+    it('says when an accepted element rests on a claim nobody validated', () => {
+      expect(runUbml('walk set AC01000 accepted'))
+        .toContain('"AC01000" is accepted and rests on "IN01000", which is proposed');
+    });
+
+    it('says nothing more once that claim is validated', () => {
+      runUbml('walk set IN01000 validated');
+
+      expect(runUbml('walk set AC01000 accepted')).not.toContain('is accepted and rests');
+    });
+  });
+
+  describe('an element that cites no claim', () => {
+    beforeEach(() => {
+      writeFileSync(join(tempDir, 'actors.ubml.yaml'), `ubml: "${SCHEMA_VERSION}"
+actors:
+  AC01000:
+    name: Someone nobody quoted
+    type: role
+    kind: human
+    reviewStatus: proposed
+`);
+      writeFileSync(join(tempDir, 'process.ubml.yaml'), `ubml: "${SCHEMA_VERSION}"
+processes:
+  PR01000:
+    name: A process
+    steps:
+      ST01000:
+        name: A step nobody quoted
+        kind: action
+        reviewStatus: proposed
+        derivedFrom: []
+`);
+    });
+
+    it('still awaits review once every claim is answered', () => {
+      runUbml('walk set IN01000 validated');
+      runUbml('walk set IN01010 validated');
+
+      const out = runUbml('walk next');
+
+      expect(out).not.toContain('finished');
+      expect(out).toContain('AC01000');
+      expect(out).toContain('ST01000');
+    });
+
+    it('awaits review in a workspace with nothing extracted yet', () => {
+      writeFileSync(join(tempDir, 'insights.ubml.yaml'), `ubml: "${SCHEMA_VERSION}"\ninsights: {}\n`);
+
+      const out = runUbml('walk next');
+
+      expect(out).toContain('AC01000');
+      expect(out).toContain('ST01000');
+    });
+
+    it('awaits review beside claims the walk cannot place', () => {
+      writeFileSync(join(tempDir, 'sources.ubml.yaml'), `ubml: "${SCHEMA_VERSION}"\nsources: {}\n`);
+
+      const out = runUbml('walk next');
+
+      expect(out).toContain('IN01000 cites SR01000');
+      expect(out).toContain('AC01000');
+      expect(out).toContain('ST01000');
+    });
+
+    it('can be answered, and says what its acceptance rests on', () => {
+      const accepted = runUbml('walk set AC01000 accepted');
+      runUbml('walk set ST01000 rejected');
+
+      expect(accepted).toContain('"AC01000" is accepted and cites no insight');
+      expect(readFileSync(join(tempDir, 'actors.ubml.yaml'), 'utf8')).toContain('    reviewStatus: accepted\n');
+      expect(readFileSync(join(tempDir, 'process.ubml.yaml'), 'utf8')).toContain('        reviewStatus: rejected\n');
+    });
+  });
+
+  describe('an element that contains other elements', () => {
+    // A process holds steps and each of them carries the same field. The
+    // process's own sits after them here, which is where anyone writing YAML by
+    // hand puts it.
+    beforeEach(() => {
+      writeFileSync(join(tempDir, 'process.ubml.yaml'), `ubml: "${SCHEMA_VERSION}"
+processes:
+  PR01000:
+    name: A process the claim implies
+    steps:
+      ST01000:
+        name: A step inside it
+        kind: action
+        reviewStatus: proposed
+        derivedFrom: [IN01000]
+    reviewStatus: proposed
+    derivedFrom: [IN01000]
+`);
+    });
+
+    it('records the answer against the id it was given', () => {
+      runUbml('walk set PR01000 accepted');
+      const after = readFileSync(join(tempDir, 'process.ubml.yaml'), 'utf8');
+
+      // Read by position, because both lines say the same thing.
+      const [step, process] = after.split('reviewStatus: ').slice(1).map((s) => s.split('\n')[0]);
+      expect(step).toBe('proposed');
+      expect(process).toBe('accepted');
+    });
+
+    it('leaves a nested element to be answered by its own id', () => {
+      runUbml('walk set PR01000 accepted');
+      runUbml('walk set ST01000 accepted');
+      const after = readFileSync(join(tempDir, 'process.ubml.yaml'), 'utf8');
+
+      expect(after.split('reviewStatus: accepted').length - 1).toBe(2);
+    });
+  });
+
+  it('reports when nothing is left', () => {
+    runUbml('walk set IN01000 validated');
+    runUbml('walk set IN01010 disputed');
+
+    expect(runUbml('walk next')).toContain('finished');
+  });
+
+  it('says to extract a source only when nothing has been extracted', () => {
+    writeFileSync(join(tempDir, 'insights.ubml.yaml'), `ubml: "${SCHEMA_VERSION}"\ninsights: {}\n`);
+
+    expect(runUbml('walk next')).toContain('No insights to walk');
+  });
+
+  describe('a claim the walk cannot place', () => {
+    const UNPLACED = `
+  IN01020:
+    text: "Written down with no source."
+    status: proposed
+
+  IN01030:
+    text: "Citing a source nobody registered."
+    status: proposed
+    source: SR09999
+`;
+
+    beforeEach(() => {
+      writeFileSync(join(tempDir, 'insights.ubml.yaml'), INSIGHTS + UNPLACED);
+    });
+
+    it('is listed once the sourced claims are done, rather than the walk called finished', () => {
+      runUbml('walk set IN01000 validated');
+      runUbml('walk set IN01010 validated');
+
+      const out = runUbml('walk next');
+
+      expect(out).not.toContain('finished');
+      expect(out).toContain('IN01020 cites no source');
+      expect(out).toContain('IN01030 cites SR09999');
+    });
+
+    it('is listed when no claim cites a source the workspace defines', () => {
+      writeFileSync(join(tempDir, 'sources.ubml.yaml'), `ubml: "${SCHEMA_VERSION}"\nsources: {}\n`);
+
+      const out = runUbml('walk next');
+
+      expect(out).not.toContain('No insights to walk');
+      for (const id of ['IN01000', 'IN01010', 'IN01020', 'IN01030']) expect(out).toContain(id);
+    });
+
+    it('can be settled, and then the walk is finished', () => {
+      for (const id of ['IN01000', 'IN01010', 'IN01020', 'IN01030']) runUbml(`walk set ${id} validated`);
+
+      expect(runUbml('walk next')).toContain('finished');
+    });
+  });
+
+  it('names a file it cannot parse instead of reading it as empty', () => {
+    writeFileSync(join(tempDir, 'insights.ubml.yaml'), INSIGHTS.replace(
+      '    status: proposed\n    source: SR01000',
+      '    status: proposed\n    status: validated\n    source: SR01000',
+    ));
+
+    const out = runUbml('walk next');
+
+    expect(out).toContain('insights.ubml.yaml');
+    expect(out).toContain('Map keys must be unique');
+    expect(out).not.toContain('No insights to walk');
+  });
+
+  it('updates a status that carries a comment, and keeps the comment', () => {
+    writeFileSync(join(tempDir, 'insights.ubml.yaml'), INSIGHTS.replace(
+      '    status: proposed\n    source: SR01000',
+      '    status: proposed   # waiting on the reviewer\n    source: SR01000',
+    ));
+
+    runUbml('walk set IN01000 validated');
+    const after = readFileSync(join(tempDir, 'insights.ubml.yaml'), 'utf8');
+
+    expect(after).toContain('    status: validated   # waiting on the reviewer\n');
+    expect(after.split('status:')).toHaveLength(3);
+  });
+
+  it('finds a claim whose id carries a comment', () => {
+    writeFileSync(join(tempDir, 'insights.ubml.yaml'), INSIGHTS.replace(
+      '  IN01000:\n',
+      '  IN01000:   # confirmed by phone\n',
+    ));
+
+    const out = runUbml('walk set IN01000 validated');
+
+    expect(out).toContain('→');
+    expect(readFileSync(join(tempDir, 'insights.ubml.yaml'), 'utf8')).toContain('  IN01000:   # confirmed by phone\n');
+    expect(runUbml('walk next')).toContain('IN01010');
+  });
+
+  it('reads past a comment line inside a claim', () => {
+    writeFileSync(join(tempDir, 'insights.ubml.yaml'), INSIGHTS.replace(
+      '    kind: decision\n',
+      '    kind: decision\n# checked against the recording\n  # and again on the call\n',
+    ));
+
+    const out = runUbml('walk set IN01000 validated');
+    const after = readFileSync(join(tempDir, 'insights.ubml.yaml'), 'utf8');
+
+    expect(out).toContain('→');
+    expect(after).toContain('  # and again on the call\n    status: validated\n');
+    expect((parse(after) as { insights: Record<string, { status: string }> }).insights.IN01000.status).toBe('validated');
+  });
+
+  it('takes an id as written, whatever characters it carries', () => {
+    writeFileSync(join(tempDir, 'insights.ubml.yaml'), INSIGHTS.replace('  IN01000:\n', '  IN0100[:\n'));
+
+    const out = runUbml('walk set "IN0100[" validated');
+    const after = readFileSync(join(tempDir, 'insights.ubml.yaml'), 'utf8');
+
+    expect(out).toContain('→');
+    expect((parse(after) as { insights: Record<string, { status: string }> }).insights['IN0100['].status).toBe('validated');
+  });
+
+  it.each([
+    ['a block scalar', '    status: >-\n      proposed\n', 'runs on past its own line'],
+    ['a value on the next line', '    status:\n      proposed\n', 'runs on past its own line'],
+    ['a quoted key', '    "status": proposed\n', 'which this does not rewrite'],
+    ['a space before the colon', '    status : proposed\n', 'which this does not rewrite'],
+  ])('refuses a status written as %s, says why, and leaves the file as it was', (_, written, why) => {
+    const before = INSIGHTS.replace('    kind: decision\n    status: proposed\n', `    kind: decision\n${written}`);
+    writeFileSync(join(tempDir, 'insights.ubml.yaml'), before);
+
+    const out = runUbml('walk set IN01000 validated');
+    const after = readFileSync(join(tempDir, 'insights.ubml.yaml'), 'utf8');
+
+    expect(out).not.toContain('→');
+    expect(out).toContain('IN01000');
+    expect(out).toContain(why);
+    expect(out).toContain('Nothing was written');
+    expect(after).toBe(before);
+    expect((parse(after) as { insights: Record<string, { status: string }> }).insights.IN01000.status).toBe('proposed');
+  });
+
+  it.each([
+    [
+      'an anchor an alias further down still names',
+      'IN01010',
+      (text: string) => text
+        .replace('    status: proposed\n    source: SR01010\n', '    status: &open proposed\n    source: SR01010\n')
+        .replace('    status: proposed\n    source: SR01000\n', '    status: *open\n    source: SR01000\n'),
+    ],
+    [
+      'an anchor shadowing another of the same name',
+      'IN01000',
+      (text: string) => text
+        .replace('    text: "From the earlier note."\n', '    text: &said "From the earlier note."\n')
+        .replace('    status: proposed\n    source: SR01000\n', '    status: &said proposed\n    source: SR01000\n    notes: *said\n'),
+    ],
+    [
+      'a line added under a block that keeps its trailing newlines',
+      'IN01010',
+      (text: string) => text.replace(
+        '    status: proposed\n    source: SR01010\n    confidence: 0.8\n',
+        '    source: SR01010\n    confidence: 0.8\n    notes: |+\n      kept as written\n',
+      ),
+    ],
+  ])('refuses a rewrite that would change more than the status, through %s', (_, id, edit) => {
+    const before = edit(INSIGHTS);
+    expect(before).not.toBe(INSIGHTS);
+    writeFileSync(join(tempDir, 'insights.ubml.yaml'), before);
+
+    const out = runUbml(`walk set ${id} validated`);
+
+    expect(out).toContain(`Rewriting ${id}'s status would`);
+    expect(out).toContain('Nothing was written');
+    expect(readFileSync(join(tempDir, 'insights.ubml.yaml'), 'utf8')).toBe(before);
+  });
+
+  it('reads past a comment at the margin rather than add a second status', () => {
+    writeFileSync(join(tempDir, 'insights.ubml.yaml'), INSIGHTS.replace(
+      '    kind: decision\n    status: proposed',
+      '    kind: decision\n# checked against the recording\n    status: proposed',
+    ));
+
+    runUbml('walk set IN01000 validated');
+    const after = readFileSync(join(tempDir, 'insights.ubml.yaml'), 'utf8');
+
+    expect(after).toContain('# checked against the recording\n    status: validated\n');
+    expect(after.split('status:')).toHaveLength(3);
+    expect(runUbml('walk next')).toContain('IN01010');
+  });
+
+  it('says a claim has no quote rather than search its context for one', () => {
+    writeFileSync(join(tempDir, 'later-meeting.md'), 'From the later meeting, word for word.\n');
+    writeFileSync(join(tempDir, 'sources.ubml.yaml'), SOURCES.replace(
+      '    type: meeting\n',
+      '    type: meeting\n    file: later-meeting.md\n',
+    ));
+    writeFileSync(join(tempDir, 'insights.ubml.yaml'), INSIGHTS.replace(
+      '    confidence: 0.8\n',
+      '    confidence: 0.8\n    context: "said in passing"\n',
+    ));
+
+    const out = runUbml('walk context IN01010');
+
+    expect(out).toContain('no quote recorded');
+    expect(out).not.toContain('not found');
+  });
+});

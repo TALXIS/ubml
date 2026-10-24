@@ -34,7 +34,7 @@ description: |
 x-ubml-cli:
   category: advanced
   categoryDisplayName: "Advanced"
-  workflowOrder: 11
+  workflowOrder: 13
   shortDescription: "Define relationships between steps across processes."
   defaultFilename: "cross-process"
   detectBy:

@@ -38,7 +38,7 @@ description: |
 x-ubml-cli:
   category: knowledge
   categoryDisplayName: "Knowledge"
-  workflowOrder: 15
+  workflowOrder: 2
   shortDescription: "Catalog of knowledge sources — interviews, meetings, documents, surveys."
   defaultFilename: "sources"
   detectBy:

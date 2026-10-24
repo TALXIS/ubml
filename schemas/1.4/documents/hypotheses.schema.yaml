@@ -37,7 +37,7 @@ description: |
 x-ubml-cli:
   category: analysis
   categoryDisplayName: "Analysis & Planning"
-  workflowOrder: 6
+  workflowOrder: 8
   shortDescription: "Define hypothesis trees for structured problem framing."
   defaultFilename: "solution"
   detectBy:
